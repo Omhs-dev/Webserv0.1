@@ -18,9 +18,9 @@ class Socket
 		virtual int connect_network(int sock, struct sockaddr_in address) = 0;
 		
 		void check_connection(int);
+		
 		struct sockaddr_in get_address();
 		int get_socket();
 		int get_connection();
-		// ~Socket();
 		void set_connection(int con);
 };

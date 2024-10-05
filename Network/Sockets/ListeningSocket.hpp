@@ -1,5 +1,9 @@
 #pragma once
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <iostream>
+#include <stdio.h>
 #include "BindingSocket.hpp"
 
 class ListeningSocket: public BindingSocket
@@ -12,5 +16,5 @@ class ListeningSocket: public BindingSocket
 		ListeningSocket(int domain, int service, int protocol, int port, u_long interf, int bklog);
 		// ~ListeningSocket();
 
-		void start_listening();
+		void start_listening(int sock, int backlog);
 };

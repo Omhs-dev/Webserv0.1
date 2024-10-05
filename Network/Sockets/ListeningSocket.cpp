@@ -4,11 +4,11 @@ ListeningSocket::ListeningSocket(int domain, int service, int protocol, int port
 				:BindingSocket(domain, service, protocol, port, interf)
 {
 	_backlog = bklog;
-	start_listening();
-	check_connection(_listening);
+	start_listening(get_socket(), _backlog);
+	check_connection(get_connection());
 }
 
-void ListeningSocket::start_listening()
+void ListeningSocket::start_listening(int sock, int backlog)
 {
-	_listening = listen(get_connection(), _backlog);
+	_listening = listen(sock, _backlog);
 }
