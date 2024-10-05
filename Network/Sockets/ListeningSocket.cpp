@@ -10,5 +10,5 @@ ListeningSocket::ListeningSocket(int domain, int service, int protocol, int port
 
 void ListeningSocket::start_listening(int sock, int backlog)
 {
-	_listening = listen(sock, _backlog);
+	_listening = listen(sock, backlog);
 }

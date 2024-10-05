@@ -9,7 +9,7 @@
 class TestServer: public Server
 {
 	private:
-		char _buffer[30000] = {0};
+		char _buffer[30000];
 		int _new_socket;
 		void accepter();
 		void handler();

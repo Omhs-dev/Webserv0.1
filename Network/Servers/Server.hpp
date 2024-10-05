@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "../headerNetwork.hpp"
+#include "../Sockets/headerSocket.hpp"
 
 class Server
 {
