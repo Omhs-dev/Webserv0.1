@@ -14,7 +14,7 @@ class ListeningSocket: public BindingSocket
 		
 	public:
 		ListeningSocket(int domain, int service, int protocol, int port, u_long interf, int bklog);
-		// ~ListeningSocket();
+		virtual ~ListeningSocket();  
 
 		void start_listening(int sock, int backlog);
 };

@@ -4,13 +4,15 @@ CC = c++
 FLAGS = -Wall -Wextra -Werror -std=c++98
 INCLUDES = -I./includes
 
-SRCS = ./Network/main.cpp \
+SRCS =  main.cpp \
 		./Network/Servers/Server.cpp \
 		./Network/Servers/TestServer.cpp \
 		./Network/Sockets/BindingSocket.cpp \
 		./Network/Sockets/ConnectingSocket.cpp \
 		./Network/Sockets/ListeningSocket.cpp \
-		./Network/Sockets/Socket.cpp
+		./Network/Sockets/Socket.cpp \
+		./Network/Parse/ConfigParser.cpp \
+		./Network/Parse/ConfigUtils.cpp
 
 OBJS_DIR = .objs
 

@@ -8,6 +8,10 @@ ListeningSocket::ListeningSocket(int domain, int service, int protocol, int port
 	check_connection(get_connection());
 }
 
+ListeningSocket::~ListeningSocket() {
+    // Destructor body: You can clean up resources here if needed
+}
+
 void ListeningSocket::start_listening(int sock, int backlog)
 {
 	_listening = listen(sock, backlog);

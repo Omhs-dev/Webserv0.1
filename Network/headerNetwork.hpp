@@ -4,5 +4,6 @@
 
 #include "Sockets/headerSocket.hpp"
 #include "Servers/headerServers.hpp"
+#include "Parse/headerParse.hpp"
 
 #endif
