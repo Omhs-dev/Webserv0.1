@@ -5,7 +5,15 @@
 #include <iostream>
 
 using namespace std;
-
+/*
+	Create a socket
+	Bind the socket to an address IP and port
+	Listen for incoming connections
+	Accept incoming connections
+	Close the listening socket
+	While receiving, display the message
+	close socket
+*/
 class Socket
 {
 	private:
