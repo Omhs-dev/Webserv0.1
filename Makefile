@@ -1,39 +1,26 @@
 NAME = webserv
 
-CC = c++
-FLAGS = -Wall -Wextra -Werror -std=c++98
-INCLUDES = -I./includes
+CXX = c++
+CXXFLAGS = -std=c++11 -Wall -Wextra -Werror
+SRCS =  src/main.cpp \
+		src/Server.cpp \
+		src/Socket.cpp \
+		src/HTTPRequest.cpp \
+		src/HTTPResponse.cpp \
+		src/ConfigParser.cpp
+OBJS = $(SRCS:.cpp=.o)
 
-SRCS =  main.cpp \
-		./Network/Servers/Server.cpp \
-		./Network/Servers/TestServer.cpp \
-		./Network/Sockets/BindingSocket.cpp \
-		./Network/Sockets/ConnectingSocket.cpp \
-		./Network/Sockets/ListeningSocket.cpp \
-		./Network/Sockets/Socket.cpp \
-		./Network/Parse/ConfigParser.cpp \
-		./Network/Parse/ConfigUtils.cpp
-
-OBJS_DIR = .objs
-
-OBJS = $(patsubst ./Network/%.cpp, $(OBJS_DIR)/%.o, $(SRCS))
+INCLUDES = -I include
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(FLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
-
-$(OBJS_DIR)/%.o: ./Network/%.cpp
-	# Create necessary directories (including subdirectories)
-	@mkdir -p $(dir $@)
-	$(CC) $(FLAGS) $(INCLUDES) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
 clean:
-	rm -rf $(OBJS_DIR)
+	rm -rf $(OBJS)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -rf $(NAME)
 
 re: fclean all
-
-.PHONY: all clean fclean re

@@ -1,1 +1,0 @@
-console.log("I'm the index.js file in the www directory");
