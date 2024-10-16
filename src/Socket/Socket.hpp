@@ -13,7 +13,7 @@ public:
 
     void create();
     void bind(int port);
-    void listen(int backlog = 10);
+    void listen(int backlog);
     void setNonBlocking();
     int acceptConnection();
     int getSocketFd() const;

@@ -3,11 +3,13 @@ NAME = webserv
 CXX = c++
 CXXFLAGS = -std=c++11 -Wall -Wextra -Werror
 SRCS =  src/main.cpp \
-		src/Server.cpp \
-		src/Socket.cpp \
-		src/HTTPRequest.cpp \
-		src/HTTPResponse.cpp \
-		src/ConfigParser.cpp
+		src/Server/Server.cpp \
+		src/Server/Client.cpp \
+		src/Socket/Socket.cpp \
+		src/Request/HTTPRequest.cpp \
+		src/Response/HTTPResponse.cpp \
+		src/Parse/ConfigParser.cpp 
+		# src/Parse/ConfigUtils.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 INCLUDES = -I include
