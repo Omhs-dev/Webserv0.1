@@ -24,6 +24,15 @@ void Client::handleRequest() {
         HTTPResponse response;
         if (request.getMethod() == "GET") {
             std::string filePath = request.getPath();  // Example: map to server's file system
+            
+            // - this part is to be modified
+            if (filePath == "/" || filePath.back() == '/') {
+				filePath += "index.html";  // Example: map / to index.html
+			}
+            
+            filePath = "./www" + filePath;  // Example: prepend www root directory
+            // -
+            
             response = HTTPResponse::fromFile(filePath);  // Generate response from the file
         } else {
             // Handle other HTTP methods or errors (e.g., 405 Method Not Allowed)
@@ -38,6 +47,8 @@ void Client::handleRequest() {
 
     close(clientSocket);  // Close the connection after sending the response
 }
+
+// create a function handleResponse() that will handle the response
 
 void Client::sendResponse(const std::string& response) {
     write(clientSocket, response.c_str(), response.size());

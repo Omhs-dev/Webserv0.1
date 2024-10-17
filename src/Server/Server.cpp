@@ -67,6 +67,7 @@ void Server::run() {
     }
 }
 
+// Handle a new connection on the server socket
 void Server::handleNewConnection() {
     sockaddr_in clientAddr;
     socklen_t clientAddrLen = sizeof(clientAddr);

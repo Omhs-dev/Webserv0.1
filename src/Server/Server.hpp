@@ -42,18 +42,19 @@
 #include "../Socket/Socket.hpp"
 
 class Server {
-public:
-    Server(const ServerConfig& config);
-    void run();
+	private:
+	    Socket _serverSocket;
+	    ServerConfig serverConfigs;
+	    int serverSocket;
+	    std::vector<pollfd> pollfds;
+	
+	    void handleNewConnection();
+	    void handleClient(int client_fd);
 
-private:
-    Socket _serverSocket;
-    ServerConfig serverConfigs;
-    int serverSocket;
-    std::vector<pollfd> pollfds;
+	public:
+	    Server(const ServerConfig& config);
+	    void run();
 
-    void handleNewConnection();
-    void handleClient(int client_fd);
 };
 
 #endif
