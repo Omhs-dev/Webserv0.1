@@ -6,3 +6,4 @@
 
 // -> next
 	Parse request
+// create a function to handle get, post, delete

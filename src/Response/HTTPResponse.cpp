@@ -40,5 +40,5 @@ void HTTPResponse::buildResponse() {
 }
 
 std::string HTTPResponse::getData() const {
-    return headers + body;
+    return headers;
 }

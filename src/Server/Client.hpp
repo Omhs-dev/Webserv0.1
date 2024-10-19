@@ -2,16 +2,36 @@
 #define CLIENT_HPP
 
 #include <string>
+#include <unistd.h>
+#include <iostream>
 
-class Client {
-public:
-    Client(int clientSocket);
-    void handleRequest();
-    ~Client();
+#include "../header.hpp"
 
-private:
-    int clientSocket;
-    void sendResponse(const std::string& response);
+#define MAX_BUFFER_SIZE 1024
+
+class Client
+{
+	private:
+	    int clientSocket;
+	    HTTPRequest _request;
+	    HTTPResponse _response;
+	    void sendResponse(const std::string& response);
+
+	public:
+	    Client(int clientSocket);
+	    void clientConnectionProcess();
+	    void handleRequest();
+	    void handleResponse();
+	    ~Client();
+
+		class ClientException : public std::exception
+		{
+			public:
+			    virtual const char* what() const throw()
+			    {
+			        return "Client is disconnected";
+			    }
+		};
 };
 
 #endif

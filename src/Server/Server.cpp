@@ -90,8 +90,10 @@ void Server::handleNewConnection() {
 
 void Server::handleClient(int client_fd) {
     Client client(client_fd);  // Create a client object to handle the connection
-    client.handleRequest();    // Process the client's request
-
+    // client.handleRequest();    // Process the client's request
+    // client.handleResponse();   // Generate and send a response to the client
+    // close(client_fd);		  // Close the connection after sending the response
+	client.clientConnectionProcess();
     // After handling the client, remove it from the pollfd set
     for (size_t i = 0; i < pollfds.size(); ++i) {
 		if (pollfds[i].fd == client_fd) {

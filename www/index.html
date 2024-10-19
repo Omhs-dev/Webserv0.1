@@ -1,15 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webserver</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>WebServ</title>
+    <style>
+        body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.container {
+  text-align: center;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  border-radius: 5px;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+    </style>
+  </head>
+  <body>
     <div class="container">
-        <h1 id="welcome-message">Welcome to webserver</h1>
+      <h1>Welcome On Our WebServer page</h1>
+
+      <div class="button-container">
+        <form action="/pages/get.html" method="get">
+          <button type="submit">GET Request</button>
+        </form>
+
+        <form action="/pages/post.html" method="get">
+          <input type="hidden" value="some_data" />
+          <button type="submit">POST Request</button>
+        </form>
+
+        <form action="/pages/delete.html" method="get">
+          <input type="hidden" name="_method" value="delete" />
+          <button type="submit">DELETE Request</button>
+        </form>
+
+        <form action="/pages/cgi.html" method="get">
+          <input type="hidden" name="_method" value="cgi" />
+          <button type="submit">CGI Request</button>
+        </form>
+      </div>
     </div>
-    <script src="script.js"></script>
-</body>
+    
+    <script src"script.js">
+  </body>
 </html>

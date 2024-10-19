@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cgi post Request</title>
+    <link rel="stylesheet" href="../style.css">
+  </head>
+  <body>
+    <div class="container">
+        <h2>CGI Post Request Page</h2>
+        <form action="../cgi-bin/get_post_cgi.py" method="post">
+            Username: <input type="text" name="username" />
+            <br />
+            Email Address: <input type="email" name="emailaddress" />
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</html>
