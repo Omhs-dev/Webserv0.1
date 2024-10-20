@@ -18,13 +18,8 @@ int main(int argc, char* argv[]) {
         HTTPConfigs configs = parser.getHTTPConfigs();
 
         // Loop through all the server configs and start the servers
-        int serverCount = 0;
-        for (const ServerConfig& config : configs._servers) {
-            serverCount++;
-            std::cout << "server number " << serverCount << std::endl;
-            Server server(config);
-            server.run();  // Start the server (this could run in a separate thread if you want)
-        }
+        Server server(configs);
+        server.run();
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;

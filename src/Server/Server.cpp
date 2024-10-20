@@ -1,21 +1,3 @@
-// #include "Server.hpp"
-// // Server.cpp
-// #include <fstream>
-// #include <sstream>
-// #include <unistd.h>
-// #include <iostream>
-
-// Server::Server(int port, const std::vector<Location>& locations) : _locations(locations) {
-//     _serverSocket.create();
-//     _serverSocket.bind(port);
-//     _serverSocket.listen(10);
-//     _serverSocket.setNonBlocking();
-    
-//     pollfd serverPollFd;
-//     serverPollFd.fd = _serverSocket.getSocketFd();
-//     serverPollFd.events = POLLIN;
-//     _pollfds.push_back(serverPollFd);
-// }
 #include "Server.hpp"
 #include "Client.hpp"
 #include "../Request/HTTPRequest.hpp"
@@ -25,23 +7,29 @@
 #include <fcntl.h>
 #include <iostream>
 
-Server::Server(const ServerConfig& config) : serverConfigs(config) {
-    // Create and configure the server socket
-    _serverSocket.create();
-    _serverSocket.bind(std::stoi(config._listen));
-    _serverSocket.listen(10);
-    _serverSocket.setNonBlocking();
+Server::Server(const HTTPConfigs& config) : _httpConfigs(config)
+{
+	for (auto &serverConfig : config._servers)
+	{
+	    _socketObject.create();
+	    _socketObject.bind(std::stoi(serverConfig._listen));
+	    _socketObject.listen(30);
+	    _socketObject.setNonBlocking();
+		
+		std::cout << "Server name: " << serverConfig._serverName << std::endl;
+		std::cout << "Server listening on port: " << serverConfig._listen << std::endl;
+		std::cout << "Server root directory: " << serverConfig._root << std::endl;
+		std::cout << "Server index file: " << serverConfig._index << std::endl;
 	
-	std::cout << "Server name: " << config._serverName << std::endl;
-	std::cout << "Server listening on port: " << config._listen << std::endl;
-	std::cout << "Server root directory: " << config._root << std::endl;
-	std::cout << "Server index file: " << config._index << std::endl;
-
-    // Add the server socket to the pollfd set
-    pollfd serverPollFd;
-    serverPollFd.fd = _serverSocket.getSocketFd();
-    serverPollFd.events = POLLIN;  // We're interested in reading new connections
-    pollfds.push_back(serverPollFd);
+	    // Add the server socket to the pollfd set
+	    pollfd serverPollFd;
+	    serverPollFd.fd = _socketObject.getSocketFd();
+	    serverPollFd.events = POLLIN;  // We're interested in reading new connections
+	    pollfds.push_back(serverPollFd);
+	    
+	    _serverSockets.push_back(_socketObject.getSocketFd());
+	}
+    // Create and configure the server socket
 }
 
 void Server::run() {
@@ -56,22 +44,22 @@ void Server::run() {
         for (size_t i = 0; i < pollfds.size(); ++i) {
             if (pollfds[i].revents & POLLIN) {
                 // Check if it's a new connection on the server socket
-                if (pollfds[i].fd == _serverSocket.getSocketFd()) {
-                    handleNewConnection();
-                } else {
-                    // Handle incoming data from existing clients
-                    handleClient(pollfds[i].fd);
-                }
+                if (_serverSockets.size() > 0 && pollfds[i].fd == _serverSockets[i]) {
+					handleNewConnection(_serverSockets[i]);
+				} else {
+					// Otherwise, it's a client connection
+					handleClient(pollfds[i].fd);
+				}
             }
         }
     }
 }
 
 // Handle a new connection on the server socket
-void Server::handleNewConnection() {
-    sockaddr_in clientAddr;
+void Server::handleNewConnection(int server_fd) {
+    sockaddr_in clientAddr{};
     socklen_t clientAddrLen = sizeof(clientAddr);
-    int clientSocket = accept(_serverSocket.getSocketFd(), (sockaddr*)&clientAddr, &clientAddrLen);
+    int clientSocket = accept(server_fd, (struct sockaddr*)&clientAddr, &clientAddrLen);
 
     if (clientSocket < 0) {
         std::cerr << "Failed to accept client connection" << std::endl;
@@ -86,19 +74,24 @@ void Server::handleNewConnection() {
     clientPollFd.fd = clientSocket;
     clientPollFd.events = POLLIN;  // We're interested in reading data from the client
     pollfds.push_back(clientPollFd);
+    
+    std::cout << "New client connected" << std::endl;
 }
 
 void Server::handleClient(int client_fd) {
     Client client(client_fd);  // Create a client object to handle the connection
-    // client.handleRequest();    // Process the client's request
-    // client.handleResponse();   // Generate and send a response to the client
-    // close(client_fd);		  // Close the connection after sending the response
-	client.clientConnectionProcess();
-    // After handling the client, remove it from the pollfd set
-    for (size_t i = 0; i < pollfds.size(); ++i) {
-		if (pollfds[i].fd == client_fd) {
-			pollfds.erase(pollfds.begin() + i);
-			break;
-		}
-	}
+    client.handleRequest();    // Process the client's request
+	closeClient(client_fd);    // Close the client connection
 }
+
+// After handling the client, remove it from the pollfd set
+void Server::closeClient(int client_fd)
+{
+	close(client_fd);
+	pollfds.erase(std::remove_if(pollfds.begin(), pollfds.end(), [client_fd](const pollfd& pfd) {
+		return pfd.fd == client_fd;
+	}), pollfds.end());
+}
+
+// add a signal handler to close the server socket
+// when the server is terminated or ctrl-c is pressed
