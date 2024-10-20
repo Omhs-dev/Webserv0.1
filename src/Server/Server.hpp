@@ -43,16 +43,18 @@
 
 class Server {
 	private:
-	    Socket _serverSocket;
+	    std::vector<int> _serverSockets;
+	    std::vector<int> _clientSockets;
+	    Socket _socketObject;
+	    HTTPConfigs _httpConfigs;
 	    ServerConfig serverConfigs;
-	    int serverSocket;
 	    std::vector<pollfd> pollfds;
 	
-	    void handleNewConnection();
+	    void handleNewConnection(int server_fd);
 	    void handleClient(int client_fd);
-
+		void closeClient(int client_fd);
 	public:
-	    Server(const ServerConfig& config);
+	    Server(const HTTPConfigs& config);
 	    void run();
 
 };
