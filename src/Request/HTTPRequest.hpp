@@ -13,6 +13,7 @@ class HTTPRequest {
 	    std::string getVersion() const;
 	
 	private:
+		int stateCode;
 	    std::string method;
 	    std::string path;
 	    std::string version;

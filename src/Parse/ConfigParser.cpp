@@ -299,7 +299,7 @@ void ConfigParser::locationPath(const std::string &line, ConfigLocation &confLoc
     {
         throw std::runtime_error("Invalid location line: " + line);
     }
-}
+}p
 
 // ----------------- Utils ----------------- //
 

@@ -47,3 +47,4 @@ std::string HTTPRequest::getPath() const {
 std::string HTTPRequest::getVersion() const {
     return version;
 }
+int HttpRequest::getStateCode(void) const {return stateCode;}
