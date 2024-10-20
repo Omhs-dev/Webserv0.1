@@ -137,6 +137,7 @@ void HTTPResponse::manageLocation()
 
 }
 
+//manageServer
 
 //handle the Get request
 
