@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[]) {
     // Check if the user provided a configuration file
-    std::string configFile = "webserv.conf"; // Default config file
+    std::string configFile = "config/webserv.conf"; // Default config file
     if (argc == 2) {
         configFile = argv[1];
     } else if (argc > 2) {
