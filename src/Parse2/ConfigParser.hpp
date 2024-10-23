@@ -77,10 +77,10 @@ private:
 
     void parseHttpBlock(std::ifstream& file);
     void parseServerBlock(std::ifstream& file, ServerConfig& serverConfig);
-    void parseLocationBlock(std::ifstream& file, ConfigLocation& confLocation);
+    void parseLocationBlock(std::ifstream& file, LocationConfig& confLocation);
     // void setKeyValue(const std::string& line, std::string& key, std::string& value);
     // void removeWhiteSpace(std::string& str);
-    void locationPath(const std::string& line, ConfigLocation& confLocation);
+    void locationPath(const std::string& line, LocationConfig& confLocation);
     void initConfigServer(ServerConfig& serverConf);
 };
 

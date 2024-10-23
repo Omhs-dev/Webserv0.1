@@ -38,7 +38,7 @@ enum RequestType
 
 //---------structs----------//
 
-struct ConfigLocation
+struct LocationConfig
 {
     std::string locationPath;
     std::vector<RequestType> requestAllowed;
@@ -64,7 +64,7 @@ struct ServerConfig
     std::map<int, std::string> errorPage;
     std::vector<RequestType> _requestAllowed;
     std::string _redirect;
-    std::vector<ConfigLocation> _locations;
+    std::vector<LocationConfig> _locations;
 };
 
 struct HTTPConfigs
@@ -75,7 +75,7 @@ struct HTTPConfigs
 
    //---------function----------//
 void printRequestTypes(const std::vector<RequestType> &requestTypes);
-void printConfigLocation(const ConfigLocation &location);
+void printLocationConfig(const LocationConfig &location);
 void printServerConfig(const ServerConfig &server);
 RequestType strToRequestType(const std::string &str);
 void removeWhiteSpace(std::string &str);

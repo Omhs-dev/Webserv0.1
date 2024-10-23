@@ -8,8 +8,10 @@ SRCS =  src/main.cpp \
 		src/Socket/Socket.cpp \
 		src/Request/HTTPRequest.cpp \
 		src/Response/HTTPResponse.cpp \
-		src/Parse/ConfigParser.cpp 
-		# src/Parse/ConfigUtils.cpp
+		src/Parse/ConfigParser.cpp  \
+		src/Parse/LocationConfig.cpp \
+		src/Parse/ServerConfig.cpp
+		
 OBJS = $(SRCS:.cpp=.o)
 
 INCLUDES = -I include

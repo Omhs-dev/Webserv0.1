@@ -67,6 +67,12 @@
 		"fstream": "cpp",
 		"iomanip": "cpp",
 		"numeric": "cpp",
-		"stack": "cpp"
+		"stack": "cpp",
+		"clocale": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"memory_resource": "cpp",
+		"random": "cpp",
+		"numbers": "cpp"
 	}
 }

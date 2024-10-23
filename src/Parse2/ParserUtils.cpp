@@ -87,7 +87,7 @@ void printRequestTypes(const std::vector<RequestType>& requestTypes)
     std::cout << std::endl;
 }
 
-void printConfigLocation(const ConfigLocation& location)
+void printLocationConfig(const LocationConfig& location)
 {
     std::cout << "  Location Path: " << location.locationPath << std::endl;
     std::cout << "  Allowed Methods: ";
@@ -125,9 +125,9 @@ void printServerConfig(const ServerConfig& server)
     for (std::map<int, std::string>::const_iterator it = server.errorPage.begin(); it != server.errorPage.end(); ++it) {
     std::cout << "  Error Page: " << it->first << " -> " << it->second << std::endl;
     }
-    for (std::vector<ConfigLocation>::const_iterator it = server._locations.begin(); it != server._locations.end(); ++it) {
+    for (std::vector<LocationConfig>::const_iterator it = server._locations.begin(); it != server._locations.end(); ++it) {
         std::cout << "  Location {" << std::endl;
-        printConfigLocation(*it);
+        printLocationConfig(*it);
         std::cout << "  }" << std::endl;
     }
     std::cout << "}" << std::endl;

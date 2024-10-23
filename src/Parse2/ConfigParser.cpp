@@ -103,7 +103,7 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
         }
         else if (found != std::string::npos)
         {
-            ConfigLocation confLoc;
+            LocationConfig confLoc;
             locationPath(line, confLoc);
             parseLocationBlock(file, confLoc);
             serverConfig._locations.push_back(confLoc);
@@ -194,7 +194,7 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
     }
 }
 
-void ConfigParser::parseLocationBlock(std::ifstream &file, ConfigLocation &confLocation)
+void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confLocation)
 {
     this->blockStack.push_back(LOCATION);
 
@@ -287,7 +287,7 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, ConfigLocation &confL
     }
 }
 
-void ConfigParser::locationPath(const std::string &line, ConfigLocation &confLocation)
+void ConfigParser::locationPath(const std::string &line, LocationConfig &confLocation)
 {
     size_t pos = line.find('{');
     if (pos != std::string::npos)
