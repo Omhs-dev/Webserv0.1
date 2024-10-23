@@ -3,17 +3,22 @@
 
 #include <string>
 #include <unistd.h>
+#include <sys/socket.h>
 #include <iostream>
 
-#include "../header.hpp"
+// #include "../header.hpp"
+#include "../Request/HTTPRequest.hpp"
+#include "../Response/HTTPResponse.hpp"
 
 #define MAX_BUFFER_SIZE 1024
+
+class HTTPRequest;
 
 class Client
 {
 	private:
 	    int clientSocket;
-	    HTTPRequest _request;
+	    HTTPRequest *_request;
 	    HTTPResponse _response;
 	    void sendResponse(const std::string& response);
 

@@ -1,6 +1,4 @@
 #include "Client.hpp"
-#include "../Request/HTTPRequest.hpp"
-#include "../Response/HTTPResponse.hpp"
 
 Client::Client(int socket) : clientSocket(socket) {}
 
@@ -21,12 +19,12 @@ void Client::handleRequest()
 	if (bytesRead > 0)
 	{
 		// Parse the HTTP request
-		_request.parseRequest(std::string(buffer, bytesRead));
+		_request->parseRequest(std::string(buffer, bytesRead));
 
 		// For debugging: print the parsed request method, path, and version
-		std::cout << "Method: " << _request.getMethod() << std::endl;
-		std::cout << "Path: " << _request.getPath() << std::endl;
-		std::cout << "Version: " << _request.getVersion() << std::endl;
+		std::cout << "Method: " << _request->getMethod() << std::endl;
+		std::cout << "Path: " << _request->getPath() << std::endl;
+		std::cout << "Version: " << _request->getVersion() << std::endl;
 
 	}
 	else if (bytesRead == 0)
@@ -45,9 +43,9 @@ void Client::handleRequest()
 void Client::handleResponse()
 {
 	// Generate an appropriate HTTP response based on the request
-		if (_request.getMethod() == "GET")
+		if (_request->getMethod() == "GET")
 		{
-			std::string filePath = _request.getPath(); // Example: map to server's file system
+			std::string filePath = _request->getPath(); // Example: map to server's file system
 
 			// - this part is to be modified
 			 // Serve index.html for root path "/"

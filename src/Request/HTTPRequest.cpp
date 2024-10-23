@@ -1,4 +1,5 @@
 #include "HTTPRequest.hpp"
+#include "../Server/Client.hpp"
 #include <sstream>
 #include <iostream>
 

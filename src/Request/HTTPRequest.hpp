@@ -8,13 +8,16 @@
 #include "../Parse/LocationConfig.hpp"
 #include "../Parse/ServerConfig.hpp"
 
+class Client;
+
 class HTTPRequest
 {
 	private:
 		Client          *_client;
 		LocationConfig  *_location;
 		ServerConfig    *_server;
-		HTTPConfigs     _httpConfigs;
+		// HTTPConfigs     _httpConfigs;
+		
 		// Request Line
 		std::string     _method;
 		std::string     _uriPath;
@@ -35,15 +38,15 @@ class HTTPRequest
 	
 		// Parse request
 		// --- Request Line ---
-		void parseRequestLine(const std::string &line);
+		void        parseRequestLine(const std::string &line);
 		std::string parseMethod(const std::string &line);
 		std::string parsePath(const std::string &line);
 		std::string parseVersion(const std::string &line);
 		// --- Headers ---
-		void parseHeaderLine(const std::string &line);
+		void        parseHeaderLine(const std::string &line);
 		std::string parseHeaderKey(const std::string &line);
 		std::string parseHeaderValue(const std::string &line);
-	
+
 	public:
 		HTTPRequest();
 		void parseRequest(const std::string &requestData);
