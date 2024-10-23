@@ -137,6 +137,23 @@ std::string HTTPRequest::parseHeaderValue(const std::string &line)
 	return line.substr(colonPos + 1);
 }
 
+// ------------------- GETTERS ----------------------
+
+Client *HTTPRequest::getClient() const
+{
+	return _client;
+}
+
+LocationConfig *HTTPRequest::getLocation() const
+{
+	return _location;
+}
+
+ServerConfig *HTTPRequest::getServer() const
+{
+	return _server;
+}
+
 std::string HTTPRequest::getMethod() const
 {
 	return _method;
