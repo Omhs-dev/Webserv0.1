@@ -13,13 +13,14 @@
 #define MAX_BUFFER_SIZE 1024
 
 class HTTPRequest;
+class HTTPResponse;
 
 class Client
 {
 	private:
 	    int clientSocket;
 	    HTTPRequest *_request;
-	    HTTPResponse _response;
+	    HTTPResponse *_response;
 	    void sendResponse(const std::string& response);
 
 	public:

@@ -15,8 +15,8 @@
 #include <map>
 #include <sstream>
 #include <cstring>
-#include <iterator> // for std::istream_iterator
-#include <numeric>	// for std::accumulate
+#include <iterator>
+#include <numeric>
 
 #include "enumeration.hpp"
 #include "LocationConfig.hpp"

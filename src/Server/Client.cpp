@@ -1,6 +1,9 @@
 #include "Client.hpp"
 
-Client::Client(int socket) : clientSocket(socket) {}
+Client::Client(int socket) : clientSocket(socket)
+{
+	_request = nullptr;
+}
 
 void Client::clientConnectionProcess()
 {
@@ -18,6 +21,7 @@ void Client::handleRequest()
 	memset(buffer + bytesRead, 0, 1); // Null-terminate the buffer
 	if (bytesRead > 0)
 	{
+		_request = new HTTPRequest(this);
 		// Parse the HTTP request
 		_request->parseRequest(std::string(buffer, bytesRead));
 
@@ -39,35 +43,53 @@ void Client::handleRequest()
 	// close(clientSocket); // Close the connection after sending the response
 }
 
+
 // create a function handleResponse() that will handle the response
 void Client::handleResponse()
 {
-	// Generate an appropriate HTTP response based on the request
-		if (_request->getMethod() == "GET")
-		{
-			std::string filePath = _request->getPath(); // Example: map to server's file system
+    if (_request->getMethod() == "GET")
+    {
+        std::string filePath = _request->getPath();
 
-			// - this part is to be modified
-			 // Serve index.html for root path "/"
-            if (filePath == "/") {
-                filePath = "/index.html";
-            }
+        // Serve index.html for the root path "/"
+        if (filePath == "/")
+        {
+            filePath = "/index.html";  // Default to index.html if the path is "/"
+        }
 
-            // Map the path to the server's file system
-            filePath = "./www" + filePath;  // Assuming the server's root directory is "./www"
+        // Assuming the server root directory is configured and stored in the server config
+        std::string rootDirectory = _request->getServer()->_root;  // Root directory from server config
 
-            // Generate response from the file (this will serve the file if it exists)
-            _response = HTTPResponse::fromFile(filePath);
-		}
-		else
-		{
-			// Handle other HTTP methods or errors (e.g., 405 Method Not Allowed)
-			_response.setStatus("405", "Method Not Allowed");
-		}
+        // Map the path to the server's file system using the root directory
+        filePath = rootDirectory + filePath;
 
-		// Send the response to the client
-		sendResponse(_response.getData());
+        // Check if the file exists (simple file existence check, could be expanded)
+        std::ifstream file(filePath);
+        if (!file.good())
+        {
+            std::cerr << "File not found: " << filePath << std::endl;
+            _response = new HTTPResponse();
+            _response->setStatus("404", "Not Found");
+        }
+        else
+        {
+            // Generate response from the file (serve the file if it exists)
+            _response = new HTTPResponse(HTTPResponse::fromFile(filePath));
+        }
+    }
+    else
+    {
+        // Handle other HTTP methods or errors (e.g., 405 Method Not Allowed)
+        _response = new HTTPResponse();
+        _response->setStatus("405", "Method Not Allowed");
+    }
+
+    // Send the response to the client
+    sendResponse(_response->getData());
 }
+
+
+
 
 void Client::sendResponse(const std::string &response)
 {
@@ -77,5 +99,17 @@ void Client::sendResponse(const std::string &response)
 
 Client::~Client()
 {
-	close(clientSocket);
+    close(clientSocket);
+    
+    // // Clean up dynamically allocated memory
+    // if (_request) {
+    // std::cout << "Deleting request object" << std::endl;
+    // delete _request;
+    // _request = nullptr;
+	// }
+	// if (_response) {
+	//     std::cout << "Deleting response object" << std::endl;
+	//     delete _response;
+	//     _response = nullptr;
+	// }
 }
