@@ -11,6 +11,7 @@
 
 
 class HTTPRequest;
+# define THRESHOLD_LARGE_FILE 100000 // 100KB
 
 class HTTPResponse {
 public:
@@ -35,9 +36,13 @@ private:
     int     statusCode;
     std::string statusMessage;
     std::string body;
+    e_response_state _state;
     std::string headers;
 
-    void buildResponse();
+    // void buildResponse();
+
+    bool isLargeFile(const std::string &path)
+    bool fileExist(const std::string &path)
 
     //method 
     void handlePostRequest(void);

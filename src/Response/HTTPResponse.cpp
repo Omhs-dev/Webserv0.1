@@ -50,6 +50,17 @@ bool fileExist(const std::string &path) {
     return (stat(path.c_str(), &buffer) == 0 && S_ISREG(buffer.st_mode));
 }
 
+bool HTTPResponse::isLargeFile(const std::string &path)
+{
+    struct stat fileStat;
+    if (stat(path.c_str(), &fileStat) != 0) // 'stat' still needs C-style string
+    {
+        std::cerr << "Error: Failed to stat file: " << path << std::endl;
+        return false;
+    }
+    return fileStat.st_size > THRESHOLD_LARGE_FILE;
+}
+
 
 std::string HTTPResponse::findGoodPath(std::vector<std::string> allpaths)
 {
@@ -64,45 +75,46 @@ std::string HTTPResponse::findGoodPath(std::vector<std::string> allpaths)
 
 
 std::vector<std::string> HTTPResponse::getAllPathsLoc()
-{   
-    std::vector<sdt::string> allPathsLocation;
+{
+    std::vector<std::string> allPathsLocation
     std::string path = this->HTTPRequest->getPath();
     std::string root = this->HTTPRequest->getLocation()->getRoot();
     std::string alias = this->HTTPRequest->getLocation()->getAlias();
     std::vector<std::string> indexes = this->HTTPRequest->getLocation()->getIndexes();
     bool isAlias = false;
 
-    if (this->getLocation() == NULL)
-        return std::vector<std::string>();
-    if (root.empty())
+    if (this->HTTPRequest->getLocation() == NULL)
+        return std::vector<std::string>(); // Return empty if no location
+    if (root.empty()) // Set root to server's root if it's empty
         root = this->HTTPRequest->getServer()->getRoot();
-    if (!alias.empty())
+    if (!alias.empty()) {
         root = alias;
         isAlias = true;
-    //in case the request is asking a file direct
-    if (path[path.size() - 1] != '/') {
+    }
+    // If the request is for a specific file (i.e., doesn't end with "/")
+    if (path.back() != '/') {
         if (isAlias)
             path = path.substr(this->HTTPRequest->getLocation()->getPath().size());
-        allPathLocations.push_back(root + path);
+        allPathsLocation.push_back(root + path); // Fix push_back target
     }
-
-    for (size_t i = 0; i < indexes.size(); i++)
-    {
+    // Iterate over the indexes and create possible paths
+    for (size_t i = 0; i < indexes.size(); i++) {
         std::string index = indexes[i];
-        std::string bkpPath = path;
-        if (path == "/"){
+        std::string bkpPath = path; // Backup original path
+        // If the path is root "/"
+        if (path == "/") {
             path = root + "/" + index;
-        }
-        else if (isAlias){
+        } else if (isAlias) {
+            path = root + "/" + index;
+        } else {
             path = root + path + index;
         }
-        else
-            path = root + path + index;
-        allPathsLocation.push_back(path);
-        path = bkpPath;
+        allPathsLocation.push_back(path); // Add the generated path
+        path = bkpPath; // Restore original path
     }
-    return allPathsLocations;
+    return allPathsLocation;
 }
+
 
 //Checking if the request is looking for a location bloc,
 //then manage it
@@ -111,9 +123,10 @@ void HTTPResponse::manageLocation()
     std::string root;
     this->HTTPRequest->getLocation()->getRoot().empty() ? root = this->HTTPRequest->getServer()->getRoot() : root = this->HTTPRequest->getLocation()->getRoot();
 
-    std::string path = findGoodPath(allPAthsLocation);
+    std::vector<std::string> allPathsLocation = getAllPathsLoc();
+    std::string path = findGoodPath(allPathsLocation);
     if (path.empty()) {
-        if (this->HTTPRequest->getLocation())->getAutoIndex() == TRUE {
+        if (this->HTTPRequest->getLocation())->getAutoindex() == TRUE {
             std::string alias = this->HTTPRequest->getLocation()->getAlias();
             if (!alias.empty()){
                 std::string shortPath = HTTPRequest->getPath().substr(HTTPRequest->getLocation()->getPath().size());
@@ -124,18 +137,22 @@ void HTTPResponse::manageLocation()
             setSate(HTTPResponse::FINISH); 
             return ;
         }
-        return manageNotFound(root + HTTPRequest->getPath());
-    }
-    if isLargeFile(path) {
-        prepareChunkedResponse(path);
-        setState(HTTPResponse::CHUNK);
-    }
-    else{
-        prepareStandardResponse(path);
-        setState(HTTPResponse::FINISH);
-    }
-
+        // return manageNotFound(root + HTTPRequest->getPath());
+        std::cout << "location not found !! \n" << std::endl;
+     }
+     if isLargeFile(path) {
+        std::cout << "Incoming Chunked response !!!!" << std::endl;
+    //     prepareChunkedResponse(path);
+    //     setState(HTTPResponse::CHUNK);
+        }
+     else{
+           std::cout << "Incoming Standard response !!!"  << std::endl;
+    //     prepareStandardResponse(path);
+    //     setState(HTTPResponse::FINISH);
+     }
 }
+
+
 
 //manageServer
 
@@ -146,7 +163,8 @@ void HTTPResponse::handleGetRequest(void)
     if  (this->HTTPRequest->getLocation() != NULL)
         manageLocation();
     else 
-        manageServer();
+        std::cout << "Server manager is called!! " std::endl;
+        // manageServer();
 }
 
 
@@ -160,16 +178,16 @@ void HTTPResponse::handlePostRequest(void)
     json +="}\n";
 
     HTTPResponse = "HTTP/1.1 200 OK\r\n";
-    HTTPResponse = "Content-Type: application/json\r\n";
-    HTTPResponse =  "Content-Length: " + intToString(json.size()) + "\r\n";
-    HTTPResponse = "\r\n";
-    HTTPResponse = json;
+    HTTPResponse += "Content-Type: application/json\r\n";
+    HTTPResponse +=  "Content-Length: " + std::to_string(json.size()) + "\r\n";
+    HTTPResponse += "\r\n";
+    HTTPResponse += json;
     this->setState(HTTPResponse::FINISH);
 }
 
 //handle the DELETE REQUEST
 
-void Response::handleDeleteRequest(void)
+void HTTPResponse::handleDeleteRequest(void)
 {
 	std::string path = this->HTTPRequest->location ? this->HTTPRequest->location->getRoot() + this->HTTPRequest->getPath() : this->HTTPRequest->getServer()->getRoot() + this->HTTPRequest->getPath();
 	if (!fileExist(path))
@@ -183,10 +201,10 @@ void Response::handleDeleteRequest(void)
 
 	HTTPResponse = "HTTP/1.1 200 OK\r\n";
 	HTTPResponse += "Content-Type: application/json\r\n";
-	HTTPResponse += "Content-Length: " + intToString(json.size()) + "\r\n";
+	HTTPResponse += "Content-Length: " + std::to_string(json.size()) + "\r\n";
 	HTTPResponse += "\r\n";
 	HTTPResponse += json;
-	this->setState(Response::FINISH);
+    this->setState(HTTPResponse::FINISH);
 }
 
 int HTTPResponse::generateResponse(int pollfd)
@@ -196,14 +214,14 @@ int HTTPResponse::generateResponse(int pollfd)
         HTTPResponse.clear();
     if (HTTPRequest->getStateCode() != 200)
         return (this->setError());
-    if (isRedirect())
-        return (setState())
-    if (this->HTTPRequest->isCgi())
-    {
-        std::cout << "It's a cgi" << "\n";  
-        return (this->handleCgi());
-    }
-    std::cout << "It's not a cgi" << "\n";
+    // if (isRedirect())
+    //     return (setState())
+    // if (this->HTTPRequest->isCgi())
+    // {
+    //     std::cout << "It's a cgi" << "\n";  
+    //     return (this->handleCgi());
+    // }
+    // std::cout << "It's not a cgi" << "\n";
 
     if (state != HTTPResponse::CHUNK)
         this->setState(HTTPResponse::PROCESS);
@@ -216,4 +234,41 @@ int HTTPResponse::generateResponse(int pollfd)
     else
         return (this->setError(405), 0);
     return (0);
+}
+
+//To access to all the state accessor
+void HTTPResponse::setState(e_response_state state)
+{
+    if (this->_state == HTTPResponse::FINISH) {
+        std::cout << "[setState (response)] Response already finished" << std::endl;
+        return;
+    }
+    if (this->_state == state) {
+        std::cout << "[setState (response)] Response already in this state" << std::endl;
+        return;
+    }
+    this->_state = state;
+    switch (this->_state) {
+        case HTTPResponse::INIT:
+            std::cout << "[setState (response)] Response INIT" << std::endl;
+            break;
+        case HTTPResponse::PROCESS:
+            std::cout << "[setState (response)] Response PROCESS" << std::endl;
+            break;
+        case HTTPResponse::FINISH:
+            std::cout << "[setState (response)] Response FINISH" << std::endl;
+            break;
+        default:
+            std::cout << "[setState (response)] Unknown state" << std::endl;
+            break;
+    }
+}
+
+
+void HTTPResponse::setError(int code, bool generatePage)
+{
+    this->HTTPRequest->setStateCode(code);
+    if (generatePage)
+        this->HTTPResponse = ErrorPage::getPage(code, this->HTTPRequest->getServer()->getErrorPages());
+    this->setState(HTTPResponse::FINISH);
 }
