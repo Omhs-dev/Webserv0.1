@@ -18,7 +18,7 @@ class HTTPResponse;
 class Client
 {
 	private:
-	    int clientSocket;
+	    int _clientSocket;
 	    HTTPRequest *_request;
 	    HTTPResponse *_response;
 	    void sendResponse(const std::string& response);

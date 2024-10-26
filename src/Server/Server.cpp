@@ -95,3 +95,13 @@ void Server::closeClient(int client_fd)
 
 // add a signal handler to close the server socket
 // when the server is terminated or ctrl-c is pressed
+
+// --- GETTERS ---
+
+HTTPConfigs Server::getConfigs() {
+	return _httpConfigs;
+}
+
+Socket Server::getSocketObject() {
+	return _socketObject;
+}

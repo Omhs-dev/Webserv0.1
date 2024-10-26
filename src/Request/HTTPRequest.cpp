@@ -84,6 +84,10 @@ void HTTPRequest::parseHeaderLine(const std::string &line)
 	{
 		std::string key = line.substr(0, colonPos);
 		std::string value = line.substr(colonPos + 1);
+		std::string::iterator it = value.begin();
+		while (it != value.end() && std::isspace(*it))
+			it++;
+		value.erase(value.begin(), it);
 		_headers[key] = value;
 		std::cout << "Parsed Header: " << key << ": " << value << std::endl;
 	}
@@ -197,7 +201,6 @@ int HTTPRequest::checkContentLength()
     }
     return 0;
 }
-
 
 int HTTPRequest::checkMethod()
 {

@@ -1,29 +1,39 @@
+// HTTPResponse.hpp
 #ifndef HTTPRESPONSE_HPP
 #define HTTPRESPONSE_HPP
 
 #include <string>
-#include <map>
+#include <fstream>
+#include <sstream>
 
 class HTTPResponse {
-public:
-    HTTPResponse();
-    static HTTPResponse fromFile(const std::string &filePath);
-	
-	void getIndexeFile();
-    void setStatus(const std::string &statusCode, const std::string &statusMessage);
-    void setHeader(const std::string &key, const std::string &value);
-    void setBody(const std::string &bodyContent);
-
-    std::string getData() const;
-
 private:
     std::string _statusCode;
     std::string _statusMessage;
-    std::map<std::string, std::string> _headers;
+    std::string _headers;
     std::string _body;
 
-    std::string getStatusLine() const;
-    std::string getHeaders() const;
+public:
+    HTTPResponse();
+
+    // Generate response based on file path
+    static HTTPResponse fromFile(const std::string& filePath);
+
+    // Generate response based on method and file path
+    static HTTPResponse generateResponse(const std::string& method, const std::string& filePath);
+
+    // Setters
+    void setStatus(const std::string& code, const std::string& message);
+    void setBody(const std::string& body);
+	void getBody();
+	void setHeader(const std::string &key, const std::string &value);
+    
+    
+    // Get formatted response data for sending
+    std::string getData() const;
+
+    // Helper method for common headers
+    void setDefaultHeaders();
 };
 
 #endif

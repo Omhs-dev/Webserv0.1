@@ -73,6 +73,7 @@
 		"concepts": "cpp",
 		"memory_resource": "cpp",
 		"random": "cpp",
-		"numbers": "cpp"
+		"numbers": "cpp",
+		"testheader.hpp": "c"
 	}
 }

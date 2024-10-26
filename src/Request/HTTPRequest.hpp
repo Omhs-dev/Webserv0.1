@@ -12,6 +12,7 @@ class Client;
 
 class HTTPRequest
 {
+	friend class HTTPRequestTest;
 	private:
 		Client          *_client;
 		LocationConfig  *_location;
@@ -56,13 +57,6 @@ class HTTPRequest
 		void        parseBody(const std::string &line);
 		void        parseChunkedBody(const std::string &line);
 		
-		// --- CHECKERS ---
-		bool checkHttpVersion();
-		bool checkHostHeader();
-		int 	   checkTransferEncoding();
-		int 	  checkContentLength();
-		int checkMethod();
-		int checkCgi();
 		
 		// --- UTILS ---
 		int processPath();
@@ -74,6 +68,13 @@ class HTTPRequest
 		HTTPRequest(Client *client);
 		void parseRequest(const std::string &requestData);
 		
+		// --- CHECKERS ---
+		bool checkHttpVersion();
+		bool checkHostHeader();
+		int 	   checkTransferEncoding();
+		int 	  checkContentLength();
+		int checkMethod();
+		int checkCgi();
 		// --- GETTERS ---
 		Client          *getClient() const;
 		LocationConfig  *getLocation() const;

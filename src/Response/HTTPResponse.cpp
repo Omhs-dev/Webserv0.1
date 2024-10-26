@@ -1,12 +1,31 @@
 #include "HTTPResponse.hpp"
-#include <fstream>
-#include <sstream>
-#include <iostream>
 
+// Constructor with default 200 OK status
 HTTPResponse::HTTPResponse() : _statusCode("200"), _statusMessage("OK") {
-    _headers["Content-Type"] = "text/html";  // Default content type
+    _body = "<html><body><h1>Hello, World!</h1></body></html>";
 }
 
+// Generates response based on the method type and file path
+HTTPResponse HTTPResponse::generateResponse(const std::string& method, const std::string& filePath) {
+    HTTPResponse response;
+    
+    if (method == "GET") {
+        response = HTTPResponse::fromFile(filePath);
+    } else if (method == "POST") {
+        response.setStatus("200", "OK");
+        response.setBody("POST request received");
+    } else if (method == "DELETE") {
+        // Here, you can add file deletion logic
+        response.setStatus("200", "OK");
+        response.setBody("File deleted (simulated)");
+    } else {
+        response.setStatus("405", "Method Not Allowed");
+        response.setBody("Only GET, POST, and DELETE methods are allowed");
+    }
+    return response;
+}
+
+// Generate a response from a file (used for GET requests)
 HTTPResponse HTTPResponse::fromFile(const std::string &filePath) {
     HTTPResponse response;
     std::ifstream file(filePath);
@@ -40,31 +59,35 @@ HTTPResponse HTTPResponse::fromFile(const std::string &filePath) {
     return response;
 }
 
-void HTTPResponse::setStatus(const std::string &statusCode, const std::string &statusMessage) {
-    _statusCode = statusCode;
-    _statusMessage = statusMessage;
+// Sets the response status code and message
+void HTTPResponse::setStatus(const std::string& code, const std::string& message) {
+    _statusCode = code;
+    _statusMessage = message;
 }
 
-void HTTPResponse::setHeader(const std::string &key, const std::string &value) {
-    _headers[key] = value;
+void HTTPResponse::setHeader(const std::string &key, const std::string &value)
+{
+	_headers += key + ": " + value + "\r\n";
 }
 
-void HTTPResponse::setBody(const std::string &bodyContent) {
-    _body = bodyContent;
+// Sets the response body content
+void HTTPResponse::setBody(const std::string& body) {
+    _body = body;
 }
 
-std::string HTTPResponse::getStatusLine() const {
-    return "HTTP/1.1 " + _statusCode + " " + _statusMessage + "\r\n";
+
+// Sets common headers for all responses
+void HTTPResponse::setDefaultHeaders() {
+    _headers = "Content-Type: text/html\r\n";
 }
 
-std::string HTTPResponse::getHeaders() const {
-    std::string headersStr;
-    for (const auto &header : _headers) {
-        headersStr += header.first + ": " + header.second + "\r\n";
-    }
-    return headersStr;
-}
-
+// Combines status line, headers, and body to create full HTTP response data
 std::string HTTPResponse::getData() const {
-    return getStatusLine() + getHeaders() + "\r\n" + _body;
+    std::ostringstream oss;
+    oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+    oss << _headers;
+    oss << "Content-Length: " << _body.size() << "\r\n";
+    oss << "\r\n";
+    oss << _body;
+    return oss.str();
 }
