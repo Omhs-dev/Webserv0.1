@@ -6,34 +6,43 @@
 #include <fstream>
 #include <sstream>
 
-class HTTPResponse {
+#include "../Request/HTTPRequest.hpp"
+#include "../Server/Client.hpp"
+
+#define MAX_ALLOWED_FILE_SIZE 1024 * 1024
+#define MAX_RESPONSE_BODY_SIZE 1024 * 1024
+
+class HTTPRequest;
+class Client;
+
+// Set a content type based on the file extension
+// set an error page message
+
+// Generate reponse
+// handle methodes
+// handle GET
+// check if the path is /
+// if yes serve by default index.html
+
+#include <string>
+
+class HTTPResponse
+{
 private:
-    std::string _statusCode;
-    std::string _statusMessage;
-    std::string _headers;
-    std::string _body;
+	void handleGet(const std::string &path);
+	void setDefaultResponse(); // Serves default index content
+	void setStatus(const std::string &code, const std::string &message);
+	void setBody(const std::string &body);
+
+	std::string _statusCode;
+	std::string _statusMessage;
+	std::string _headers;
+	std::string _body;
 
 public:
-    HTTPResponse();
-
-    // Generate response based on file path
-    static HTTPResponse fromFile(const std::string& filePath);
-
-    // Generate response based on method and file path
-    static HTTPResponse generateResponse(const std::string& method, const std::string& filePath);
-
-    // Setters
-    void setStatus(const std::string& code, const std::string& message);
-    void setBody(const std::string& body);
-	void getBody();
-	void setHeader(const std::string &key, const std::string &value);
-    
-    
-    // Get formatted response data for sending
-    std::string getData() const;
-
-    // Helper method for common headers
-    void setDefaultHeaders();
+	HTTPResponse();
+	void generateResponse(const std::string &method, const std::string &path);
+	std::string getData() const;
 };
 
 #endif

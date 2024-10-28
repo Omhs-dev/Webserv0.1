@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <iostream>
+#include <cstring>
+#include <iostream>
 
 // #include "../header.hpp"
 #include "../Request/HTTPRequest.hpp"
