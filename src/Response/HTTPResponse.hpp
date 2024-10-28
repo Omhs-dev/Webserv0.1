@@ -1,4 +1,3 @@
-// HTTPResponse.hpp
 #ifndef HTTPRESPONSE_HPP
 #define HTTPRESPONSE_HPP
 
@@ -6,34 +5,39 @@
 #include <fstream>
 #include <sstream>
 
+// function that generates responses based on the req
+   // function to handle delete req
+   // function to handle put req
+   // function to handle get req
+   // for the function handleGet req
+       // a function that checks if req is directed to the server block
+           // first retrieve the path to all servers in a list
+           //Find the path that matches the req path
+           //Once okay
+           //Check if the req path points to a large file
+               //If yes prepare a chunked response
+           // otherwise prepare a standard response
+
 class HTTPResponse {
-private:
-    std::string _statusCode;
-    std::string _statusMessage;
-    std::string _headers;
-    std::string _body;
+    private:
+        std::string statusCode;
+        std::string statusMessage;
+        std::string headers;
+        std::string body;
+        std::string response;
 
-public:
-    HTTPResponse();
+        void buildResponse(); // Builds the full HTTP response with headers and body
 
-    // Generate response based on file path
-    static HTTPResponse fromFile(const std::string& filePath);
+    public:
+        HTTPResponse();
+        void setStatus(const std::string& code, const std::string& message);
+        void setResponse(const std::string& responseContent);
+        
+        // Generates a response from a file if it exists, otherwise sets a 404 response
+        static HTTPResponse fromFile(const std::string& filePath);
 
-    // Generate response based on method and file path
-    static HTTPResponse generateResponse(const std::string& method, const std::string& filePath);
-
-    // Setters
-    void setStatus(const std::string& code, const std::string& message);
-    void setBody(const std::string& body);
-	void getBody();
-	void setHeader(const std::string &key, const std::string &value);
-    
-    
-    // Get formatted response data for sending
-    std::string getData() const;
-
-    // Helper method for common headers
-    void setDefaultHeaders();
+        // Gets the full HTTP response data (headers + body)
+        std::string getData();
 };
 
 #endif

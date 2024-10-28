@@ -21,8 +21,7 @@ void Client::clientConnectionProcess()
 void Client::handleRequest()
 {
 	char buffer[MAX_BUFFER_SIZE + 1];
-	int bytesRead = 0;
-	bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
+	int bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
 	if (bytesRead > 0)
 	{
 		buffer[bytesRead] = '\0'; // Null-terminate the buffer
@@ -44,34 +43,33 @@ void Client::handleRequest()
 }
 
 void Client::handleResponse() {
-    std::string method = _request->getMethod();
-    std::string filePath = _request->getPath();
-
-    // Check if request method is GET
-    // if (method == "GET") {
-    //     // First, check if the path matches any configured location
-    //     if (_request->getLocation()) {
-    //         LocationConfig* location = _request->getLocation();
-            
-    //         // If the location has a specified index file, use it
-    //         filePath = location->getRoot() + (filePath == "/" ? location->getIndex() : filePath);
-    //     } 
-    //     else if (_request->getServer()) {
-    //         // Otherwise, check the server configuration for an index file
-    //         ServerConfig* server = _request->getServer();
-    //         filePath = server->getRoot() + (filePath == "/" ? server->getIndex() : filePath);
-    //     } 
-    //     else {
-    //         // Default to "index.html" in the root directory if no location or server-specific index is found
-    //         filePath += "index.html";
-    //     }
-    // }
-
-    // Generate response from the file
-    *_response = HTTPResponse::generateResponse(method, filePath);
+	// Check if the request is for a specific file path
+	// std::string filePath = "./www" + _request->getPath();
 	
-    // Send the response to the client
-    sendResponse(_response->getData());
+	// Generate response from file if it exists, otherwise default response
+	// if (_request->getMethod() == "GET") {
+	//     *_response = HTTPResponse::fromFile(filePath);  // Create response from file
+	//     if (_response->getData().empty()) {  // If no content found, set default response
+	//         _response->setStatus("200", "OK");
+	//         _response->setBody("<html><body><h1>Hello World</h1></body></html>");
+	//     }
+	// } else {
+	//     // For non-GET methods, set a simple 405 response
+	//     _response->setStatus("405", "Method Not Allowed");
+	//     _response->setBody("<html><body><h1>405 Method Not Allowed</h1></body></html>");
+	// }
+
+	// Send the response to the client
+	std::string response = 
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/html\r\n"
+        "Content-Length: 20\r\n" // Length of the HTML content
+        "\r\n"
+        "<h1>Hello World</h1>";
+
+	sendResponse(_response->getData());
+	// sendResponse(_response->getData());
+	std::cout << "connect to data : " << _response->getData() << std::endl;
 }
 
 void Client::sendResponse(const std::string &response)

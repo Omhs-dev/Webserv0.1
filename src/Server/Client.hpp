@@ -5,8 +5,6 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <iostream>
-
-// #include "../header.hpp"
 #include "../Request/HTTPRequest.hpp"
 #include "../Response/HTTPResponse.hpp"
 
@@ -20,7 +18,7 @@ class Client
 	private:
 	    int _clientSocket;
 	    HTTPRequest *_request;
-	    HTTPResponse *_response;
+	    HTTPResponse *_response; // initialize this in constructor
 	    void sendResponse(const std::string& response);
 
 	public:
