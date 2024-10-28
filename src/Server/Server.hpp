@@ -49,6 +49,10 @@ class Server {
 	    HTTPConfigs _httpConfigs;
 	    ServerConfig serverConfigs;
 	    std::vector<pollfd> pollfds;
+		//narcisse
+		std::map<int, std::string> _errorPages;
+		std::vector<std::string> _indexes;
+
 	
 	    void handleNewConnection(int server_fd);
 	    void handleClient(int client_fd);
@@ -56,6 +60,9 @@ class Server {
 	public:
 	    Server(const HTTPConfigs& config);
 	    void run();
+		//narcisse
+		const std::vector<std::string> &getIndexes() const { return _indexes; }
+		const std::map<int, std::string> &getErrorPages() const { return _errorPages; }
 
 };
 

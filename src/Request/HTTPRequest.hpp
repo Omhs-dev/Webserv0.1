@@ -4,23 +4,69 @@
 #include <string>
 #include <map>
 
-class HTTPRequest {
-	public:
-	    HTTPRequest();
-	    void parseRequest(const std::string& requestData);
-	    std::string getMethod() const;
-	    std::string getPath() const;
-	    std::string getVersion() const;
-	
+#include "../Server/Client.hpp"
+#include "../Parse/LocationConfig.hpp"
+#include "../Parse/ServerConfig.hpp"
+
+class HTTPRequest
+{
 	private:
-		int stateCode;
-	    std::string method;
-	    std::string path;
-	    std::string version;
-	    std::map<std::string, std::string> headers;
+		Client          *_client;
+		LocationConfig  *_location;
+		ServerConfig    *_server;
+		HTTPConfigs     _httpConfigs;
+		// Request Line
+		std::string     _method;
+		std::string     _uriPath;
+		std::string     _version;
+		// Headers
+		std::string     _query;
+		std::string     _rawRequest;
+		std::string     _body;
+		std::map<std::string, std::string>  _headers;
+		std::string     _headerKey;
+		std::string     _headerValue;
+		bool            _isChunked;
+		std::string     _contentLength;
+		unsigned long long _iscontentLength;
+		int             _chunkSize;
+		time_t          _timeout;
+		int             _stateCode;
 	
-	    void parseRequestLine(const std::string& line);
-	    void parseHeaderLine(const std::string& line);
+		// Parse request
+		// --- Request Line ---
+		void parseRequestLine(const std::string &line);
+		std::string parseMethod(const std::string &line);
+		std::string parsePath(const std::string &line);
+		std::string parseVersion(const std::string &line);
+		// --- Headers ---
+		void parseHeaderLine(const std::string &line);
+		std::string parseHeaderKey(const std::string &line);
+		std::string parseHeaderValue(const std::string &line);
+	
+	public:
+		HTTPRequest();
+		void parseRequest(const std::string &requestData);
+		
+		// --- GETTERS ---
+		Client          *getClient() const;
+		LocationConfig  *getLocation() const;
+		ServerConfig    *getServer() const;
+
+		//--- SETTERS ---
+		void setStateCode(int code) {_stateCode = code;}
+		// --- Request Line ---
+		std::string getMethod() const;
+		std::string getPath() const;
+		std::string getVersion() const;
+		int getStateCode(void) const{ return _stateCode};
+		// unsigned long long	getSize(void) const { return this-> _iscontentLength; }
+
+
+		// --- Headers ---
+		std::map<std::string, std::string> getHeaders() const;
+		std::string getHeaderKey() const;
+		std::string getHeaderValue() const;
 };
 
 #endif

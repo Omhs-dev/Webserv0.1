@@ -103,7 +103,7 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
         }
         else if (found != std::string::npos)
         {
-            ConfigLocation confLoc;
+            LocationConfig confLoc;
             locationPath(line, confLoc);
             parseLocationBlock(file, confLoc);
             serverConfig._locations.push_back(confLoc);
@@ -166,7 +166,7 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
                 {
                     int code = std::stoi(value.substr(0, pos));
                     std::string path = value.substr(pos + 1);
-                    serverConfig.errorPage[code] = path;
+                    serverConfig._errorPage[code] = path;
                 }
             }
             else if (key == "allow_methods")
@@ -194,7 +194,7 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
     }
 }
 
-void ConfigParser::parseLocationBlock(std::ifstream &file, ConfigLocation &confLocation)
+void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confLocation)
 {
     this->blockStack.push_back(LOCATION);
 
@@ -287,7 +287,7 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, ConfigLocation &confL
     }
 }
 
-void ConfigParser::locationPath(const std::string &line, ConfigLocation &confLocation)
+void ConfigParser::locationPath(const std::string &line, LocationConfig &confLocation)
 {
     size_t pos = line.find('{');
     if (pos != std::string::npos)
@@ -299,9 +299,9 @@ void ConfigParser::locationPath(const std::string &line, ConfigLocation &confLoc
     {
         throw std::runtime_error("Invalid location line: " + line);
     }
-}p
+}
 
-// ----------------- Utils ----------------- //
+// ---------------------------------------- UTILS ----------------------------------------- //
 
 void ConfigParser::setKeyValue(std::string &line, std::string &key, std::string &value)
 {
@@ -388,7 +388,7 @@ void ConfigParser::printRequestTypes(const std::vector<RequestType>& requestType
     std::cout << std::endl;
 }
 
-void ConfigParser::printConfigLocation(const ConfigLocation& location)
+void ConfigParser::printLocationConfig(const LocationConfig& location)
 {
     std::cout << "  Location Path: " << location.locationPath << std::endl;
     std::cout << "  Allowed Methods: ";
@@ -423,12 +423,12 @@ void ConfigParser::printServerConfig(const ServerConfig& server)
     std::cout << "  Root: " << server._root << std::endl;
     std::cout << "  Index: " << server._index << std::endl;
     std::cout << "  Max Body Size: " << server._clientMaxBodySize << std::endl;
-    for (std::map<int, std::string>::const_iterator it = server.errorPage.begin(); it != server.errorPage.end(); ++it) {
+    for (std::map<int, std::string>::const_iterator it = server._errorPage.begin(); it != server._errorPage.end(); ++it) {
     std::cout << "  Error Page: " << it->first << " -> " << it->second << std::endl;
     }
-    for (std::vector<ConfigLocation>::const_iterator it = server._locations.begin(); it != server._locations.end(); ++it) {
+    for (std::vector<LocationConfig>::const_iterator it = server._locations.begin(); it != server._locations.end(); ++it) {
         std::cout << "  Location {" << std::endl;
-        printConfigLocation(*it);
+        printLocationConfig(*it);
         std::cout << "  }" << std::endl;
     }
     std::cout << "}" << std::endl;
