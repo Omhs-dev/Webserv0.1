@@ -153,7 +153,6 @@ void HTTPResponse::manageLocation()
 }
 
 
-
 //manageServer
 
 //handle the Get request
@@ -164,7 +163,7 @@ void HTTPResponse::handleGetRequest(void)
         manageLocation();
     else 
         std::cout << "Server manager is called!! " std::endl;
-        // manageServer();
+        manageServer();
 }
 
 

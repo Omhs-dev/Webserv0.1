@@ -100,28 +100,33 @@ public:
     }
 };
 
-int main() {
-    // Create a mock server
-    Server server;
+struct LocationInfo
+{
+	std::string	_path;
+    std::string _root;
+    std::string _alias;
+    std::vector<std::string> _indexes;
+    std::vector<e_Methods> _allowedMethods;
+    bool _autoindex;
+    // std::map<std::string, std::string> _cgiExtension;
+    std::string _uploadPath;
+};
 
-    // Create a mock location with some indexes
-    std::vector<std::string> indexes = {"index.html", "index.htm"};
-    Location location("/var/www/html", "/alias", indexes, "/location");
+void manageLocation(void)
+{
+    std::vector<LocationInfo> collectLocations;
+    collectLocations = this->request->getLocations();
+    bool isAlias = false;
+    for (size_t i = 0; i < collectLocation.size(); i++)
+    {
+        std::string path = collectLocation[i].getPath();
+        std::string root = collectLocation[i].getRoot();
+        std::string alias = collectLocation[i].getAlias();
+        
 
-    // Create a mock HTTP request
-    HTTPRequest request("/images", &location, &server);
-
-    // Create HTTPResponse object with the mock request
-    HTTPResponse response(&request);
-
-    // Call the method and get all paths
-    std::vector<std::string> allPaths = response.getAllPathsLoc();
-
-    // Print the resulting paths
-    std::cout << "Generated Paths:\n";
-    for (const auto& path : allPaths) {
-        std::cout << path << std::endl;
     }
+    
 
-    return 0;
 }
+
+
