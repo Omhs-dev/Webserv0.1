@@ -1,8 +1,7 @@
 #include "Client.hpp"
-#include <cstring>
-#include <iostream>
+#include "../Response/HTTPResponse.hpp"
 
-Client::Client(int socket) : _clientSocket(socket), _request(new HTTPRequest(this)), _response(new HTTPResponse()) {}
+Client::Client(int socket) : _clientSocket(socket), _request(new HTTPRequest(this)) {}
 
 void Client::clientConnectionProcess()
 {
@@ -21,8 +20,8 @@ void Client::clientConnectionProcess()
 void Client::handleRequest()
 {
 	char buffer[MAX_BUFFER_SIZE + 1];
-	int bytesRead = 0;
-	bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
+	int bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
+
 	if (bytesRead > 0)
 	{
 		buffer[bytesRead] = '\0'; // Null-terminate the buffer
@@ -43,35 +42,11 @@ void Client::handleRequest()
 	}
 }
 
-void Client::handleResponse() {
-    std::string method = _request->getMethod();
-    std::string filePath = _request->getPath();
-
-    // Check if request method is GET
-    // if (method == "GET") {
-    //     // First, check if the path matches any configured location
-    //     if (_request->getLocation()) {
-    //         LocationConfig* location = _request->getLocation();
-            
-    //         // If the location has a specified index file, use it
-    //         filePath = location->getRoot() + (filePath == "/" ? location->getIndex() : filePath);
-    //     } 
-    //     else if (_request->getServer()) {
-    //         // Otherwise, check the server configuration for an index file
-    //         ServerConfig* server = _request->getServer();
-    //         filePath = server->getRoot() + (filePath == "/" ? server->getIndex() : filePath);
-    //     } 
-    //     else {
-    //         // Default to "index.html" in the root directory if no location or server-specific index is found
-    //         filePath += "index.html";
-    //     }
-    // }
-
-    // Generate response from the file
-    *_response = HTTPResponse::generateResponse(method, filePath);
-	
-    // Send the response to the client
-    sendResponse(_response->getData());
+void Client::handleResponse()
+{
+	HTTPResponse response;
+	response.generateResponse(_request->getMethod(), _request->getPath());
+	sendResponse(response.getData());
 }
 
 void Client::sendResponse(const std::string &response)
@@ -82,6 +57,5 @@ void Client::sendResponse(const std::string &response)
 Client::~Client()
 {
 	delete _request;
-	delete _response;
 	close(_clientSocket);
 }

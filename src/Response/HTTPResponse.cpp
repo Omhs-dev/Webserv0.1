@@ -1,93 +1,153 @@
 #include "HTTPResponse.hpp"
+#include <sstream>
+#include <iostream>
+#include <fstream>
 
-// Constructor with default 200 OK status
-HTTPResponse::HTTPResponse() : _statusCode("200"), _statusMessage("OK") {
-    _body = "<html><body><h1>Hello, World!</h1></body></html>";
-}
+HTTPResponse::HTTPResponse() : _statusCode("200"), _statusMessage("OK") {}
 
-// Generates response based on the method type and file path
-HTTPResponse HTTPResponse::generateResponse(const std::string& method, const std::string& filePath) {
-    HTTPResponse response;
-    
-    if (method == "GET") {
-        response = HTTPResponse::fromFile(filePath);
-    } else if (method == "POST") {
-        response.setStatus("200", "OK");
-        response.setBody("POST request received");
-    } else if (method == "DELETE") {
-        // Here, you can add file deletion logic
-        response.setStatus("200", "OK");
-        response.setBody("File deleted (simulated)");
-    } else {
-        response.setStatus("405", "Method Not Allowed");
-        response.setBody("Only GET, POST, and DELETE methods are allowed");
-    }
-    return response;
-}
-
-// Generate a response from a file (used for GET requests)
-HTTPResponse HTTPResponse::fromFile(const std::string &filePath) {
-    HTTPResponse response;
-    std::ifstream file(filePath);
-
-    if (file.is_open()) {
-        std::stringstream buffer;
-        buffer << file.rdbuf();  // Read the file contents into a string
-        response.setBody(buffer.str());
-
-        // Set the content type based on the file extension
-        if (filePath.find(".html") != std::string::npos) {
-            response.setHeader("Content-Type", "text/html");
-        } else if (filePath.find(".css") != std::string::npos) {
-            response.setHeader("Content-Type", "text/css");
-        } else if (filePath.find(".js") != std::string::npos) {
-            response.setHeader("Content-Type", "application/javascript");
-        } else {
-            response.setHeader("Content-Type", "text/plain");
-        }
-
-        // Set content length
-        response.setHeader("Content-Length", std::to_string(response._body.size()));
-    } else {
-        // File not found: return a 404 error
-        response.setStatus("404", "Not Found");
-        response.setBody("<html><body><h1>404 Not Found</h1></body></html>");
-        response.setHeader("Content-Type", "text/html");
-        response.setHeader("Content-Length", std::to_string(response._body.size()));
-    }
-
-    return response;
-}
-
-// Sets the response status code and message
-void HTTPResponse::setStatus(const std::string& code, const std::string& message) {
-    _statusCode = code;
-    _statusMessage = message;
-}
-
-void HTTPResponse::setHeader(const std::string &key, const std::string &value)
+void HTTPResponse::generateResponse(const std::string &method, const std::string &path)
 {
-	_headers += key + ": " + value + "\r\n";
+	if (method == "GET")
+	{
+		handleGet(path);
+	}
 }
 
-// Sets the response body content
-void HTTPResponse::setBody(const std::string& body) {
-    _body = body;
+void HTTPResponse::handleGet(const std::string &path)
+{
+	if (path == "/")
+	{
+		setDefaultResponse();
+	}
+	else if (path != "/")
+	{
+		setStandardResponse("./www" + path);
+		std::cout << "Path: " << path << std::endl;
+	}
+	else
+	{
+		setStatus("404", "Not Found");
+		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+	}
+}
+
+void HTTPResponse::setStandardResponse(const std::string &path)
+{
+	std::ifstream file(path);
+
+	if (file.is_open())
+	{
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+		setStatus("200", "OK");
+		setBody(buffer.str());
+		
+		file.close();
+	}
+	else
+	{
+		setStatus("404", "Not Found");
+		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+	}
+}
+
+void HTTPResponse::setDefaultResponse()
+{
+	std::ifstream file("./www/index.html");
+
+	if (file.is_open())
+	{
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+		setBody(buffer.str());
+		setStatus("200", "OK");
+	}
+	else
+	{
+		setStatus("404", "Not Found");
+		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+	}
 }
 
 
-// Sets common headers for all responses
-void HTTPResponse::setDefaultHeaders() {
-    _headers = "Content-Type: text/html\r\n";
+
+void HTTPResponse::setStatus(const std::string &code, const std::string &message)
+{
+	_statusCode = code;
+	_statusMessage = message;
 }
 
-// Combines status line, headers, and body to create full HTTP response data
-std::string HTTPResponse::getData() const {
-    std::ostringstream oss;
-    oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
-    oss << _headers;
-    oss << "Content-Length: " << _body.size() << "\r\n";
-    oss << "\r\n";
-    oss << _body;
-    return oss.str();
+void HTTPResponse::setBody(const std::string &body)
+{
+	_body = body;
+}
+
+std::string HTTPResponse::getData() const
+{
+	std::ostringstream oss;
+	oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+	oss << "Content-Type: text/html\r\n";
+	oss << "Content-Length: " << _body.size() << "\r\n";
+	oss << "\r\n";
+	oss << _body;
+	return oss.str();
+}
+
+// --- Checkers ---
+
+bool HTTPResponse::isFile(const std::string &path)
+{
+	struct stat info;
+    return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
+}
+
+bool HTTPResponse::isFileLarge(const std::string &path)
+{
+	std::ifstream file("./www" + path);
+	file.seekg(0, std::ios::end);
+	int fileSize = file.tellg();
+	file.close();
+	return fileSize > MAX_ALLOWED_FILE_SIZE;
+}
+
+bool HTTPResponse::isDirectory(const std::string &path)
+{
+	struct stat info;
+    return stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
+}
+
+bool HTTPResponse::isPathValid(const std::string &path)
+{
+	for (ServerConfig serverConfig : _client->getServer()->getConfigs()._servers)
+	{
+		if (path.find(serverConfig._root) != std::string::npos)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+// --- Utils ---
+
+std::string HTTPResponse::getMimeType(const std::string &path)
+{
+	std::string extension = path.substr(path.find_last_of('.') + 1);
+	if (extension == "html" || extension == "htm")
+	{
+		return "text/html";
+	}
+	else if (extension == "css")
+	{
+		return "text/css";
+	}
+	else if (extension == "js")
+	{
+		return "text/javascript";
+	}
+	else
+	{
+		return "text/plain";
+	}
 }

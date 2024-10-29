@@ -80,7 +80,7 @@ void Server::handleNewConnection(int server_fd) {
 
 void Server::handleClient(int client_fd) {
     Client client(client_fd);  // Create a client object to handle the connection
-    client.handleRequest();    // Process the client's request
+    client.clientConnectionProcess();    // Process the client's request
 	closeClient(client_fd);    // Close the client connection
 }
 

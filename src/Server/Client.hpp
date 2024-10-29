@@ -5,10 +5,13 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <iostream>
+#include <cstring>
+#include <iostream>
 
 // #include "../header.hpp"
 #include "../Request/HTTPRequest.hpp"
 #include "../Response/HTTPResponse.hpp"
+#include "Server.hpp"
 
 #define MAX_BUFFER_SIZE 1024
 
@@ -19,6 +22,7 @@ class Client
 {
 	private:
 	    int _clientSocket;
+	    Server *_server;
 	    HTTPRequest *_request;
 	    HTTPResponse *_response;
 	    void sendResponse(const std::string& response);
@@ -29,7 +33,9 @@ class Client
 	    void handleRequest();
 	    void handleResponse();
 	    ~Client();
-
+		
+		Server *getServer() const { return _server; }
+		
 		class ClientException : public std::exception
 		{
 			public:
