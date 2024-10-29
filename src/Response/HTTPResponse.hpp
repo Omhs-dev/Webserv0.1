@@ -5,6 +5,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
+#include <vector>
 
 #include "../Request/HTTPRequest.hpp"
 #include "../Server/Client.hpp"
@@ -19,30 +21,50 @@ class Client;
 // set an error page message
 
 // Generate reponse
-// handle methodes
-// handle GET
-// check if the path is /
-// if yes serve by default index.html
-
-#include <string>
+	// handle methodes
+		// handle GET
+			// check if the path is /
+				// if yes serve by default index.html
+			// if path is file or different of "/"
+				// check if the path is a good path
+					// if yes
+						// check if the file is large
+							// if yes prepare chunked response
+						// check if the path is a file
+							// if yes serve the file
+						// check if the path is a directory
+							// if yes serve the directory
+						// if is a recirect
+							// if yes serve the redirect
+					// if no serve 404
+				
 
 class HTTPResponse
 {
 private:
-	void handleGet(const std::string &path);
-	void setDefaultResponse(); // Serves default index content
-	void setStatus(const std::string &code, const std::string &message);
-	void setBody(const std::string &body);
-
+	Client *_client;
 	std::string _statusCode;
 	std::string _statusMessage;
-	std::string _headers;
+	std::vector<std::string> _headers;
 	std::string _body;
+	
+	void handleGet(const std::string &path);
+	void setDefaultResponse();
+	void setStandardResponse(const std::string &path);
+	void setStatus(const std::string &code, const std::string &message);
+	void setBody(const std::string &body);
 
 public:
 	HTTPResponse();
 	void generateResponse(const std::string &method, const std::string &path);
 	std::string getData() const;
+	std::vector<std::string> getHeaders() const { return _headers; }
+	std::string getMimeType(const std::string &path);
+	
+	bool isFileLarge(const std::string &path);
+	bool isFile(const std::string &path);
+	bool isDirectory(const std::string &path);
+	bool isPathValid(const std::string &path);
 };
 
 #endif
