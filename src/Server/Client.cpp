@@ -1,8 +1,7 @@
 #include "Client.hpp"
-#include <cstring>
-#include <iostream>
+#include "../Response/HTTPResponse.hpp"
 
-Client::Client(int socket) : _clientSocket(socket), _request(new HTTPRequest(this)), _response(new HTTPResponse()) {}
+Client::Client(int socket) : _clientSocket(socket), _request(new HTTPRequest(this)) {}
 
 void Client::clientConnectionProcess()
 {
@@ -80,6 +79,5 @@ void Client::sendResponse(const std::string &response)
 Client::~Client()
 {
 	delete _request;
-	delete _response;
 	close(_clientSocket);
 }

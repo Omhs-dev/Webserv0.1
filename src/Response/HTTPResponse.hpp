@@ -4,6 +4,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
+#include <vector>
 
 // function that generates responses based on the req
    // function to handle delete req
