@@ -77,10 +77,39 @@ std::string getErrorMesssage(const std::string &code)
 	{
 		return "Created";
 	}
+	else if (code == "202")
+	{
+		return "Accepted";
+	}
 	else if (code == "204")
 	{
 		return "No Content";
 	}
+	else if (code == "301")
+	{
+		return "Moved Permanently";
+	}
+	else if (code == "302")
+	{
+		return "Found";
+	}
+	else if (code == "303")
+	{
+		return "See Other";
+	}
+	else if (code == "304")
+	{
+		return "Not Modified";
+	}
+	else if (code == "307")
+	{
+		return "Temporary Redirect";
+	}
+	else if (code == "308")
+	{
+		return "Permanent Redirect";
+	}
+	
 	else if (code == "400")
 	{
 		return "Bad Request";
