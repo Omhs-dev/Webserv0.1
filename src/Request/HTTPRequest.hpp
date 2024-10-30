@@ -8,6 +8,9 @@
 #include "../Parse/LocationConfig.hpp"
 #include "../Parse/ServerConfig.hpp"
 
+#define REQUEST_DEFAULT_STATE_CODE 200
+
+
 class Client;
 
 class HTTPRequest
@@ -98,6 +101,9 @@ class HTTPRequest
 		time_t getTimeout() const;
 		int getStateCode() const;
 		
+
+		//Setters
+		void setStateCode(int stateCode) {_stateCode = stateCode;}
 		// --- UTILS ---
 		std::string getLineSanitizer(std::stringstream &ss);
 		void errorOccur(int code);

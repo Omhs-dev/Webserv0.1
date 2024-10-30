@@ -28,6 +28,7 @@ class Client
 	    void clientConnectionProcess();
 	    void handleRequest();
 	    void handleResponse();
+
 	    ~Client();
 		
 		Server *getServer() const { return _server; }
@@ -43,3 +44,4 @@ class Client
 };
 
 #endif
+		

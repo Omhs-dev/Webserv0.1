@@ -1,67 +1,113 @@
 #include "HTTPResponse.hpp"
-#include <sstream>
-#include <iostream>
-#include <fstream>
+#include "HTTPResponseUtils.hpp"
 
-HTTPResponse::HTTPResponse() : statusCode("200"), statusMessage("OK") {}
 
-void HTTPResponse::setStatus(const std::string& code, const std::string& message) {
-    statusCode = code;
-    statusMessage = message;
+HTTPResponse::HTTPResponse() : _statusCode("200"), _statusMessage("OK") {}
+
+
+void HTTPResponse::generateResponse(const std::string &method, const std::string &path)
+{
+	if (method == "GET")
+	{
+		handleGet(path);
+	}
+}
+void HTTPResponse::handleGet(const std::string &path)
+{
+	if (path == "/")
+		setDefaultResponse();
+	else if (path == "/images")
+	{
+		setStandardResponse(path);
+		std::cout << "Path: " << path << std::endl;
+	}
+	else
+	{
+		setStatus("404", "Not Found");
+		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+	}
 }
 
-// void HTTPResponse::setBody(const std::string& bodyContent) {
-//     body = bodyContent;
-//     buildResponse();
+	// std::string root;
+	// if(this->_request->getLocation()->getRoot().empty())
+	// 	root = this-> _request->getServer()->getRoot();
+	// root = this->_request->getLocation()->getRoot();
+	
+
+	// std::cout << "Path not found" << std::endl;
+
+// void HTTPResponse::setStandardResponse(const std::string &path)
+// {
+
+// 	if(path.empty())
+// 	std::string response;
+// 	response = listDirectory("./www", path);
+// 	std::ifstream file(path);
+
+// 	if (file.is_open())
+// 	{
+// 		std::stringstream buffer;
+// 		buffer << file.rdbuf();
+// 		setStatus("200", "OK");
+// 		setBody(buffer.str());
+		
+// 		file.close();
+// 	}
+// 	else
+// 	{
+// 		setStatus("404", "Not Found");
+// 		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+// 	}
 // }
 
-// HTTPResponse HTTPResponse::fromFile(const std::string& filePath) {
-//     HTTPResponse response;
-//     std::ifstream file(filePath);
+// Sets the response based on the path provided
+void HTTPResponse::setStandardResponse(const std::string& path) {
+    // check if the directory has an index
+        // if yes serve that index
+    // if not check if directory has an autoindex on or off
+        // if on serve directory elements
+        // else serve page not found 404
+    std::string cleanPathStr = path;
+    cleanPath(cleanPathStr);
 
-//     if (file.is_open()) {
-//         std::ostringstream bodyStream;
-//         bodyStream << file.rdbuf();
-//         response.body = bodyStream.str();
-//         response.setStatus("200", "OK");
-//     } else {
-//         response.setStatus("404", "Not Found");
-//         response.body = "<html><body><h1>404 Not Found</h1></body></html>";
-//     }
-
-//     response.buildResponse();
-//     return response;
-// }
-
-// void HTTPResponse::buildResponse() {
-//     std::string response = 
-//         "HTTP/1.1 200 OK\r\n"
-//         "Content-Type: text/html\r\n"
-//         "Content-Length: 20\r\n" // Length of the HTML content
-//         "\r\n";
-//     std::string bod = "<h1>Hello World</h1>";
-//     headers = response;
-//     setBody(bod);
-// }
-
-void HTTPResponse::setResponse(const std::string& responseContent) {
-    response = responseContent;
+    std::string directoryListing = listDirectory(cleanPathStr, "./www");
+    if (!directoryListing.empty()) {
+        setStatus("200", "OK");
+        setBody(directoryListing);
+    } else {
+        setStatus("404", "Not Found");
+        setBody("<html><body><h1>404 Not Found Narcisse</h1></body></html>");
+    }
 }
 
-std::string HTTPResponse::getData() {
-    // Construct the response content
-    body = "<h1>Hello World</h1>";
-    std::string responseContent = 
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html\r\n"
-        "Content-Length: " + std::to_string(body.size()) + "\r\n"
-        "\r\n" + body;
-    
-    // Use the setter to ensure _response is updated
-    setResponse(responseContent);
+void HTTPResponse::setDefaultResponse()
+{
 
-    // Return the stored response
-    return response;
+	std::ifstream file("./www/index.html");
+
+	if (file.is_open())
+	{
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+		setBody(buffer.str());
+		setStatus("200", "OK");
+	}
+	else
+	{
+		setStatus("404", "Not Found");
+		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+	}
+}
+
+void HTTPResponse::setStatus(const std::string &code, const std::string &message)
+{
+	_statusCode = code;
+	_statusMessage = message;
+}
+
+void HTTPResponse::setBody(const std::string &body)
+{
+	_body = body;
 }
 
 std::string HTTPResponse::getData() const
@@ -75,61 +121,109 @@ std::string HTTPResponse::getData() const
 	return oss.str();
 }
 
-// --- Checkers ---
 
-bool HTTPResponse::isFile(const std::string &path)
-{
-	struct stat info;
-    return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
+//  * ex: /Users/toukoum/42/webserv/././www/../www/../
+//  * -> /Users/toukoum/42/webserv/
+void HTTPResponse::cleanPath(std::string &path) {
+    // Ensure path starts with '/' and ends with '/'
+    if (path[0] != '/')
+        path.insert(0, "/");
+    if (path[path.size() - 1] != '/')
+        path += "/";
+
+    // Normalize multiple slashes to a single slash
+    path.erase(std::unique(path.begin(), path.end(), [](char a, char b) {
+        return a == '/' && b == '/';
+    }), path.end());
+
+    // Remove all "/./" occurrences
+    size_t pos;
+    while ((pos = path.find("/./")) != std::string::npos) {
+        path.erase(pos, 2);
+    }
+
+    // Remove all "/prev/../" occurrences
+    while ((pos = path.find("/../")) != std::string::npos) {
+        if (pos == 0) {
+            path.erase(0, 3);
+            continue;
+        }
+        size_t prev = path.rfind('/', pos - 1);
+        if (prev != std::string::npos) {
+            path.erase(prev, pos - prev + 3);
+        } else {
+            path.erase(0, pos + 3);
+        }
+    }
 }
 
-bool HTTPResponse::isFileLarge(const std::string &path)
-{
-	std::ifstream file("./www" + path);
-	file.seekg(0, std::ios::end);
-	int fileSize = file.tellg();
-	file.close();
-	return fileSize > MAX_ALLOWED_FILE_SIZE;
+// Lists the contents of a directory and returns an HTML-formatted string
+std::string HTTPResponse::listDirectory(const std::string& path, const std::string& root) {
+    std::string fullPath = root + path;
+    DIR* dir = opendir(fullPath.c_str());
+    if (!dir) {
+        return ""; // Directory not found or unable to open
+    }
+    std::stringstream html;
+    html << "<html><head><title>Directory Listing</title></head><body>";
+    html << "<h1>Directory Listing for " << path << "</h1><ul>";
+
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+        std::string name = entry->d_name;
+        if (name == "." || name == "..") continue;
+
+        struct stat info;
+        std::string itemPath = fullPath + "/" + name;
+        if (stat(itemPath.c_str(), &info) == 0) {
+            if (S_ISDIR(info.st_mode)) {
+                html << "<li><b>[DIR]</b> <a href=\"" << path + "/" + name << "/\">" << name << "/</a></li>";
+            } else {
+                html << "<li><a href=\"" << path + "/" + name << "\">" << name << "</a></li>";
+            }
+        }
+    }
+    closedir(dir);
+    html << "</ul></body></html>";
+    return html.str();
 }
 
-bool HTTPResponse::isDirectory(const std::string &path)
-{
-	struct stat info;
-    return stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode);
-}
 
-bool HTTPResponse::isPathValid(const std::string &path)
-{
-	for (ServerConfig serverConfig : _client->getServer()->getConfigs()._servers)
-	{
-		if (path.find(serverConfig._root) != std::string::npos)
-		{
-			return true;
-		}
-	}
-	
-	return false;
-}
 
-// --- Utils ---
+// std::string listDirectory(std::string path, std::string root) {
+//     cleanPath(path);
 
-std::string HTTPResponse::getMimeType(const std::string &path)
-{
-	std::string extension = path.substr(path.find_last_of('.') + 1);
-	if (extension == "html" || extension == "htm")
-	{
-		return "text/html";
-	}
-	else if (extension == "css")
-	{
-		return "text/css";
-	}
-	else if (extension == "js")
-	{
-		return "text/javascript";
-	}
-	else
-	{
-		return "text/plain";
-	}
-}
+//     // Ensure path starts with a '.' if it doesn't already
+//     if (path[0] != '.')
+//         path.insert(0, ".");
+//     // Output debugging information
+//     std::cout << "Root: " << root << std::endl;
+//     std::cout << "Path: " << path << std::endl;
+
+//     return ""; // Placeholder return, replace with actual return logic
+// }
+
+
+// //setters
+// void HTTPResponse::setStatus(const std::string& code, const std::string& message) {
+//     _statusCode = code;
+//     _statusMessage = message;
+// }
+// void HTTPResponse::setHeader(const std::string& header) {
+//     _header = header;
+// }
+// void HTTPResponse::setBody(const std::string& body) {
+// 	_body = body;
+// }
+
+// // std::string HTTPResponse::getData() {
+// //     // Construct the response content
+// //     _body = "<h1>Hello World</h1>";
+// //     _response = "HTTP/1.1 200 OK\r\n";
+// // 	_response += "Content-Type: text/html\r\n";
+// //     _response += "Content-Length: " + std::to_string(_body.size()) + "\r\n";
+// // 	_response += "\r\n" + _body;
+
+// //     // Return the stored response
+// //     return _response;
+// // }

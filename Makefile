@@ -18,6 +18,7 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/Socket/Socket.cpp \
        $(SRC_DIR)/Request/HTTPRequest.cpp \
        $(SRC_DIR)/Response/HTTPResponse.cpp \
+       $(SRC_DIR)/Response/HTTPResponseUtils.cpp \
        $(SRC_DIR)/Parse/ConfigParser.cpp \
        $(SRC_DIR)/Parse/LocationConfig.cpp \
        $(SRC_DIR)/Parse/ServerConfig.cpp
