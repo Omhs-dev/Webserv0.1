@@ -101,6 +101,8 @@ class HTTPRequest
 		// --- UTILS ---
 		std::string getLineSanitizer(std::stringstream &ss);
 		void errorOccur(int code);
+		bool validateLocation(const std::string& path);
+		LocationConfig* findLocationConfig(const std::string& path);
 };
 
 #endif

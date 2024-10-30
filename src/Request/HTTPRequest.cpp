@@ -266,3 +266,41 @@ std::string HTTPRequest::getLineSanitizer(std::stringstream &ss)
         line.erase(line.find('\r'));
     return line;
 }
+
+LocationConfig* HTTPRequest::findLocationConfig(const std::string& path) {
+    // Ensure server and locations are correctly initialized
+    auto& locations = _client->getServer()->getConfigs()._servers[0]._locations;
+    
+    for (LocationConfig& location : locations) {
+        std::string locPath = location.getLocationPath();
+
+        // Check if locPath is empty or contains invalid data
+        if (locPath.empty() || locPath.find_first_not_of(" \t\n") == std::string::npos) {
+            std::cerr << "Warning: Empty or invalid location path in config." << std::endl;
+            continue;
+        }
+
+        std::cout << "Checking location path: " << locPath << std::endl;
+        std::cout << "Client server root: " << _client->getServer()->getConfigs()._servers[0]._root << std::endl;
+
+        // Check if the location path is a prefix of the request path
+        if (path.find(locPath) == 0) {
+            std::cout << "Match found for path: " << locPath << std::endl;
+            return &location;  // Found a matching location
+        }
+    }
+
+    std::cerr << "Error: Location not configured for path: " << path << std::endl;
+    return nullptr;  // No matching location found
+}
+
+
+bool HTTPRequest::validateLocation(const std::string& path) {
+    LocationConfig* location = findLocationConfig(path);
+    if (location == nullptr) {
+        std::cerr << "Error: Location not configured for path: " << path << std::endl;
+        return false;  // Indicate invalid location
+    }
+    _location = location;  // Store the valid location
+    return true;
+}

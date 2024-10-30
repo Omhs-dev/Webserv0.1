@@ -47,6 +47,10 @@ void Client::handleResponse()
 	HTTPResponse response;
 	response.generateResponse(_request->getMethod(), _request->getPath());
 	sendResponse(response.getData());
+	
+	// _response = new HTTPResponse(this);
+	// _response->generateResponse();
+	// sendResponse(_response->getData());
 }
 
 void Client::sendResponse(const std::string &response)
@@ -57,5 +61,6 @@ void Client::sendResponse(const std::string &response)
 Client::~Client()
 {
 	delete _request;
+	// delete _response;
 	close(_clientSocket);
 }

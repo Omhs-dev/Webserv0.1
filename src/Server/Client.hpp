@@ -35,6 +35,7 @@ class Client
 	    ~Client();
 		
 		Server *getServer() const { return _server; }
+		HTTPRequest *getRequest() const { return _request; }
 		
 		class ClientException : public std::exception
 		{

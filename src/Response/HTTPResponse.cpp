@@ -21,6 +21,8 @@ void HTTPResponse::handleGet(const std::string &path)
 	}
 	else if (path != "/")
 	{
+		// if (isPathValid(path))
+		// 	std::cout << "Checking if Path is valid" << std::endl;
 		setStandardResponse("./www" + path);
 		std::cout << "Path: " << path << std::endl;
 	}
@@ -70,7 +72,6 @@ void HTTPResponse::setDefaultResponse()
 }
 
 
-
 void HTTPResponse::setStatus(const std::string &code, const std::string &message)
 {
 	_statusCode = code;
@@ -118,16 +119,40 @@ bool HTTPResponse::isDirectory(const std::string &path)
 
 bool HTTPResponse::isPathValid(const std::string &path)
 {
-	for (ServerConfig serverConfig : _client->getServer()->getConfigs()._servers)
-	{
-		if (path.find(serverConfig._root) != std::string::npos)
-		{
-			return true;
-		}
-	}
-	
-	return false;
+    // Check if _client is not null
+    if (!_client) {
+        std::cerr << "Error: _client is null" << std::endl;
+        return false;
+    }
+
+    // Check if _client->getServer() is not null
+    if (!_client->getServer()) {
+        std::cerr << "Error: Server pointer in _client is null" << std::endl;
+        return false;
+    }
+
+    // Check if _client->getServer()->getConfigs() is not null
+    const HTTPConfigs& configs = _client->getServer()->getConfigs();
+    if (configs._servers.empty()) {
+        std::cerr << "Error: Server configs are empty" << std::endl;
+        return false;
+    }
+
+    // Loop through the server configurations
+    for (const ServerConfig& serverConfig : configs._servers)
+    {
+        std::cout << "Server root: " << serverConfig._root << std::endl;
+        if (path.find(serverConfig._root) != std::string::npos)
+        {
+            std::cout << "Path is valid" << std::endl;
+            return true;
+        }
+        std::cout << "Path is not valid" << std::endl;
+    }
+
+    return false;
 }
+
 
 // --- Utils ---
 

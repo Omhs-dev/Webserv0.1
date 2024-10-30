@@ -1,4 +1,3 @@
-// HTTPResponse.hpp
 #ifndef HTTPRESPONSE_HPP
 #define HTTPRESPONSE_HPP
 
@@ -17,6 +16,10 @@
 class HTTPRequest;
 class Client;
 
+// Create a content type mime type map function
+
+// Create a function to highlight all the status codes
+
 // Set a content type based on the file extension
 // set an error page message
 
@@ -33,7 +36,10 @@ class Client;
 						// check if the path is a file
 							// if yes serve the file
 						// check if the path is a directory
-							// if yes serve the directory
+							// check if the directory has an index file
+								// if yes serve the index file
+							// check if the directory has an autoindex on or off
+								// if yes serve the directory
 						// if is a recirect
 							// if yes serve the redirect
 					// if no serve 404
@@ -43,6 +49,7 @@ class HTTPResponse
 {
 private:
 	Client *_client;
+	HTTPRequest *_request;
 	std::string _statusCode;
 	std::string _statusMessage;
 	std::vector<std::string> _headers;
