@@ -67,6 +67,7 @@ public:
 	std::string getData() const;
 	std::vector<std::string> getHeaders() const { return _headers; }
 	std::string getMimeType(const std::string &path);
+	std::string getErrorMesssage(const std::string &code);
 	
 	bool isFileLarge(const std::string &path);
 	bool isFile(const std::string &path);

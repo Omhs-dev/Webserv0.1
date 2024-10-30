@@ -71,7 +71,6 @@ void HTTPResponse::setDefaultResponse()
 	}
 }
 
-
 void HTTPResponse::setStatus(const std::string &code, const std::string &message)
 {
 	_statusCode = code;
@@ -151,28 +150,4 @@ bool HTTPResponse::isPathValid(const std::string &path)
     }
 
     return false;
-}
-
-
-// --- Utils ---
-
-std::string HTTPResponse::getMimeType(const std::string &path)
-{
-	std::string extension = path.substr(path.find_last_of('.') + 1);
-	if (extension == "html" || extension == "htm")
-	{
-		return "text/html";
-	}
-	else if (extension == "css")
-	{
-		return "text/css";
-	}
-	else if (extension == "js")
-	{
-		return "text/javascript";
-	}
-	else
-	{
-		return "text/plain";
-	}
 }
