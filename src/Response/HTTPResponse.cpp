@@ -21,6 +21,11 @@ void HTTPResponse::handleGet(const std::string &path)
 		setStandardResponse(path);
 		std::cout << "Path: " << path << std::endl;
 	}
+	else if (path == "/test")
+	{
+		setStandardResponse(path);
+		std::cout << "Path: "  << path << std::endl;
+	}
 	else
 	{
 		setStatus("404", "Not Found");
@@ -60,25 +65,44 @@ void HTTPResponse::handleGet(const std::string &path)
 // 	}
 // }
 
-// Sets the response based on the path provided
+
 void HTTPResponse::setStandardResponse(const std::string& path) {
-    // check if the directory has an index
-        // if yes serve that index
-    // if not check if directory has an autoindex on or off
-        // if on serve directory elements
-        // else serve page not found 404
+    // Clean up the provided path
     std::string cleanPathStr = path;
     cleanPath(cleanPathStr);
 
-    std::string directoryListing = listDirectory(cleanPathStr, "./www");
-    if (!directoryListing.empty()) {
+    // Construct the full path by prepending the root directory, e.g., "./www"
+    std::string fullPath = "./www" + cleanPathStr;
+
+    // Check if an index file exists in the directory (e.g., "index.html")
+    std::string indexFilePath = fullPath + "/index.html";
+    std::ifstream indexFile(indexFilePath);
+
+    // Serve the index file if it exists
+    if (indexFile.is_open()) {
+        std::stringstream buffer;
+        buffer << indexFile.rdbuf(); // Read file contents
         setStatus("200", "OK");
-        setBody(directoryListing);
-    } else {
-        setStatus("404", "Not Found");
-        setBody("<html><body><h1>404 Not Found Narcisse</h1></body></html>");
+        setBody(buffer.str());
+        indexFile.close();
+        return;
     }
+	bool _autoIndex = 1;
+    // No index file found, so check autoindex status
+    if (_autoIndex){
+        // Generate a directory listing if autoindex is enabled
+        std::string directoryListing = listDirectory(cleanPathStr, "./www");
+        if (!directoryListing.empty()) {
+            setStatus("200", "OK");
+            setBody(directoryListing);
+            return;
+        }
+    }
+    // Neither index file found nor autoindex enabled, so return 404
+    setStatus("404", "Not Found");
+    setBody("<html><body><h1>404 Not Found Narcisse</h1></body></html>");
 }
+
 
 void HTTPResponse::setDefaultResponse()
 {

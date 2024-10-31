@@ -102,3 +102,41 @@ int main() {
 
     return 0;
 }
+
+void HTTPResponse::setStandardResponse(const std::string& path) {
+    // Clean up the provided path
+    std::string cleanPathStr = path;
+    cleanPath(cleanPathStr);
+
+    // Construct the full path by prepending the root directory, e.g., "./www"
+    std::string fullPath = "./www" + cleanPathStr;
+
+    // Check if an index file exists in the directory (e.g., "index.html")
+    std::string indexFilePath = fullPath + "/index.html";
+    std::ifstream indexFile(indexFilePath);
+
+    // Serve the index file if it exists
+    if (indexFile.is_open()) {
+        std::stringstream buffer;
+        buffer << indexFile.rdbuf(); // Read file contents
+        setStatus("200", "OK");
+        setBody(buffer.str());
+        indexFile.close();
+        return;
+    }
+
+    // No index file found, so check autoindex status
+    if (_autoindex) {
+        // Generate a directory listing if autoindex is enabled
+        std::string directoryListing = listDirectory(cleanPathStr, "./www");
+        if (!directoryListing.empty()) {
+            setStatus("200", "OK");
+            setBody(directoryListing);
+            return;
+        }
+    }
+
+    // Neither index file found nor autoindex enabled, so return 404
+    setStatus("404", "Not Found");
+    setBody("<html><body><h1>404 Not Found Narcisse</h1></body></html>");
+}
