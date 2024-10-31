@@ -12,6 +12,7 @@ void HTTPResponse::generateResponse(const std::string &method, const std::string
 		handleGet(path);
 	}
 }
+
 void HTTPResponse::handleGet(const std::string &path)
 {
 	if (path == "/")
@@ -33,39 +34,6 @@ void HTTPResponse::handleGet(const std::string &path)
 	}
 }
 
-	// std::string root;
-	// if(this->_request->getLocation()->getRoot().empty())
-	// 	root = this-> _request->getServer()->getRoot();
-	// root = this->_request->getLocation()->getRoot();
-	
-
-	// std::cout << "Path not found" << std::endl;
-
-// void HTTPResponse::setStandardResponse(const std::string &path)
-// {
-
-// 	if(path.empty())
-// 	std::string response;
-// 	response = listDirectory("./www", path);
-// 	std::ifstream file(path);
-
-// 	if (file.is_open())
-// 	{
-// 		std::stringstream buffer;
-// 		buffer << file.rdbuf();
-// 		setStatus("200", "OK");
-// 		setBody(buffer.str());
-		
-// 		file.close();
-// 	}
-// 	else
-// 	{
-// 		setStatus("404", "Not Found");
-// 		setBody("<html><body><h1>404 Not Found</h1></body></html>");
-// 	}
-// }
-
-
 void HTTPResponse::setStandardResponse(const std::string& path) {
     // Clean up the provided path
     std::string cleanPathStr = path;
@@ -75,7 +43,7 @@ void HTTPResponse::setStandardResponse(const std::string& path) {
     std::string fullPath = "./www" + cleanPathStr;
 
     // Check if an index file exists in the directory (e.g., "index.html")
-    std::string indexFilePath = fullPath + "/index.html";
+    std::string indexFilePath = fullPath + "index.html";
     std::ifstream indexFile(indexFilePath);
 
     // Serve the index file if it exists
@@ -102,7 +70,6 @@ void HTTPResponse::setStandardResponse(const std::string& path) {
     setStatus("404", "Not Found");
     setBody("<html><body><h1>404 Not Found Narcisse</h1></body></html>");
 }
-
 
 void HTTPResponse::setDefaultResponse()
 {
@@ -145,9 +112,6 @@ std::string HTTPResponse::getData() const
 	return oss.str();
 }
 
-
-//  * ex: /Users/toukoum/42/webserv/././www/../www/../
-//  * -> /Users/toukoum/42/webserv/
 void HTTPResponse::cleanPath(std::string &path) {
     // Ensure path starts with '/' and ends with '/'
     if (path[0] != '/')
@@ -211,43 +175,3 @@ std::string HTTPResponse::listDirectory(const std::string& path, const std::stri
     html << "</ul></body></html>";
     return html.str();
 }
-
-
-
-// std::string listDirectory(std::string path, std::string root) {
-//     cleanPath(path);
-
-//     // Ensure path starts with a '.' if it doesn't already
-//     if (path[0] != '.')
-//         path.insert(0, ".");
-//     // Output debugging information
-//     std::cout << "Root: " << root << std::endl;
-//     std::cout << "Path: " << path << std::endl;
-
-//     return ""; // Placeholder return, replace with actual return logic
-// }
-
-
-// //setters
-// void HTTPResponse::setStatus(const std::string& code, const std::string& message) {
-//     _statusCode = code;
-//     _statusMessage = message;
-// }
-// void HTTPResponse::setHeader(const std::string& header) {
-//     _header = header;
-// }
-// void HTTPResponse::setBody(const std::string& body) {
-// 	_body = body;
-// }
-
-// // std::string HTTPResponse::getData() {
-// //     // Construct the response content
-// //     _body = "<h1>Hello World</h1>";
-// //     _response = "HTTP/1.1 200 OK\r\n";
-// // 	_response += "Content-Type: text/html\r\n";
-// //     _response += "Content-Length: " + std::to_string(_body.size()) + "\r\n";
-// // 	_response += "\r\n" + _body;
-
-// //     // Return the stored response
-// //     return _response;
-// // }
