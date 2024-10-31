@@ -4,7 +4,6 @@
 
 HTTPResponse::HTTPResponse() : _statusCode("200"), _statusMessage("OK") {}
 
-
 void HTTPResponse::generateResponse(const std::string &method, const std::string &path)
 {
 	if (method == "GET")
@@ -17,7 +16,7 @@ void HTTPResponse::handleGet(const std::string &path)
 {
 	if (path == "/")
 		setDefaultResponse();
-	else if (path == "/images")
+	else if (path != "/")
 	{
 		setStandardResponse(path);
 		std::cout << "Path: " << path << std::endl;
@@ -30,7 +29,7 @@ void HTTPResponse::handleGet(const std::string &path)
 	else
 	{
 		setStatus("404", "Not Found");
-		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+		setBody("<html><body><h1>404 Not Found here</h1></body></html>");
 	}
 }
 
@@ -45,6 +44,8 @@ void HTTPResponse::setStandardResponse(const std::string& path) {
     // Check if an index file exists in the directory (e.g., "index.html")
     std::string indexFilePath = fullPath + "index.html";
     std::ifstream indexFile(indexFilePath);
+
+	std::cout << "Index file path int setstandardresponse: " << indexFilePath << std::endl;
 
     // Serve the index file if it exists
     if (indexFile.is_open()) {

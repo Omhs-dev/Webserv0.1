@@ -9,7 +9,6 @@
 // #include "../Server/Client.hpp"
 // #include "../Request/HTTPRequest.hpp"
 
-
 // // function that generates responses based on the req
 //    // function to handle delete req
 //    // function to handle put req
@@ -22,7 +21,6 @@
 //            //Check if the req path points to a large file
 //                //If yes prepare a chunked response
 //            // otherwise prepare a standard response
-
 
 // class Client;
 // class HTTPRequest;
@@ -102,11 +100,13 @@ class Client;
 						// check if the path is a file
 							// if yes serve the file
 						// check if the path is a directory
-							// if yes serve the directory
+							// check if the directory has an index file
+								// if yes serve the index file
+							// check if the directory has an autoindex on or off
+								// if yes serve the directory
 						// if is a recirect
 							// if yes serve the redirect
 					// if no serve 404
-				
 
 class HTTPResponse
 {
