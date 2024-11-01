@@ -14,7 +14,7 @@
 #include "../Server/Client.hpp"
 #include "../Parse/LocationConfig.hpp"
 #include "../Parse/ConfigParser.hpp"
-#include "../Parse/ServerConfig.hpp"
+#include "../Server/Server.hpp"
 
 
 #define MAX_ALLOWED_FILE_SIZE 1024 * 1024
@@ -55,12 +55,14 @@ class HTTPResponse
 {
 private:
 	Client *_client;
+	// Server *_server;
 	std::string _statusCode;
 	std::string _statusMessage;
 	std::vector<std::string> _headers;
 	std::string _body;
 	
-	HTTPConfigs *_httpConfigs;
+	// ConfigParser _configParser;
+	HTTPConfigs _httpConfigs;
 	HTTPRequest	*_request;
 
 	void handleGet(const std::string &path);
@@ -83,7 +85,8 @@ public:
 
 	void cleanPath(std::string &path);
 	std::string listDirectory(const std::string &path, const std::string& root);
-	LocationConfig checkLocationPath(const std::string& path);
+	// LocationConfig checkLocationPath(const std::string& path);
+	std::string checkLocationPath(const std::string& path);
 };
 
 #endif

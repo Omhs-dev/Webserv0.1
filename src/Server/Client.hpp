@@ -28,7 +28,9 @@ class Client
 	    void clientConnectionProcess();
 	    void handleRequest();
 	    void handleResponse();
-
+		
+		std::string checkLocationPath(const std::string& path);
+		
 	    ~Client();
 		
 		Server *getServer() const { return _server; }

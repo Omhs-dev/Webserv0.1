@@ -44,8 +44,33 @@ void Client::handleRequest()
 void Client::handleResponse()
 {
 	HTTPResponse response;
+	// checkLocationPath(_request->getPath());
+	std::cout << "server root: " << _server->getConfigs()._servers[0].getRoot() << std::endl;
+	std::cout << "loccation path: " << _server->getConfigs()._servers[0].getLocations()[0].getLocationPath() << std::endl;
 	response.generateResponse(_request->getMethod(), _request->getPath());
 	sendResponse(response.getData());
+}
+
+std::string Client::checkLocationPath(const std::string &path)
+{
+	std::cout << "Checking location path: " << path << std::endl;
+	std::cout << "before for loop" << std::endl;
+	for (auto &server : _server->getConfigs()._servers)
+	{
+		std::cout << "inside for loop" << std::endl;
+		for (LocationConfig &location : server.getLocations())
+		{
+			std::cout << "inside for loop 2" << std::endl;
+			if (path == location.getLocationPath())
+			{ // Path matches location
+				std::cout << "Location found: " << location.getLocationPath() << std::endl;
+				// return location.getLocationPath(); // Return the matched location configuration
+				// break;
+			}
+		}
+		std::cout << "server location index: " << server.getIndex() << std::endl;
+	}
+	return "";
 }
 
 void Client::sendResponse(const std::string &response)

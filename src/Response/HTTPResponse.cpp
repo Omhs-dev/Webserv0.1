@@ -14,12 +14,19 @@ void HTTPResponse::generateResponse(const std::string &method, const std::string
 
 void HTTPResponse::handleGet(const std::string &path)
 {
+	std::cout << "before checkLocationPath int the handleGet" << std::endl;
+	std::string locationPath = checkLocationPath(path);
+	
+	std::cout << "locationPath: " << locationPath << std::endl;
+	
 	if (path == "/")
 		setDefaultResponse();
 	else if (path != "/")
 	{
-        LocationConfig item = checkLocationPath(path);
-        std::cout <<"item location path and other: "<< item.getRoot() << std::endl;
+		// std::cout << "before checkLocationPath" << std::endl;
+        // LocationConfig item = checkLocationPath(path);
+        // std::cout <<"item location path and other: "<< item.getLocationPath() << std::endl;
+        // std::cout <<"item location index: "<< item.getIndex() << std::endl;
 		setStandardResponse(path);
 		std::cout << "Path: " << path << std::endl;
 
@@ -36,38 +43,46 @@ void HTTPResponse::handleGet(const std::string &path)
 	}
 }
 
-	// std::string root;
-	// if(this->_request->getLocation()->getRoot().empty())
-	// 	root = this-> _request->getServer()->getRoot();
-	// root = this->_request->getLocation()->getRoot();
-	
-
-	// std::cout << "Path not found" << std::endl;
-
-// void HTTPResponse::setStandardResponse(const std::string &path)
-// {
-
-// 	if(path.empty())
-// 	std::string response;
-// 	response = listDirectory("./www", path);
-// 	std::ifstream file(path);
-
-// 	if (file.is_open())
-// 	{
-// 		std::stringstream buffer;
-// 		buffer << file.rdbuf();
-// 		setStatus("200", "OK");
-// 		setBody(buffer.str());
-		
-// 		file.close();
-// 	}
-// 	else
-// 	{
-// 		setStatus("404", "Not Found");
-// 		setBody("<html><body><h1>404 Not Found</h1></body></html>");
-// 	}
+// LocationConfig HTTPResponse::checkLocationPath(const std::string& path) {
+// 	std::cout << "Checking location path: " << path << std::endl;
+// 	std::cout << "before for loop" << std::endl;
+//     for (auto& server : _server->getConfigs()._servers) {
+//         std::cout << "inside for loop" << std::endl;
+//         for (LocationConfig& location : server.getLocations()) {
+//             std::cout << "inside for loop 2" << std::endl;
+//             if (path.find(location.getLocationPath()) == 0) { // Path matches location
+//                 std::cout << "Location found: " << location.getLocationPath() << std::endl;
+//                 return location; // Return the matched location configuration
+//                 break;
+//             }
+//         }
+//         std::cout << "server location index: " << server.getRoot() << std::endl;
+//     }
+//     std::cout << "outside for loop" << std::endl;
+//     // Return an empty LocationConfig if no match is found
+//     return LocationConfig();
 // }
 
+std::string HTTPResponse::checkLocationPath(const std::string& path)
+{
+	for (auto &server : _httpConfigs._servers)
+	{
+		for (LocationConfig &location : server.getLocations())
+		{
+			if (path == location.getLocationPath())
+			{
+				std::cout << "Location found: " << location.getLocationPath() << std::endl;
+				return location.getLocationPath();
+			}
+			else
+			{
+				std::cout << "Location not found: " << location.getLocationPath() << std::endl;
+			}
+		}
+	}
+	
+	return "";
+}
 
 void HTTPResponse::setStandardResponse(const std::string& path) {
     // Clean up the provided path
