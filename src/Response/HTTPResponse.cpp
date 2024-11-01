@@ -18,43 +18,52 @@ HTTPResponse::HTTPResponse(Client *client)
 void HTTPResponse::generateResponse()
 {
 	std::string reqMethod = _request->getMethod();
-	std::string reqPath = _request->getPath();
 	
-	std::string goodPath = checkLocationPath(reqPath);
+	// std::string goodPath = checkLocationPath(reqPath);
 	
-	std::cout << "Good path: " << goodPath << std::endl;
+	// std::cout << "Good path: " << goodPath << std::endl;
 	
 	// std::cout << "Request Method: " << reqMethod << std::endl;
-	// std::cout << "Request Path: " << reqPath << std::endl;
+	// std::cout << "Request Path at the beginin: " << reqPath << std::endl;
 	
 	// std::cout << "server root: " << _server->getConfigs()._servers[0].getRoot() << std::endl;
 	// std::cout << "location path: " << _server->getConfigs()._servers[0].getLocations()[0].getLocationPath() << std::endl;
 	
 	if (reqMethod == "GET")
 	{
-		handleGet(reqPath);
+		handleGet();
 	}
 }
 
-void HTTPResponse::handleGet(const std::string &path)
+void HTTPResponse::handleGet()
 {
+	// create a function to check if the path is a file
+	// create a function setFileResponse
+	// create a function to have server root
+	std::string reqPath = _request->getPath();
+	LocationConfig location = checkLocationPath(reqPath);
 	
+	std::cout << "reqPath🪜 : "  << reqPath << std::endl;
+	std::cout << "location path🪜 1 : "  << location.getLocationPath() << std::endl;
 	
-	if (path == "/")
+	if (isFile("./www" + reqPath))
+	{
+		// continue implementation from here
+		std::cout << "File found 0" << std::endl;
+	}
+	if (reqPath == "/")
 	{
 		// checkLocationPath(path);
 		setDefaultResponse();
 	}
-	else if (path != "/")
+	else if (reqPath == location.getLocationPath())
 	{
-		setStandardResponse(path);
-		std::cout << "Path: " << path << std::endl;
-
-	}
-	else if (path == "/test")
-	{
-		setStandardResponse(path);
-		std::cout << "Path: "  << path << std::endl;
+		std::cout << "path macthes location path ✔️" << std::endl;
+		cleanPath(reqPath);
+		setStandardResponse();
+		if (isFile(reqPath))
+			std::cout << "File found 0" << std::endl;
+		std::cout << "reqPath: "  << reqPath << std::endl;
 	}
 	else
 	{
@@ -63,7 +72,7 @@ void HTTPResponse::handleGet(const std::string &path)
 	}
 }
 
-std::string HTTPResponse::checkLocationPath(const std::string &path)
+LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {
 	std::cout << "Checking location path: " << path << std::endl;
 	std::cout << "before for loop" << std::endl;
@@ -72,61 +81,114 @@ std::string HTTPResponse::checkLocationPath(const std::string &path)
 		std::cout << "inside for loop 2" << std::endl;
 		for (LocationConfig &location : server.getLocations())
 		{
+			std::cout << "locations path: " << location.getLocationPath() << std::endl;
 			std::cout << "inside for loop 2" << std::endl;
-			if (path == location.getLocationPath() || path.find(location.getLocationPath()) == 0)
+			if (path == location.getLocationPath())
 			{ // Path matches location
 				std::cout << "Location found: " << location.getLocationPath() << std::endl;
-				return location.getLocationPath(); // Return the matched location configuration
+				return location; // Return the matched location configuration
 				break;
+			}
+			if (path.find(".html") != std::string::npos) // here to chage .html to isValideFile - check if line has an ext.
+			{
+				if (path == location.getLocationPath() + location.getIndex())
+				{
+					std::cout << "File found 1 📄 :" << location.getLocationPath() + location.getIndex() << std::endl;
+					return location;
+					break;
+				}
+			
 			}
 		}
 		std::cout << "server location index: " << server.getIndex() << std::endl;
+		std::cout << "Location not found ❗" << std::endl;
 	}
-	return "";
+	return LocationConfig();
 }
 
-void HTTPResponse::setStandardResponse(const std::string& path) {
+void HTTPResponse::setStandardResponse() {
+	// check if the path is a file
+		// if yes serve the file
+	// check if the file is large
+		// if yes prepare chunked response
+	// check if the path is a directory
+		// check if the directory has an index file
+			// if yes serve the index file
+		// if not check if the directory has an autoindex on or off
+			// if yes serve the directory
+	                // else serve page not found 404
     // Clean up the provided path
-    std::string cleanPathStr = path;
-    cleanPath(cleanPathStr);
-
-    // Construct the full path by prepending the root directory, e.g., "./www"
-    std::string fullPath = "./www" + cleanPathStr;
-
-    // Check if an index file exists in the directory (e.g., "index.html")
-    std::string indexFilePath = fullPath + "index.html";
-    std::ifstream indexFile(indexFilePath);
+    std::string reqPath = _request->getPath();
+    LocationConfig location = checkLocationPath(reqPath);
+    cleanPath(reqPath);
+	
+	std::cout << "location autoindex: " << location.getAutoindex() << std::endl;
+	std::cout << "location root: " << location.getRoot() << std::endl;
+	
+	std::cout << "check again Request Path🪜: " << reqPath << std::endl;
+	
+    std::string fullPath = location.getRoot() + reqPath;
+    std::string indexFilePath = fullPath + location.getIndex();
 
 	std::cout << "Index file path int setstandardresponse: " << indexFilePath << std::endl;
+	
+	
+	// std::ifstream file(indexFilePath);
 
-    // Serve the index file if it exists
-    if (indexFile.is_open()) {
-        std::stringstream buffer;
-        buffer << indexFile.rdbuf(); // Read file contents
-        setStatus("200", "OK");
-        setBody(buffer.str());
-        indexFile.close();
-        return;
+	// if (file.is_open())
+	// {
+	// 	std::stringstream buffer;
+	// 	buffer << file.rdbuf();
+	// 	setStatus("200", "OK");
+	// 	setBody(buffer.str());
+		
+	// 	file.close();
+	// }
+	
+	// check if the path is a directory
+	if (isFile(reqPath))
+		std::cout << "File found 2 in ssr 📄" << std::endl;
+	if (isDirectory(fullPath))
+	{
+		std::cout << "Inside the directory 📁" << std::endl;
+		// check if the directory has an index file if yes serve the index file
+        std::ifstream indexFile(indexFilePath);
+	    if (indexFile.is_open() && indexFilePath.find(".html") != std::string::npos) // here to chage .html to isValideFile
+	    {
+	        std::cout << "inside index file" << std::endl;
+	        std::stringstream buffer;
+	        buffer << indexFile.rdbuf(); // Read file contents
+	        setStatus("200", "OK");
+	        setBody(buffer.str());
+	        // reqPath = indexFilePath;
+	        indexFile.close();
+	        return;
+	    }
+		// if not check if the directory has an autoindex on or off
+	    else if (location.getAutoindex() == 1)
+	    {
+	        // Generate a directory listing if autoindex is enabled
+	        std::cout << "location root in autoindex case: " << location.getRoot() << std::endl;
+	        std::cout << "location path in autoindex case: " << location.getLocationPath() << std::endl;
+	        std::string directoryListing = listDirectory(reqPath, location.getRoot());
+	        if (!directoryListing.empty())
+	        {
+	            setStatus("200", "OK");
+	            setBody(directoryListing);
+	            return;
+	        }
+	    }
+	}
+    else
+    {
+        // Neither index file found nor autoindex enabled, so return 404
+        setStatus("404", "Not Found");
+        setBody("<html><body><h1>404 Not Found</h1></body></html>");
     }
-	bool _autoIndex = 1;
-    // No index file found, so check autoindex status
-    if (_autoIndex){
-        // Generate a directory listing if autoindex is enabled
-        std::string directoryListing = listDirectory(cleanPathStr, "./www");
-        if (!directoryListing.empty()) {
-            setStatus("200", "OK");
-            setBody(directoryListing);
-            return;
-        }
-    }
-    // Neither index file found nor autoindex enabled, so return 404
-    setStatus("404", "Not Found");
-    setBody("<html><body><h1>404 Not Found Narcisse</h1></body></html>");
 }
 
 void HTTPResponse::setDefaultResponse()
 {
-
 	std::ifstream file("./www/index.html");
 	if (file.is_open())
 	{

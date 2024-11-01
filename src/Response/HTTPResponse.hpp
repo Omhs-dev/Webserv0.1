@@ -65,9 +65,9 @@ private:
 	
 	// ConfigParser _configParser;
 
-	void handleGet(const std::string &path);
+	void handleGet();
 	void setDefaultResponse();
-	void setStandardResponse(const std::string &path);
+	void setStandardResponse();
 	void setStatus(const std::string &code, const std::string &message);
 	void setBody(const std::string &body);
 
@@ -79,17 +79,17 @@ public:
 	std::vector<std::string> getHeaders() const { return _headers; }
 	std::string getMimeType(const std::string &path);
 	
-	bool isFileLarge(const std::string &path);
-	bool isFile(const std::string &path);
-	bool isDirectory(const std::string &path);
-	bool isPathValid(const std::string &path);
+	// bool isFileLarge(const std::string &path);
+	// bool isFile(const std::string &path);
+	// bool isDirectory(const std::string &path);
+	// bool isPathValid(const std::string &path);
 	
 	// HTTPConfigs getConfigs() const { return _httpConfigs; }
 	
 	void cleanPath(std::string &path);
 	std::string listDirectory(const std::string &path, const std::string& root);
-	// LocationConfig checkLocationPath(const std::string& path);
-	std::string checkLocationPath(const std::string& path);
+	LocationConfig checkLocationPath(const std::string& path);
+	// std::string checkLocationPath(const std::string& path);
 };
 
 #endif

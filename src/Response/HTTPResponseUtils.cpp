@@ -1,6 +1,27 @@
 #include "HTTPResponse.hpp"
 #include "HTTPResponseUtils.hpp"
 
+// --- Checkers ---
+
+bool isFile(const std::string &path)
+{
+	struct stat buffer;
+    return (stat(path.c_str(), &buffer) == 0 && S_ISREG(buffer.st_mode));
+}
+
+bool isDirectory(const std::string &path)
+{
+	struct stat info;
+	if (stat(path.c_str(), &info) != 0)
+		return false;
+	return S_ISDIR(info.st_mode);
+}
+
+bool pathExtension(const std::string &path)
+{
+	return path.find('.') != std::string::npos;
+}
+
 // --- Utils ---
 std::string getMimeType(const std::string &path)
 {
