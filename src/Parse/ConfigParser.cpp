@@ -292,7 +292,8 @@ void ConfigParser::locationPath(const std::string &line, LocationConfig &confLoc
     size_t pos = line.find('{');
     if (pos != std::string::npos)
     {
-        confLocation.locationPath = line.substr(0, pos);
+        size_t pos2 = line.find('/');
+        confLocation.locationPath = line.substr(pos2, pos - pos2);
         removeWhiteSpace(confLocation.locationPath);
     }
     else

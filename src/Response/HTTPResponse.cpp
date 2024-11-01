@@ -2,31 +2,51 @@
 #include "HTTPResponseUtils.hpp"
 
 
-HTTPResponse::HTTPResponse() : _statusCode("200"), _statusMessage("OK") {}
-
-void HTTPResponse::generateResponse(const std::string &method, const std::string &path)
+HTTPResponse::HTTPResponse(Client *client)
 {
-	if (method == "GET")
+	_client = client;
+	_server = client->getServer();
+	_request = client->getRequest();
+	_statusCode = "200";
+	_statusMessage = "OK";
+	_httpConfigs = new HTTPConfigs();
+	_headers = {};
+	_body = "";
+	// _server = new Server(_httpConfigs);
+}
+
+void HTTPResponse::generateResponse()
+{
+	std::string reqMethod = _request->getMethod();
+	std::string reqPath = _request->getPath();
+	
+	std::string goodPath = checkLocationPath(reqPath);
+	
+	std::cout << "Good path: " << goodPath << std::endl;
+	
+	// std::cout << "Request Method: " << reqMethod << std::endl;
+	// std::cout << "Request Path: " << reqPath << std::endl;
+	
+	// std::cout << "server root: " << _server->getConfigs()._servers[0].getRoot() << std::endl;
+	// std::cout << "location path: " << _server->getConfigs()._servers[0].getLocations()[0].getLocationPath() << std::endl;
+	
+	if (reqMethod == "GET")
 	{
-		handleGet(path);
+		handleGet(reqPath);
 	}
 }
 
 void HTTPResponse::handleGet(const std::string &path)
 {
-	std::cout << "before checkLocationPath int the handleGet" << std::endl;
-	std::string locationPath = checkLocationPath(path);
 	
-	std::cout << "locationPath: " << locationPath << std::endl;
 	
 	if (path == "/")
+	{
+		// checkLocationPath(path);
 		setDefaultResponse();
+	}
 	else if (path != "/")
 	{
-		// std::cout << "before checkLocationPath" << std::endl;
-        // LocationConfig item = checkLocationPath(path);
-        // std::cout <<"item location path and other: "<< item.getLocationPath() << std::endl;
-        // std::cout <<"item location index: "<< item.getIndex() << std::endl;
 		setStandardResponse(path);
 		std::cout << "Path: " << path << std::endl;
 
@@ -43,44 +63,25 @@ void HTTPResponse::handleGet(const std::string &path)
 	}
 }
 
-// LocationConfig HTTPResponse::checkLocationPath(const std::string& path) {
-// 	std::cout << "Checking location path: " << path << std::endl;
-// 	std::cout << "before for loop" << std::endl;
-//     for (auto& server : _server->getConfigs()._servers) {
-//         std::cout << "inside for loop" << std::endl;
-//         for (LocationConfig& location : server.getLocations()) {
-//             std::cout << "inside for loop 2" << std::endl;
-//             if (path.find(location.getLocationPath()) == 0) { // Path matches location
-//                 std::cout << "Location found: " << location.getLocationPath() << std::endl;
-//                 return location; // Return the matched location configuration
-//                 break;
-//             }
-//         }
-//         std::cout << "server location index: " << server.getRoot() << std::endl;
-//     }
-//     std::cout << "outside for loop" << std::endl;
-//     // Return an empty LocationConfig if no match is found
-//     return LocationConfig();
-// }
-
-std::string HTTPResponse::checkLocationPath(const std::string& path)
+std::string HTTPResponse::checkLocationPath(const std::string &path)
 {
-	for (auto &server : _httpConfigs._servers)
+	std::cout << "Checking location path: " << path << std::endl;
+	std::cout << "before for loop" << std::endl;
+	for (auto &server : _server->getConfigs()._servers)
 	{
+		std::cout << "inside for loop 2" << std::endl;
 		for (LocationConfig &location : server.getLocations())
 		{
-			if (path == location.getLocationPath())
-			{
+			std::cout << "inside for loop 2" << std::endl;
+			if (path == location.getLocationPath() || path.find(location.getLocationPath()) == 0)
+			{ // Path matches location
 				std::cout << "Location found: " << location.getLocationPath() << std::endl;
-				return location.getLocationPath();
-			}
-			else
-			{
-				std::cout << "Location not found: " << location.getLocationPath() << std::endl;
+				return location.getLocationPath(); // Return the matched location configuration
+				break;
 			}
 		}
+		std::cout << "server location index: " << server.getIndex() << std::endl;
 	}
-	
 	return "";
 }
 

@@ -55,15 +55,15 @@ class HTTPResponse
 {
 private:
 	Client *_client;
-	// Server *_server;
+	Server *_server;
+	HTTPRequest	*_request;
+	HTTPConfigs *_httpConfigs;
 	std::string _statusCode;
 	std::string _statusMessage;
 	std::vector<std::string> _headers;
 	std::string _body;
 	
 	// ConfigParser _configParser;
-	HTTPConfigs _httpConfigs;
-	HTTPRequest	*_request;
 
 	void handleGet(const std::string &path);
 	void setDefaultResponse();
@@ -72,8 +72,9 @@ private:
 	void setBody(const std::string &body);
 
 public:
-	HTTPResponse();
-	void generateResponse(const std::string &method, const std::string &path);
+	HTTPResponse(Client *client);
+	~HTTPResponse();
+	void generateResponse();
 	std::string getData() const;
 	std::vector<std::string> getHeaders() const { return _headers; }
 	std::string getMimeType(const std::string &path);
@@ -82,7 +83,9 @@ public:
 	bool isFile(const std::string &path);
 	bool isDirectory(const std::string &path);
 	bool isPathValid(const std::string &path);
-
+	
+	// HTTPConfigs getConfigs() const { return _httpConfigs; }
+	
 	void cleanPath(std::string &path);
 	std::string listDirectory(const std::string &path, const std::string& root);
 	// LocationConfig checkLocationPath(const std::string& path);

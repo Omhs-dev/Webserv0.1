@@ -29,6 +29,7 @@ class Client
 	    void handleRequest();
 	    void handleResponse();
 		
+		HTTPRequest *getRequest() const { return _request; }
 		std::string checkLocationPath(const std::string& path);
 		
 	    ~Client();
