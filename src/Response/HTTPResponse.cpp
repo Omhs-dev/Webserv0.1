@@ -18,8 +18,11 @@ void HTTPResponse::handleGet(const std::string &path)
 		setDefaultResponse();
 	else if (path != "/")
 	{
+        LocationConfig item = checkLocationPath(path);
+        std::cout <<"item location path and other: "<< item.getRoot() << std::endl;
 		setStandardResponse(path);
 		std::cout << "Path: " << path << std::endl;
+
 	}
 	else if (path == "/test")
 	{
@@ -29,9 +32,42 @@ void HTTPResponse::handleGet(const std::string &path)
 	else
 	{
 		setStatus("404", "Not Found");
-		setBody("<html><body><h1>404 Not Found here</h1></body></html>");
+		setBody("<html><body><h1>404 Not Found</h1></body></html>");
 	}
 }
+
+	// std::string root;
+	// if(this->_request->getLocation()->getRoot().empty())
+	// 	root = this-> _request->getServer()->getRoot();
+	// root = this->_request->getLocation()->getRoot();
+	
+
+	// std::cout << "Path not found" << std::endl;
+
+// void HTTPResponse::setStandardResponse(const std::string &path)
+// {
+
+// 	if(path.empty())
+// 	std::string response;
+// 	response = listDirectory("./www", path);
+// 	std::ifstream file(path);
+
+// 	if (file.is_open())
+// 	{
+// 		std::stringstream buffer;
+// 		buffer << file.rdbuf();
+// 		setStatus("200", "OK");
+// 		setBody(buffer.str());
+		
+// 		file.close();
+// 	}
+// 	else
+// 	{
+// 		setStatus("404", "Not Found");
+// 		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+// 	}
+// }
+
 
 void HTTPResponse::setStandardResponse(const std::string& path) {
     // Clean up the provided path
@@ -76,7 +112,6 @@ void HTTPResponse::setDefaultResponse()
 {
 
 	std::ifstream file("./www/index.html");
-
 	if (file.is_open())
 	{
 		std::stringstream buffer;
@@ -97,7 +132,7 @@ void HTTPResponse::setStatus(const std::string &code, const std::string &message
 	_statusMessage = message;
 }
 
-void HTTPResponse::setBody(const std::string &body)
+void HTTPResponse::setBody(const std::string &body) 
 {
 	_body = body;
 }

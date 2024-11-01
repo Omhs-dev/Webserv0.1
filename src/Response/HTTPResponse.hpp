@@ -12,6 +12,10 @@
 
 #include "../Request/HTTPRequest.hpp"
 #include "../Server/Client.hpp"
+#include "../Parse/LocationConfig.hpp"
+#include "../Parse/ConfigParser.hpp"
+#include "../Parse/ServerConfig.hpp"
+
 
 #define MAX_ALLOWED_FILE_SIZE 1024 * 1024
 #define MAX_RESPONSE_BODY_SIZE 1024 * 1024
@@ -56,6 +60,9 @@ private:
 	std::vector<std::string> _headers;
 	std::string _body;
 	
+	HTTPConfigs *_httpConfigs;
+	HTTPRequest	*_request;
+
 	void handleGet(const std::string &path);
 	void setDefaultResponse();
 	void setStandardResponse(const std::string &path);
@@ -76,6 +83,7 @@ public:
 
 	void cleanPath(std::string &path);
 	std::string listDirectory(const std::string &path, const std::string& root);
+	LocationConfig checkLocationPath(const std::string& path);
 };
 
 #endif
