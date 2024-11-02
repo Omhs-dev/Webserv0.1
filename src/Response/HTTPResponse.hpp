@@ -24,18 +24,25 @@
 class HTTPRequest;
 class Client;
 
+/*
+	↗️ ✔️ ✅ ❎ 🔗 ➡️ ▶️
+*/
+
 // have an instance of Cgi
 
 // we should be able to read a file in a listening directory
-// restructure the listening directory folders and files
-// Set a content type based on the file extension
-// set an error page message
 
-// a function to check redrection url
+// restructure the listening directory folders and files ✅
+
+// Set a content type based on the file extension 
+
+// set an error page message ✅
+
+// a function to check redrection url ✅
 
 // a function to set the a chunked header
 
-// if only / is requested on the navigator serve the index.html file
+// if only / is requested on the navigator serve the index.html file ✅
 	//remove the / from the path
 	// example: localhost:8080/ -> localhost:8080
 

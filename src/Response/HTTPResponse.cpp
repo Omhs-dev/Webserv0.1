@@ -41,6 +41,8 @@ void HTTPResponse::handleGet()
 	// create a function setFileResponse
 	// create a function to have server root
 	std::string reqPath = _request->getPath();
+	std::string reqRooth = _server->getConfigs()._servers[0].getRoot();
+	std::string indexFilePath = reqRooth + reqPath;
 	LocationConfig location = checkLocationPath(reqPath);
 	
 	Logger::Separator();
@@ -48,16 +50,27 @@ void HTTPResponse::handleGet()
 	Logger::Itroduction("handleGet");
 	Logger::Specifique(reqPath, "Request Path 🪜 ");
 	Logger::Specifique(location.getLocationPath(), "Location Path 🪜 ");
+	Logger::Specifique(reqRooth, "Request Root 🛤️ ");
+	Logger::Specifique(indexFilePath, "Request Root + path + index 🪜 ");
 	
-	if (isFile("./www" + reqPath))
-	{
-		// continue implementation from here
-		std::cout << "File found 0" << std::endl;
-	}
 	if (reqPath == "/")
 	{
 		// checkLocationPath(path);
 		setDefaultResponse();
+	}
+	else if (isFile(indexFilePath))
+	{
+		// continue implementation from here
+		Logger::Cout("File found here 📄");
+		std::ifstream file(indexFilePath);
+		if (file.is_open())
+		{
+			std::stringstream buffer;
+			buffer << file.rdbuf();
+			setStatus("200", "OK");
+			setBody(buffer.str());
+			file.close();
+		}
 	}
 	else if (reqPath == location.getLocationPath() && _state == IS_NORMAL) // will have to make a differece between this and the one below
 	{
@@ -224,7 +237,7 @@ void HTTPResponse::setStandardResponse() {
 
 void HTTPResponse::setDefaultResponse()
 {
-	std::ifstream file("./www/main/index.html");
+	std::ifstream file("./www/index.html");
 	if (file.is_open())
 	{
 		std::stringstream buffer;
