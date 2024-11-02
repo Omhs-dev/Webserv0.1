@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>CodePen - Item Hover Color Background</title>
+	<link rel="stylesheet" href="./style.css" />
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+	<style>
+		/* Container Styling */
+		.ag-format-container {
+			width: 1142px;
+			margin: 0 auto;
+		}
+
+		body {
+			font-family: "Roboto", sans-serif;
+		}
+
+		a {
+			text-decoration: none;
+		}
+		
+		h1 {
+			text-align: center;
+			margin-top: 50px;
+			font-size: 60px;
+			color: #01161e;
+		}
+
+		/* Courses Box Styling */
+		.ag-courses_box {
+			display: flex;
+			align-items: flex-start;
+			flex-wrap: wrap;
+			padding: 50px 0;
+		}
+
+		/* Individual Card Styling */
+		.ag-courses_item {
+			flex-basis: calc(33.33333% - 30px);
+			margin: 0 15px 30px;
+			overflow: hidden;
+			border-radius: 28px;
+			position: relative;
+		}
+
+		/* Link Styling */
+		.ag-courses-item_link {
+			display: block;
+			padding: 40px 30px;
+			background-color: #01161e;
+			overflow: hidden;
+			position: relative;
+			text-align: center;
+			z-index: 2;
+			/* Keep content above background */
+		}
+
+		/* Button Styling - Positioned at Top and Centered */
+		.ag-courses_item span {
+			color: #fff;
+			z-index: 3;
+			display: block;
+			font-size: 20px;
+			background-color: #124559;
+			padding: 16px;
+			margin-bottom: 20px;
+			border-radius: 5px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: background-color 0.3s;
+		}
+
+		.ag-courses_item span:hover {
+			background-color: #eff6e0;
+			color: #01161e;
+		}
+
+		/* Title Styling */
+		.ag-courses-item_title {
+			min-height: 87px;
+			margin: 0 0 25px;
+			font-weight: bold;
+			font-size: 30px;
+			color: #fff;
+			z-index: 3;
+			/* Ensure title stays above the background */
+			position: relative;
+		}
+
+		/* Date Box Styling */
+		.ag-courses-item_date-box {
+			font-size: 18px;
+			color: #fff;
+			z-index: 3;
+			position: relative;
+		}
+
+		/* Date Styling */
+		.ag-courses-item_date {
+			font-weight: bold;
+			color: #f9b234;
+			transition: color 0.5s ease;
+		}
+
+		/* Background Circle Styling */
+		.ag-courses-item_bg {
+			height: 128px;
+			width: 128px;
+			background-color: #f9b234;
+			z-index: 1;
+			/* Place background behind content */
+			position: absolute;
+			top: -75px;
+			right: -75px;
+			border-radius: 50%;
+			transition: all 0.5s ease;
+		}
+
+		/* Background Color Variants */
+		.ag-courses_item:nth-child(2n) .ag-courses-item_bg {
+			background-color: #3ecd5e;
+		}
+
+		.ag-courses_item:nth-child(3n) .ag-courses-item_bg {
+			background-color: #e44002;
+		}
+
+		.ag-courses_item:nth-child(4n) .ag-courses-item_bg {
+			background-color: #952aff;
+		}
+
+		.ag-courses_item:nth-child(5n) .ag-courses-item_bg {
+			background-color: #cd3e94;
+		}
+
+		.ag-courses_item:nth-child(6n) .ag-courses-item_bg {
+			background-color: #4c49ea;
+		}
+
+		/* Hover Effects */
+		.ag-courses-item_link:hover,
+		.ag-courses-item_link:hover .ag-courses-item_date {
+			text-decoration: none;
+			color: #fff;
+		}
+
+		.ag-courses-item_link:hover .ag-courses-item_bg {
+			transform: scale(10);
+			z-index: 1;
+			/* Ensure the background stays behind content even on hover */
+		}
+
+		/* Responsive Styles */
+		@media only screen and (max-width: 979px) {
+			.ag-courses_item {
+				flex-basis: calc(50% - 30px);
+			}
+
+			.ag-courses-item_title {
+				font-size: 24px;
+			}
+		}
+
+		@media only screen and (max-width: 767px) {
+			.ag-format-container {
+				width: 96%;
+			}
+		}
+
+		@media only screen and (max-width: 639px) {
+			.ag-courses_item {
+				flex-basis: 100%;
+			}
+
+			.ag-courses-item_title {
+				min-height: 72px;
+				line-height: 1;
+				font-size: 24px;
+			}
+
+			.ag-courses-item_link {
+				padding: 22px 40px;
+			}
+
+			.ag-courses-item_date-box {
+				font-size: 16px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<h1>WEBSERV</h1>
+
+	<div class="ag-format-container">
+
+		<div class="ag-courses_box">
+			<div class="ag-courses_item">
+				<a href="/pages/get.html" class="ag-courses-item_link">
+					<div class="ag-courses-item_bg"></div>
+					<span class="ag-courses_item">GET</span>
+				</a>
+			</div>
+
+			<div class="ag-courses_item">
+				<a href="#" class="ag-courses-item_link">
+					<div class="ag-courses-item_bg"></div>
+					<span class="ag-courses_item">POST</span>
+				</a>
+			</div>
+
+			<div class="ag-courses_item">
+				<a href="#" class="ag-courses-item_link">
+					<div class="ag-courses-item_bg"></div>
+					<span class="ag-courses_item">DELETE</span>
+				</a>
+			</div>
+			
+		</hr>
+			
+			<div class="ag-courses_item">
+				<a href="#" class="ag-courses-item_link">
+					<div class="ag-courses-item_bg"></div>
+					<span class="ag-courses_item">REDIRECTION</span>
+				</a>
+			</div>
+
+			<div class="ag-courses_item">
+				<a href="#" class="ag-courses-item_link">
+					<div class="ag-courses-item_bg"></div>
+					<span class="ag-courses_item">Error Pages</span>
+				</a>
+			</div>
+
+			<div class="ag-courses_item">
+				<a href="#" class="ag-courses-item_link">
+					<div class="ag-courses-item_bg"></div>
+					<span class="ag-courses_item">UPLOAD</span>
+				</a>
+			</div>
+
+			<div class="ag-courses_item">
+				<a href="#" class="ag-courses-item_link">
+					<div class="ag-courses-item_bg"></div>
+					<span class="ag-courses_item">LIST DIRECTORY</span>
+				</a>
+			</div>
+
+			<div class="ag-courses_item">
+				<a href="#" class="ag-courses-item_link">
+					<div class="ag-courses-item_bg"></div>
+					<span class="ag-courses_item">ALIAS</span>
+				</a>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

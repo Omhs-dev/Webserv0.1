@@ -92,6 +92,7 @@ class HTTPResponse
 		void setDefaultResponse();
 		void setStandardResponse();
 		void setRedirection(const std::string &location, int code);
+		void setHeaders(const std::string &key, const std::string &value);
 		void setStatus(const std::string &code, const std::string &message);
 		void setBody(const std::string &body);
 	

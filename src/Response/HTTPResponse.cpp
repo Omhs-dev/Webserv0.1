@@ -70,9 +70,19 @@ void HTTPResponse::handleGet()
 	}
 	else if (reqPath == location.getLocationPath() && _state ==IS_REDIRECT)
 	{
-		bool isRec = false;
-	    std::cout << "there might be a redirect here ❎" << isRec << std::endl;
-	        
+	    std::cout << "there might be a redirect here 🔄" << std::endl;
+	    std::map<int, std::string> redir = location.getRedirect();
+	    for (auto &red : redir)
+	    {
+	        if (red.first == 301)
+	        {
+	            Logger::Cout("301 Redirect found 🔄");
+	            setStatus(iToString(red.first), getErrorMesssage(iToString(red.first)));
+	            break;
+	        }
+	    }
+	    Logger::Checker(location.getRedirect().begin()->second);
+	    setHeaders("Location", location.getRedirect().begin()->second);
 	}
 	else
 	{
@@ -214,7 +224,7 @@ void HTTPResponse::setStandardResponse() {
 
 void HTTPResponse::setDefaultResponse()
 {
-	std::ifstream file("./www/index.html");
+	std::ifstream file("./www/main/index.html");
 	if (file.is_open())
 	{
 		std::stringstream buffer;
@@ -235,6 +245,11 @@ void HTTPResponse::setStatus(const std::string &code, const std::string &message
 	_statusMessage = message;
 }
 
+void HTTPResponse::setHeaders(const std::string &key, const std::string &value)
+{
+	_headers.push_back(key + ": " + value);
+}
+
 void HTTPResponse::setBody(const std::string &body) 
 {
 	_body = body;
@@ -243,11 +258,22 @@ void HTTPResponse::setBody(const std::string &body)
 std::string HTTPResponse::getData() const
 {
 	std::ostringstream oss;
-	oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
-	oss << "Content-Type: text/html\r\n";
-	oss << "Content-Length: " << _body.size() << "\r\n";
-	oss << "\r\n";
-	oss << _body;
+	if (_state == IS_REDIRECT)
+	{
+		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+		oss << _headers[0] << "\r\n";
+		oss << "Content-Length: 0\r\n";
+		oss << "\r\n";
+		return oss.str();
+	}
+	else
+	{
+		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+		oss << "Content-Type: text/html\r\n";
+		oss << "Content-Length: " << _body.size() << "\r\n";
+		oss << "\r\n";
+		oss << _body;
+	}
 	return oss.str();
 }
 

@@ -1,6 +1,13 @@
 #include "HTTPResponse.hpp"
 #include "HTTPResponseUtils.hpp"
 
+std::string iToString(int integer)
+{
+	std::ostringstream oss;
+	oss << integer;
+	return oss.str();
+}
+
 // --- Checkers ---
 
 bool isFile(const std::string &path)
