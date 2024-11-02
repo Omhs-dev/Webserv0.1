@@ -25,7 +25,7 @@ std::string ServerConfig::getIndex() const
 	return _index;
 }
 
-std::string ServerConfig::getRedirect() const
+std::map<int, std::string> ServerConfig::getRedirect() const
 {
 	return _redirect;
 }

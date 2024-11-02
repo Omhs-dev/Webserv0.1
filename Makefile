@@ -21,7 +21,8 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/Response/HTTPResponseUtils.cpp \
        $(SRC_DIR)/Parse/ConfigParser.cpp \
        $(SRC_DIR)/Parse/LocationConfig.cpp \
-       $(SRC_DIR)/Parse/ServerConfig.cpp
+       $(SRC_DIR)/Parse/ServerConfig.cpp \
+       $(SRC_DIR)/Logger/Logger.cpp
 
 # Object files (excluding the main application file for tests)
 OBJS = $(filter-out $(SRC_DIR)/main.o, $(SRCS:.cpp=.o))
@@ -45,6 +46,9 @@ all: $(NAME)
 
 $(NAME): $(OBJS) $(SRC_DIR)/main.o
 	$(CXX) $(CXXFLAGS) $(OBJS) $(SRC_DIR)/main.o -o $(NAME)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 # Clean object files and executables
 clean:

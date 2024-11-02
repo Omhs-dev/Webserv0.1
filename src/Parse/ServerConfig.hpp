@@ -28,7 +28,7 @@ struct ServerConfig
 	std::string     _listen;
 	std::string     _port;
 	std::string     _index;
-	std::string     _redirect;
+	std::map<int, std::string> _redirect;
 	std::string     _clientMaxBodySize;
 	std::map<int, std::string>  _errorPage;
 	std::vector<RequestType>    _requestAllowed;
@@ -41,7 +41,7 @@ struct ServerConfig
 	std::string getListen() const;
 	std::string getPort() const;
 	std::string getIndex() const;
-	std::string getRedirect() const;
+	std::map<int, std::string> getRedirect() const;
 	std::string getClientMaxBodySize() const;
 	std::map<int, std::string> getErrorPage() const;
 	std::vector<RequestType> getRequestAllowed() const;

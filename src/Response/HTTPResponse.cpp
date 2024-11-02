@@ -1,12 +1,12 @@
 #include "HTTPResponse.hpp"
 #include "HTTPResponseUtils.hpp"
 
-
 HTTPResponse::HTTPResponse(Client *client)
 {
 	_client = client;
 	_server = client->getServer();
 	_request = client->getRequest();
+	_state = INIT;
 	_statusCode = "200";
 	_statusMessage = "OK";
 	_httpConfigs = new HTTPConfigs();
@@ -43,8 +43,11 @@ void HTTPResponse::handleGet()
 	std::string reqPath = _request->getPath();
 	LocationConfig location = checkLocationPath(reqPath);
 	
-	std::cout << "reqPath🪜 : "  << reqPath << std::endl;
-	std::cout << "location path🪜 1 : "  << location.getLocationPath() << std::endl;
+	Logger::Separator();
+	Logger::VerticalSeparator();
+	Logger::Itroduction("handleGet");
+	Logger::Specifique(reqPath, "Request Path 🪜 ");
+	Logger::Specifique(location.getLocationPath(), "Location Path 🪜 ");
 	
 	if (isFile("./www" + reqPath))
 	{
@@ -56,14 +59,20 @@ void HTTPResponse::handleGet()
 		// checkLocationPath(path);
 		setDefaultResponse();
 	}
-	else if (reqPath == location.getLocationPath())
+	else if (reqPath == location.getLocationPath() && _state == IS_NORMAL) // will have to make a differece between this and the one below
 	{
-		std::cout << "path macthes location path ✔️" << std::endl;
+		std::cout << "    path macthes location path ✔️" << std::endl;
 		cleanPath(reqPath);
 		setStandardResponse();
 		if (isFile(reqPath))
 			std::cout << "File found 0" << std::endl;
 		std::cout << "reqPath: "  << reqPath << std::endl;
+	}
+	else if (reqPath == location.getLocationPath() && _state ==IS_REDIRECT)
+	{
+		bool isRec = false;
+	    std::cout << "there might be a redirect here ❎" << isRec << std::endl;
+	        
 	}
 	else
 	{
@@ -72,32 +81,47 @@ void HTTPResponse::handleGet()
 	}
 }
 
+// bool HTTPResponse::isRedirecUrl(const std::string &path)
+// {
+	
+// }
+
 LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {
-	std::cout << "Checking location path: " << path << std::endl;
+	std::cout << "----- Checking location path ------ : \n" << path << std::endl;
 	std::cout << "before for loop" << std::endl;
 	for (auto &server : _server->getConfigs()._servers)
 	{
 		std::cout << "inside for loop 2" << std::endl;
 		for (LocationConfig &location : server.getLocations())
 		{
-			std::cout << "locations path: " << location.getLocationPath() << std::endl;
-			std::cout << "inside for loop 2" << std::endl;
-			if (path == location.getLocationPath())
+			std::cout << "----------------------------------" << std::endl;
+			std::cout << "locations path : " << location.getLocationPath() << std::endl;
+			// std::cout << "inside for loop 2" << std::endl;
+			if (path == location.getLocationPath() && location.getRedirect().begin()->second == "https://github.com/")
+			{
+				_state = IS_REDIRECT;
+				std::cout << "    Redirect found 🔄" << std::endl;
+				std::cout << "    Redirect Link found 🔗: " << location.getRedirect().begin()->second << std::endl;
+				return location;
+				break;
+			}
+			else if (path == location.getLocationPath())
 			{ // Path matches location
-				std::cout << "Location found: " << location.getLocationPath() << std::endl;
+				_state = IS_NORMAL;
+				std::cout << "      Location found: " << location.getLocationPath() << std::endl;
 				return location; // Return the matched location configuration
 				break;
 			}
-			if (path.find(".html") != std::string::npos) // here to chage .html to isValideFile - check if line has an ext.
+			else if (path.find(".html") != std::string::npos) // here to chage .html to isValideFile - check if line has an ext.
 			{
+				_state = IS_FILE;
 				if (path == location.getLocationPath() + location.getIndex())
 				{
-					std::cout << "File found 1 📄 :" << location.getLocationPath() + location.getIndex() << std::endl;
+					std::cout << "      File found 1 📄 :" << location.getLocationPath() + location.getIndex() << std::endl;
 					return location;
 					break;
 				}
-			
 			}
 		}
 		std::cout << "server location index: " << server.getIndex() << std::endl;
@@ -121,16 +145,16 @@ void HTTPResponse::setStandardResponse() {
     std::string reqPath = _request->getPath();
     LocationConfig location = checkLocationPath(reqPath);
     cleanPath(reqPath);
-	
-	std::cout << "location autoindex: " << location.getAutoindex() << std::endl;
-	std::cout << "location root: " << location.getRoot() << std::endl;
-	
-	std::cout << "check again Request Path🪜: " << reqPath << std::endl;
+    
+    Logger::VerticalSeparator();
+	std::cout << "I am in setStandardResponse \n"
+				<< "    check again location root: " << location.getRoot() << "\n"
+				<< "    check again Request Path🪜: " << reqPath << std::endl;
 	
     std::string fullPath = location.getRoot() + reqPath;
     std::string indexFilePath = fullPath + location.getIndex();
 
-	std::cout << "Index file path int setstandardresponse: " << indexFilePath << std::endl;
+	std::cout << "    Index file path int setstandardresponse: " << indexFilePath << std::endl;
 	
 	
 	// std::ifstream file(indexFilePath);
@@ -178,6 +202,7 @@ void HTTPResponse::setStandardResponse() {
 	            return;
 	        }
 	    }
+	    // else if(reqPath) if reqPath is redirect handle redirect
 	}
     else
     {
@@ -225,6 +250,13 @@ std::string HTTPResponse::getData() const
 	oss << _body;
 	return oss.str();
 }
+
+// bool HTTPResponse::isReqRedirection(const std::string &path)
+// {
+	
+	
+		
+// }
 
 void HTTPResponse::cleanPath(std::string &path) {
     // Ensure path starts with '/' and ends with '/'
