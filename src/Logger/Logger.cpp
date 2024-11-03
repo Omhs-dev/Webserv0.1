@@ -57,3 +57,8 @@ void Logger::Cout(std::string string)
 {
 	std::cout << "What is this ▶️" <<  string << std::endl;
 }
+
+void Logger::NormalCout(std::string string)
+{
+	std::cout << string << std::endl;
+}

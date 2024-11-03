@@ -9,6 +9,7 @@ class Logger
 		Logger();
 		
 		static void Itroduction(std::string sring);
+		static void NormalCout(std::string sring);
 		static void Separator();
 		static void VerticalSeparator();
 		static void Checker(std::string string);

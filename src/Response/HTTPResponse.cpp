@@ -56,10 +56,10 @@ void HTTPResponse::handleGet()
 	}
 	else if (reqPath == location.getLocationPath() && _state == IS_NORMAL)
 	{
-		std::cout << "    path macthes location path ✔️" << std::endl;
+		Logger::Cout("Path matches location path here ✅");
 		cleanPath(reqPath);
 		setStandardResponse();
-		std::cout << "reqPath: " << reqPath << std::endl;
+		Logger::Specifique(reqPath, "Request Path 🪜");
 	}
 	else if (reqPath == location.getLocationPath() && _state == IS_REDIRECT)
 	{
@@ -162,54 +162,58 @@ void HTTPResponse::setStandardResponse()
 
 LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {
-	std::cout << "----- Checking location path ------ : \n"
-			  << path << std::endl;
-	std::cout << "before for loop" << std::endl;
+	Logger::NormalCout("-------------- checkLocationPath --------------");
+	Logger::Specifique(path, "Request Path 🪜");
+	Logger::NormalCout("before for loop 1 \n|");
 	for (auto &server : _server->getConfigs()._servers)
 	{
-		std::cout << "inside for loop 2" << std::endl;
+			Logger::NormalCout("before for loop 2\n|");
+			Logger::NormalCout("Liste of locations ../../ ⬇");
+			Logger::NormalCout("|");
 		for (LocationConfig &location : server.getLocations())
 		{
-			std::cout << "----------------------------------" << std::endl;
-			std::cout << "locations path : " << location.getLocationPath() << std::endl;
-			// std::cout << "inside for loop 2" << std::endl;
-			if (path == location.getLocationPath() && location.getRedirect().begin()->second == "https://github.com/")
+			Logger::Separator();
+			Logger::Specifique(location.getLocationPath(), "Location Path to look for 🪜");
+			if (path == location.getLocationPath()
+					&& location.getRedirect().begin()->second == "https://github.com/")
 			{
 				_state = IS_REDIRECT;
-				std::cout << "    Redirect found 🔄" << std::endl;
-				std::cout << "    Redirect Link found 🔗: " << location.getRedirect().begin()->second << std::endl;
+				Logger::NormalCout("Redirect found 🔄");
+				Logger::Specifique(location.getRedirect().begin()->second, "Redirect Link found 🔗");
 				return location;
 				break;
 			}
-			else if (path == location.getLocationPath() && location.getAlias() != "" && location.getAlias() != location.getLocationPath())
+			else if (path == location.getLocationPath() && location.getAlias() != ""
+						&& location.getAlias() != location.getLocationPath())
 			{
 				_state = IS_ALIAS;
 				Logger::Specifique(location.getLocationPath(), "Location Path 🪜");
-				std::cout << "    Alias found 🪜" << std::endl;
-				std::cout << "    Alias path 🪜: " << location.getAlias() << std::endl;
+				Logger::Specifique(location.getAlias(), "Alias found 🪜");
+				Logger::Specifique(location.getAlias(), "Alias path 🪜");
 				return location;
 				break;
 			}
 			else if (path == location.getLocationPath())
 			{
+				Logger::NormalCout("Location found ✅");
 				_state = IS_NORMAL;
-				std::cout << "      Location found: " << location.getLocationPath() << std::endl;
 				return location;
 				break;
 			}
 			else if (path.find(".html") != std::string::npos) // here to chage .html to isValideFile - check if line has an ext.
 			{
-				_state = IS_FILE;
 				if (path == location.getLocationPath() + location.getIndex())
 				{
-					std::cout << "      File found 1 📄 :" << location.getLocationPath() + location.getIndex() << std::endl;
+					Logger::NormalCout("File found here 📄");
+					_state = IS_FILE;
 					return location;
 					break;
 				}
 			}
+			std::cout << "Location not found ❗" << std::endl;
 		}
-		std::cout << "server location index: " << server.getIndex() << std::endl;
-		std::cout << "Location not found ❗" << std::endl;
+		// std::cout << "server location index: " << server.getIndex() << std::endl;
+		Logger::NormalCout("|\nNext server 🚀");
 	}
 	return LocationConfig();
 }
