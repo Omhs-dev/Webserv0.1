@@ -9,31 +9,23 @@ HTTPResponse::HTTPResponse(Client *client)
 	_state = INIT;
 	_statusCode = "200";
 	_statusMessage = "OK";
-	// _httpConfigs = new HTTPConfigs();
 	_headers = {};
 	_body = "";
-	// _server = new Server(_httpConfigs);
 }
+
+// --------- Response Generation ---------
 
 void HTTPResponse::generateResponse()
 {
 	std::string reqMethod = _request->getMethod();
-	
-	// std::string goodPath = checkLocationPath(reqPath);
-	
-	// std::cout << "Good path: " << goodPath << std::endl;
-	
-	// std::cout << "Request Method: " << reqMethod << std::endl;
-	// std::cout << "Request Path at the beginin: " << reqPath << std::endl;
-	
-	// std::cout << "server root: " << _server->getConfigs()._servers[0].getRoot() << std::endl;
-	// std::cout << "location path: " << _server->getConfigs()._servers[0].getLocations()[0].getLocationPath() << std::endl;
-	
+
 	if (reqMethod == "GET")
 	{
 		handleGet();
 	}
 }
+
+// --------- Handling Requests ---------
 
 void HTTPResponse::handleGet()
 {
@@ -66,9 +58,9 @@ void HTTPResponse::handleGet()
 		std::cout << "    path macthes location path ✔️" << std::endl;
 		cleanPath(reqPath);
 		setStandardResponse();
-		std::cout << "reqPath: "  << reqPath << std::endl;
+		std::cout << "reqPath: " << reqPath << std::endl;
 	}
-	else if (reqPath == location.getLocationPath() && _state ==IS_REDIRECT)
+	else if (reqPath == location.getLocationPath() && _state == IS_REDIRECT)
 	{
 		std::cout << "there might be a redirect here 🔄" << std::endl;
 		std::map<int, std::string> redir = location.getRedirect();
@@ -99,9 +91,77 @@ void HTTPResponse::handleGet()
 	}
 }
 
+void HTTPResponse::setDefaultResponse(std::string path, LocationConfig config)
+{
+	std::string indexPath = config.getRoot() + path + config.getIndex();
+
+	Logger::Itroduction("setDefaultResponse");
+	Logger::Specifique(config.getRoot() + path + config.getIndex(), "Index file path 📄");
+
+	serveFile(indexPath);
+}
+
+void HTTPResponse::setStandardResponse()
+{
+	std::string reqPath = _request->getPath();
+	LocationConfig location = checkLocationPath(reqPath);
+	cleanPath(reqPath);
+
+	Logger::VerticalSeparator();
+	Logger::Itroduction("setStandardResponse");
+
+	std::string fullPath = location.getRoot() + reqPath;
+	std::string indexFilePath = fullPath + location.getIndex();
+
+	Logger::Specifique(reqPath, "Request Path 🪜");
+	Logger::Specifique(fullPath, "FullPath here 🪜");
+	Logger::Specifique(indexFilePath, "Index File Path 🪜");
+
+	if (isDirectory(fullPath))
+	{
+		Logger::Cout("Directory found 📁");
+		Logger::Cout("Checking for index file or autoindex 📁");
+		Logger::SpecifiqueForBool(location.getAutoindex(), "Autoindex 🪜  ");
+		Logger::Specifique(location.getAlias(), "Alias 🪜");
+		Logger::Specifique(location.getRoot(), "Root 🪜");
+
+		// check if the directory has an index file if yes serve the index file
+		if (isFile(indexFilePath))
+		{
+			Logger::Cout("Index file found 📄");
+			serveFile(indexFilePath);
+			return;
+		}
+		// if not check if the directory has an autoindex on or off
+		else if (location.getAutoindex() == true)
+		{
+			Logger::Cout("Autoindex found 📁");
+			Logger::Specifique(reqPath, "Request Path 🪜");
+			Logger::Specifique(location.getRoot(), "Root 🪜");
+
+			std::string directoryListing = listDirectory(reqPath, location.getRoot());
+			if (!directoryListing.empty() && _state != IS_ALIAS)
+			{
+				setStatus("200", "OK");
+				setBody(directoryListing);
+				return;
+			}
+		}
+	}
+	else
+	{
+		// Neither index file found nor autoindex enabled, so return 404
+		setStatus("404", "Not Found");
+		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+	}
+}
+
+// --------- Motor of the code ---------
+
 LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {
-	std::cout << "----- Checking location path ------ : \n" << path << std::endl;
+	std::cout << "----- Checking location path ------ : \n"
+			  << path << std::endl;
 	std::cout << "before for loop" << std::endl;
 	for (auto &server : _server->getConfigs()._servers)
 	{
@@ -119,10 +179,7 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 				return location;
 				break;
 			}
-			else if (path == location.getLocationPath()
-				&& location.getAlias() != ""
-				&& location.getAlias() != location.getLocationPath()
-				)
+			else if (path == location.getLocationPath() && location.getAlias() != "" && location.getAlias() != location.getLocationPath())
 			{
 				_state = IS_ALIAS;
 				Logger::Specifique(location.getLocationPath(), "Location Path 🪜");
@@ -132,10 +189,10 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 				break;
 			}
 			else if (path == location.getLocationPath())
-			{ // Path matches location
+			{
 				_state = IS_NORMAL;
 				std::cout << "      Location found: " << location.getLocationPath() << std::endl;
-				return location; // Return the matched location configuration
+				return location;
 				break;
 			}
 			else if (path.find(".html") != std::string::npos) // here to chage .html to isValideFile - check if line has an ext.
@@ -155,71 +212,49 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 	return LocationConfig();
 }
 
-void HTTPResponse::setStandardResponse()
+// --------- Response Setter ---------
+
+void HTTPResponse::setStatus(const std::string &code, const std::string &message)
 {
-	std::string reqPath = _request->getPath();
-	LocationConfig location = checkLocationPath(reqPath);
-	cleanPath(reqPath);
-	
-	Logger::VerticalSeparator();
-	Logger::Itroduction("setStandardResponse");
+	_statusCode = code;
+	_statusMessage = message;
+}
 
-	std::string fullPath = location.getRoot() + reqPath;
-	std::string indexFilePath = fullPath + location.getIndex();
+void HTTPResponse::setHeaders(const std::string &key, const std::string &value)
+{
+	_headers.push_back(key + ": " + value);
+}
 
-	Logger::Specifique(reqPath, "Request Path 🪜");
-	Logger::Specifique(fullPath, "FullPath here 🪜");
-	Logger::Specifique(indexFilePath, "Index File Path 🪜");
+void HTTPResponse::setBody(const std::string &body)
+{
+	_body = body;
+}
 
-	if (isDirectory(fullPath))
+// --------- Response Datas ---------
+
+std::string HTTPResponse::getData() const
+{
+	std::ostringstream oss;
+	if (_state == IS_REDIRECT)
 	{
-		Logger::Cout("Directory found 📁");
-		Logger::Cout("Checking for index file or autoindex 📁");
-		Logger::SpecifiqueForBool(location.getAutoindex(), "Autoindex 🪜  ");
-		Logger::Specifique(location.getAlias(), "Alias 🪜");
-		Logger::Specifique(location.getRoot(), "Root 🪜");
-		
-		// check if the directory has an index file if yes serve the index file
-		if (isFile(indexFilePath))
-		{
-			Logger::Cout("Index file found 📄");
-			serveFile(indexFilePath);
-			return;
-		}
-		// if not check if the directory has an autoindex on or off
-		else if (location.getAutoindex() == true)
-		{
-			Logger::Cout("Autoindex found 📁");
-			Logger::Specifique(reqPath, "Request Path 🪜");
-			Logger::Specifique(location.getRoot(), "Root 🪜");
-			
-			std::string directoryListing = listDirectory(reqPath, location.getRoot());
-			if (!directoryListing.empty() && _state != IS_ALIAS)
-			{
-				setStatus("200", "OK");
-				setBody(directoryListing);
-				return;
-			}
-		}
-		
+		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+		oss << _headers[0] << "\r\n";
+		oss << "Content-Length: 0\r\n";
+		oss << "\r\n";
+		return oss.str();
 	}
 	else
 	{
-		// Neither index file found nor autoindex enabled, so return 404
-		setStatus("404", "Not Found");
-		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
+		oss << "Content-Length: " << _body.size() << "\r\n";
+		oss << "\r\n";
+		oss << _body;
 	}
+	return oss.str();
 }
 
-void HTTPResponse::setDefaultResponse(std::string path, LocationConfig config)
-{
-	std::string indexPath = config.getRoot() + path + config.getIndex();
-	
-	Logger::Itroduction("setDefaultResponse");
-	Logger::Specifique(config.getRoot() + path + config.getIndex(), "Index file path 📄");
-	
-	serveFile(indexPath);
-}
+// --------- Utils Functions ---------
 
 void HTTPResponse::serveFile(const std::string &path)
 {
@@ -239,45 +274,8 @@ void HTTPResponse::serveFile(const std::string &path)
 	}
 }
 
-void HTTPResponse::setStatus(const std::string &code, const std::string &message)
+void HTTPResponse::cleanPath(std::string &path)
 {
-	_statusCode = code;
-	_statusMessage = message;
-}
-
-void HTTPResponse::setHeaders(const std::string &key, const std::string &value)
-{
-	_headers.push_back(key + ": " + value);
-}
-
-void HTTPResponse::setBody(const std::string &body) 
-{
-	_body = body;
-}
-
-std::string HTTPResponse::getData() const
-{
-	std::ostringstream oss;
-	if (_state == IS_REDIRECT)
-	{
-		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
-		oss << _headers[0] << "\r\n";
-		oss << "Content-Length: 0\r\n";
-		oss << "\r\n";
-		return oss.str();
-	}
-	else
-	{
-		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
-		oss << "Content-Type: text/html\r\n";
-		oss << "Content-Length: " << _body.size() << "\r\n";
-		oss << "\r\n";
-		oss << _body;
-	}
-	return oss.str();
-}
-
-void HTTPResponse::cleanPath(std::string &path) {
 	// Ensure path starts with '/' and ends with '/'
 	if (path[0] != '/')
 		path.insert(0, "/");
@@ -285,54 +283,66 @@ void HTTPResponse::cleanPath(std::string &path) {
 		path += "/";
 
 	// Normalize multiple slashes to a single slash
-	path.erase(std::unique(path.begin(), path.end(), [](char a, char b) {
-		return a == '/' && b == '/';
-	}), path.end());
+	path.erase(std::unique(path.begin(), path.end(), [](char a, char b)
+			{ return a == '/' && b == '/'; }),path.end());
 
 	// Remove all "/./" occurrences
 	size_t pos;
-	while ((pos = path.find("/./")) != std::string::npos) {
+	while ((pos = path.find("/./")) != std::string::npos)
+	{
 		path.erase(pos, 2);
 	}
 
 	// Remove all "/prev/../" occurrences
-	while ((pos = path.find("/../")) != std::string::npos) {
-		if (pos == 0) {
+	while ((pos = path.find("/../")) != std::string::npos)
+	{
+		if (pos == 0)
+		{
 			path.erase(0, 3);
 			continue;
 		}
 		size_t prev = path.rfind('/', pos - 1);
-		if (prev != std::string::npos) {
+		if (prev != std::string::npos)
+		{
 			path.erase(prev, pos - prev + 3);
-		} else {
+		}
+		else
+		{
 			path.erase(0, pos + 3);
 		}
 	}
 }
 
-std::string HTTPResponse::listDirectory(const std::string& path, const std::string& root)
+std::string HTTPResponse::listDirectory(const std::string &path, const std::string &root)
 {
 	Logger::Itroduction("listDirectory 📁 📂");
 	std::string fullPath = root + path;
-	DIR* dir = opendir(fullPath.c_str());
-	if (!dir) {
-		return ""; // Directory not found or unable to open
+	DIR *dir = opendir(fullPath.c_str());
+	if (!dir)
+	{
+		return "";
 	}
 	std::stringstream html;
 	html << "<html><head><title>Directory Listing</title></head><body>";
 	html << "<h1>Directory Listing for " << path << "</h1><ul>";
 
-	struct dirent* entry;
-	while ((entry = readdir(dir)) != NULL) {
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != NULL)
+	{
 		std::string name = entry->d_name;
-		if (name == "." || name == "..") continue;
+		if (name == "." || name == "..")
+			continue;
 
 		struct stat info;
 		std::string itemPath = fullPath + "/" + name;
-		if (stat(itemPath.c_str(), &info) == 0) {
-			if (S_ISDIR(info.st_mode)) {
-				html << "<li><b>[DIR]</b> <a href=\"" << path + "/" + name << "/\">" << name << "/</a></li>";
-			} else {
+		if (stat(itemPath.c_str(), &info) == 0)
+		{
+			if (S_ISDIR(info.st_mode))
+			{
+				html << "<li><b><a href=\"" << path + name + "/" << "\">" << name << "/</a></b></li>";
+			}
+			else
+			{
 				html << "<li><a href=\"" << path + name << "\">" << name << "</a></li>";
 			}
 		}

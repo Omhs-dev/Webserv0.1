@@ -92,7 +92,7 @@ std::string getMimeType(const std::string &path)
 	else if (extension == "csv")
 		return "text/csv";
 	else
-		return "text/plain";
+		return "text/html";
 }
 
 std::string getErrorMesssage(const std::string &code)
