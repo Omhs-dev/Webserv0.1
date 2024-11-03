@@ -45,7 +45,7 @@ class Client;
 // --------------------------------------------------------------------
 
 // create a serveFile function
-
+// create a custom error page to serve when a file is not found
 
 // have an instance of Cgi
 // Set a content type based on the file extension 
@@ -92,7 +92,7 @@ class HTTPResponse
 		std::string _statusMessage;
 		std::vector<std::string> _headers;
 		std::string _body;
-		
+		std::string _errorPage;
 		void serveFile(const std::string &path);
 		
 		// check if a request is a redirection

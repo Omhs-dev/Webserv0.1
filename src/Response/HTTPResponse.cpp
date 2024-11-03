@@ -11,6 +11,7 @@ HTTPResponse::HTTPResponse(Client *client)
 	_statusMessage = "OK";
 	_headers = {};
 	_body = "";
+	_errorPage = "";
 }
 
 // --------- Response Generation ---------
@@ -86,8 +87,9 @@ void HTTPResponse::handleGet()
 	}
 	else
 	{
+		_errorPage = errorPage(reqPath, reqRooth);
 		setStatus("404", "Not Found");
-		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+		setBody(_errorPage);
 	}
 }
 
@@ -150,9 +152,9 @@ void HTTPResponse::setStandardResponse()
 	}
 	else
 	{
-		// Neither index file found nor autoindex enabled, so return 404
+		_errorPage = errorPage(reqPath, location.getRoot());
 		setStatus("404", "Not Found");
-		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+		setBody(_errorPage);
 	}
 }
 
@@ -269,8 +271,9 @@ void HTTPResponse::serveFile(const std::string &path)
 	}
 	else
 	{
+		_errorPage = errorPage(path, "/www/");
 		setStatus("404", "Not Found");
-		setBody("<html><body><h1>404 Not Found</h1></body></html>");
+		setBody(_errorPage);
 	}
 }
 

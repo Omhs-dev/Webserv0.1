@@ -13,5 +13,6 @@ bool pathExtension(const std::string &path);
 std::string iToString(int integer);
 std::string getMimeType(const std::string &path);
 std::string getErrorMesssage(const std::string &code);
+std::string errorPage(const std::string &path, const std::string &root);
 
 #endif
