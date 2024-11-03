@@ -28,23 +28,28 @@ class Client;
 	↗️ ✔️ ✅ ❎ 🔗 ➡️ ▶️
 */
 
-// have an instance of Cgi
 
-// we should be able to read a file in a listening directory
+// we should be able to read a file in a listening directory✅
 
 // restructure the listening directory folders and files ✅
 
-// Set a content type based on the file extension 
 
 // set an error page message ✅
 
 // a function to check redrection url ✅
 
-// a function to set the a chunked header
-
 // if only / is requested on the navigator serve the index.html file ✅
 	//remove the / from the path
 	// example: localhost:8080/ -> localhost:8080
+
+// --------------------------------------------------------------------
+
+// create a serveFile function
+
+
+// have an instance of Cgi
+// Set a content type based on the file extension 
+// a function to set the a chunked header
 
 // Request for a Directory (Without Trailing Slash)
 	// if a directory is requested whithout "/" at the end, the server should redirect to the same URL with a trailing slash
@@ -76,7 +81,7 @@ class Client;
 class HTTPResponse
 {
 	public:
-		enum ResponseState { INIT, IS_REDIRECT, IS_FILE, IS_NORMAL, COMPLETE };
+		enum ResponseState { INIT, IS_REDIRECT, IS_FILE, IS_NORMAL, IS_ALIAS, COMPLETE };
 	private:
 		Client *_client;
 		Server *_server;
@@ -88,17 +93,16 @@ class HTTPResponse
 		std::vector<std::string> _headers;
 		std::string _body;
 		
-		
-		// ConfigParser _configParser;
+		void serveFile(const std::string &path);
 		
 		// check if a request is a redirection
-		bool isReqRedirection(const std::string &path);
-		bool isRedirecUrl(const std::string &path);
+		// bool isReqRedirection(const std::string &path);
+		// bool isRedirecUrl(const std::string &path);
 		
 		void handleGet();
-		void setDefaultResponse();
+		void setDefaultResponse(std::string path, LocationConfig config);
 		void setStandardResponse();
-		void setRedirection(const std::string &location, int code);
+		// void setRedirection(const std::string &location, int code);
 		void setHeaders(const std::string &key, const std::string &value);
 		void setStatus(const std::string &code, const std::string &message);
 		void setBody(const std::string &body);
@@ -106,17 +110,11 @@ class HTTPResponse
 	public:
 		HTTPResponse(Client *client);
 		~HTTPResponse();
+		
 		void generateResponse();
 		std::string getData() const;
 		std::vector<std::string> getHeaders() const { return _headers; }
-		std::string getMimeType(const std::string &path);
-		
-		// bool isFileLarge(const std::string &path);
-		// bool isFile(const std::string &path);
-		// bool isDirectory(const std::string &path);
-		// bool isPathValid(const std::string &path);
-		
-		// HTTPConfigs getConfigs() const { return _httpConfigs; }
+		// std::string getMimeType(const std::string &path);
 		
 		void cleanPath(std::string &path);
 		std::string listDirectory(const std::string &path, const std::string& root);
