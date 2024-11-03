@@ -14,6 +14,8 @@ class Logger
 		static void Checker(std::string string);
 		static void Cout(std::string);
 		static void Specifique(std::string elemt, std::string elemMessage);
+		static void SpecifiqueForBool(bool elemt, std::string elemMessage);
+		static void SpecifiqueForInt(int elemt, std::string elemMessage);
 		
 		~Logger();
 };

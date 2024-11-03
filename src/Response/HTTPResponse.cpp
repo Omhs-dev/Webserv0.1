@@ -66,8 +66,6 @@ void HTTPResponse::handleGet()
 		std::cout << "    path macthes location path ✔️" << std::endl;
 		cleanPath(reqPath);
 		setStandardResponse();
-		if (isFile(reqPath))
-			std::cout << "File found 0" << std::endl;
 		std::cout << "reqPath: "  << reqPath << std::endl;
 	}
 	else if (reqPath == location.getLocationPath() && _state ==IS_REDIRECT)
@@ -93,13 +91,6 @@ void HTTPResponse::handleGet()
 		std::string aliasPath = location.getAlias() + location.getIndex();
 		Logger::Specifique(aliasPath, "Alias Path 🪜");
 		serveFile(aliasPath);
-	// 	std::string directoryListing = listDirectory(aliasPath, location.getRoot());
-	// 	if (!directoryListing.empty())
-	// 	{
-	// 		setStatus("200", "OK");
-	// 		setBody(directoryListing);
-	// 		return;
-	// 	}
 	}
 	else
 	{
@@ -164,60 +155,44 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 	return LocationConfig();
 }
 
-void HTTPResponse::setStandardResponse() {
-	// check if the path is a file
-		// if yes serve the file
-	// check if the file is large
-		// if yes prepare chunked response
-	// check if the path is a directory
-		// check if the directory has an index file
-			// if yes serve the index file
-		// if not check if the directory has an autoindex on or off
-			// if yes serve the directory
-					// else serve page not found 404
-	// Clean up the provided path
+void HTTPResponse::setStandardResponse()
+{
 	std::string reqPath = _request->getPath();
 	LocationConfig location = checkLocationPath(reqPath);
 	cleanPath(reqPath);
 	
 	Logger::VerticalSeparator();
-	std::cout << "I am in setStandardResponse \n"
-				<< "    check again location root: " << location.getRoot() << "\n"
-				<< "    check again Request Path🪜: " << reqPath << std::endl;
-	
+	Logger::Itroduction("setStandardResponse");
+
 	std::string fullPath = location.getRoot() + reqPath;
 	std::string indexFilePath = fullPath + location.getIndex();
 
-	std::cout << "    Index file path int setstandardresponse: " << indexFilePath << std::endl;
+	Logger::Specifique(reqPath, "Request Path 🪜");
+	Logger::Specifique(fullPath, "FullPath here 🪜");
+	Logger::Specifique(indexFilePath, "Index File Path 🪜");
 
-	if (isFile(reqPath))
-		std::cout << "File found 2 in ssr 📄" << std::endl;
 	if (isDirectory(fullPath))
 	{
-		std::cout << "Inside the directory 📁" << std::endl;
-		std::cout << "location autoindex 📁: " << location.getAutoindex() << std::endl;
+		Logger::Cout("Directory found 📁");
+		Logger::Cout("Checking for index file or autoindex 📁");
+		Logger::SpecifiqueForBool(location.getAutoindex(), "Autoindex 🪜  ");
 		Logger::Specifique(location.getAlias(), "Alias 🪜");
 		Logger::Specifique(location.getRoot(), "Root 🪜");
+		
 		// check if the directory has an index file if yes serve the index file
-		std::ifstream indexFile(indexFilePath);
-		if (indexFile.is_open() && indexFilePath.find(".html") != std::string::npos) // here to chage .html to isValideFile
+		if (isFile(indexFilePath))
 		{
-			std::cout << "inside index file" << std::endl;
-			std::stringstream buffer;
-			buffer << indexFile.rdbuf(); // Read file contents
-			setStatus("200", "OK");
-			setBody(buffer.str());
-			// reqPath = indexFilePath;
-			indexFile.close();
+			Logger::Cout("Index file found 📄");
+			serveFile(indexFilePath);
 			return;
 		}
 		// if not check if the directory has an autoindex on or off
 		else if (location.getAutoindex() == true)
 		{
 			Logger::Cout("Autoindex found 📁");
-			// Generate a directory listing if autoindex is enabled
-			std::cout << "location root in autoindex case: " << location.getRoot() << std::endl;
-			std::cout << "location path in autoindex case: " << location.getLocationPath() << std::endl;
+			Logger::Specifique(reqPath, "Request Path 🪜");
+			Logger::Specifique(location.getRoot(), "Root 🪜");
+			
 			std::string directoryListing = listDirectory(reqPath, location.getRoot());
 			if (!directoryListing.empty() && _state != IS_ALIAS)
 			{
@@ -337,6 +312,7 @@ void HTTPResponse::cleanPath(std::string &path) {
 
 std::string HTTPResponse::listDirectory(const std::string& path, const std::string& root)
 {
+	Logger::Itroduction("listDirectory 📁 📂");
 	std::string fullPath = root + path;
 	DIR* dir = opendir(fullPath.c_str());
 	if (!dir) {
@@ -357,7 +333,7 @@ std::string HTTPResponse::listDirectory(const std::string& path, const std::stri
 			if (S_ISDIR(info.st_mode)) {
 				html << "<li><b>[DIR]</b> <a href=\"" << path + "/" + name << "/\">" << name << "/</a></li>";
 			} else {
-				html << "<li><a href=\"" << path + "/" + name << "\">" << name << "</a></li>";
+				html << "<li><a href=\"" << path + name << "\">" << name << "</a></li>";
 			}
 		}
 	}

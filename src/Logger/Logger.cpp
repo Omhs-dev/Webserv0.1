@@ -39,6 +39,20 @@ void Logger::Specifique(std::string elemt, std::string elemMessage)
 	std::cout << specifique << std::endl;
 }
 
+void Logger::SpecifiqueForBool(bool elemt, std::string elemMessage)
+{
+	std::string specifique = elemMessage + " : " + (elemt ? "true" : "false");
+	
+	std::cout << specifique << std::endl;
+}
+
+void Logger::SpecifiqueForInt(int elemt, std::string elemMessage)
+{
+	std::string specifique = elemMessage + " : " + std::to_string(elemt);
+	
+	std::cout << specifique << std::endl;
+}
+
 void Logger::Cout(std::string string)
 {
 	std::cout << "What is this ▶️" <<  string << std::endl;
