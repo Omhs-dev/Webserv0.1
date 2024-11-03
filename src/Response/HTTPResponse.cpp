@@ -81,9 +81,14 @@ void HTTPResponse::handleGet()
 	{
 		Logger::Cout("Alias found 🪜");
 		Logger::Specifique(location.getAlias(), "Here is the Alias 🪜 :");
-		std::string aliasPath = location.getAlias() + location.getIndex();
+		std::string aliasPath = location.getAlias();
+		std::string aliasPathIndex = aliasPath + location.getIndex();
 		Logger::Specifique(aliasPath, "Alias Path 🪜");
-		serveFile(aliasPath);
+		Logger::Specifique(aliasPathIndex, "aliasPathIndex Path 🪜");
+		if (isFile(aliasPathIndex))
+			serveFile(aliasPathIndex);
+		else
+			setBody(listDirectory(aliasPath, location.getRoot()));
 	}
 	else
 	{
