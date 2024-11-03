@@ -1,14 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Get Request</title>
-    <link rel="stylesheet" href="../style.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h2>Delete Request page</h2>
-    </div>
-  </body>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Simple DELETE Request</title>
+	<style>
+		/* Basic reset and styling */
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			background-color: #f0f8ff;
+			font-family: Arial, sans-serif;
+			color: #333;
+		}
+
+		.message-container {
+			text-align: center;
+			padding: 20px 40px;
+			background-color: #fff;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			box-shadow: 0 4px 8px rgba(26, 28, 35, 0.1);
+		}
+
+		h1 {
+			font-size: 2rem;
+			color: #0c150c;
+			padding-bottom: 15px;
+		}
+
+		p {
+			font-size: 1.2rem;
+			color: #25263a;
+			margin-bottom: 20px;
+		}
+
+		form {
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+		}
+
+		select {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			font-size: 1rem;
+		}
+
+		button {
+			background-color: #4c49ea;
+			color: #fff;
+			border: none;
+			padding: 10px;
+			border-radius: 5px;
+			font-size: 1rem;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
+
+		button:hover {
+			background-color: #8684f5;
+		}
+
+		a {
+			background-color: #f0f8ff;
+			padding: 5px 10px;
+			border-radius: 5px;
+			text-decoration: none;
+			color: #4a4c4a;
+			font-size: 1rem;
+			display: block;
+			margin-top: 20px;
+		}
+
+		a:hover {
+			color: #0c150c;
+			background-color: #a4c9ea;
+			padding: 7px 12px;
+			border-radius: 5px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="message-container">
+		<h1>DELETE REQUEST</h1>
+		<p>To test this Request select a file to <strong>DELETE</strong></p>
+		<form method="post" action="/delete">
+			<label for="file">Select a file to delete:</label>
+			<select name="file" id="file" required>
+				<option value="" disabled selected>Select a file</option>
+				<!-- Replace with server-side code to dynamically list files -->
+				<option value="file1.txt">file1.txt</option>
+				<option value="file2.txt">file2.txt</option>
+				<option value="file3.txt">file3.txt</option>
+			</select>
+			<button type="submit">Delete Selected File</button>
+		</form>
+		<a href="/">Return Back Home</a>
+	</div>
+
+</body>
+
 </html>
