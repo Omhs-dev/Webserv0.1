@@ -50,9 +50,11 @@ void HTTPResponse::handleGet()
 	}
 	else if (isFile(indexFilePath))
 	{
-		// continue implementation from here
 		Logger::Cout("File found here 📄");
-		serveFile(indexFilePath);
+		if(isLargeFile(indexFilePath) && _state == IS_CHUNK)
+			setChunkResponse(indexFilePath);
+		else
+			serveFile(indexFilePath);
 	}
 	else if (reqPath == location.getLocationPath() && _state == IS_NORMAL)
 	{
@@ -86,7 +88,12 @@ void HTTPResponse::handleGet()
 		Logger::Specifique(aliasPath, "Alias Path 🪜");
 		Logger::Specifique(aliasPathIndex, "aliasPathIndex Path 🪜");
 		if (isFile(aliasPathIndex))
-			serveFile(aliasPathIndex);
+		{
+			if (isLargeFile(aliasPathIndex))
+				setChunkResponse(aliasPathIndex);
+			else
+				serveFile(aliasPathIndex);
+		}
 		else
 			setBody(listDirectory(aliasPath, location.getRoot()));
 	}
@@ -97,6 +104,46 @@ void HTTPResponse::handleGet()
 		setBody(_errorPage);
 	}
 }
+
+
+//setting the chunkResponse
+void HTTPResponse::setChunkResponse(const std::string &path)
+{
+	std::cout << "here is Chunk response reading!!" << std::endl;
+    std::ifstream file(path, std::ios::binary);
+    if (!file.is_open())
+    {
+        _errorPage = errorPage(path, "./www/");
+        setStatus("404", "Not Found");
+        setBody(_errorPage);
+        return;
+    }
+    setStatus("200", "OK");
+
+    std::ostringstream responseBody;
+    // Read the file in chunks
+    char buffer[MAX_RESPONSE_BODY_SIZE]; 
+    while (file)
+    {
+        file.read(buffer, sizeof(buffer));
+        std::streamsize bytesRead = file.gcount(); // Get number of bytes read
+
+        if (bytesRead > 0)
+        {
+            // Convert bytesRead to hexadecimal
+            std::string chunkSize = intToHexa(bytesRead) + "\r\n";
+            std::string chunkData(buffer, bytesRead);
+            responseBody << chunkSize << chunkData << "\r\n"; // Append chunk to response body
+        }
+    }
+    responseBody << "0\r\n\r\n"; // Final chunk to signal end
+    file.close();
+		std::cout << "here is Chunk response endingggggggggg!!" << std::endl;
+
+    setBody(responseBody.str());
+
+}
+
 
 void HTTPResponse::setDefaultResponse(std::string path, LocationConfig config)
 {
@@ -254,6 +301,15 @@ std::string HTTPResponse::getData() const
 		oss << "\r\n";
 		return oss.str();
 	}
+	else if (_state == IS_CHUNK)
+	{
+		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
+		oss << "Content-Length: " << _body.size() << "\r\n";
+		oss << "Transfer-Encoding: chunked"  << "r\n";
+		oss << "\r\n";
+		oss << _body;
+	}
 	else
 	{
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
@@ -324,6 +380,14 @@ void HTTPResponse::cleanPath(std::string &path)
 		}
 	}
 }
+
+
+    //  The variable DIR* is a pointer to a DIR structure,
+	//  which represents a directory stream in C and C++ 
+	//  programs that interact with directories using POSIX 
+	//  directory-handling functions (available in <dirent.h>).
+	//  When you use functions like opendir, readdir, and closedir,
+	//  you work with DIR* to manage and access the contents of a directory.
 
 std::string HTTPResponse::listDirectory(const std::string &path, const std::string &root)
 {

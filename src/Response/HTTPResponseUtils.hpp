@@ -8,7 +8,9 @@
 
 bool isFile(const std::string &path);
 bool isDirectory(const std::string &path);
+bool isLargeFile(const std::string &path);
 bool pathExtension(const std::string &path);
+std::string intToHexa(ssize_t num);
 
 std::string iToString(int integer);
 std::string getMimeType(const std::string &path);

@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "../Request/HTTPRequest.hpp"
+#include "../Response/HTTPResponse.hpp"
 #include "../Server/Client.hpp"
 #include "../Parse/LocationConfig.hpp"
 #include "../Parse/ConfigParser.hpp"
@@ -81,7 +82,7 @@ class Client;
 class HTTPResponse
 {
 	public:
-		enum ResponseState { INIT, IS_REDIRECT, IS_FILE, IS_NORMAL, IS_ALIAS, COMPLETE };
+		enum ResponseState { INIT, IS_REDIRECT, IS_CHUNK, IS_FILE, IS_NORMAL, IS_ALIAS, COMPLETE };
 	private:
 		Client *_client;
 		Server *_server;
@@ -101,6 +102,7 @@ class HTTPResponse
 		
 		void handleGet();
 		void setDefaultResponse(std::string path, LocationConfig config);
+		void setChunkResponse(const std::string &path);
 		void setStandardResponse();
 		// void setRedirection(const std::string &location, int code);
 		void setHeaders(const std::string &key, const std::string &value);

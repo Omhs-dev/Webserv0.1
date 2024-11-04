@@ -16,6 +16,18 @@ bool isFile(const std::string &path)
 	return (stat(path.c_str(), &buffer) == 0 && S_ISREG(buffer.st_mode));
 }
 
+bool isLargeFile(const std::string &path)
+{
+	struct stat fileStat;
+	if (stat(path.c_str(), &fileStat) != 0)
+	{
+        std::cerr << "Failed to stat largefile: " << path << ". Error: " << std::strerror(errno) << std::endl;
+		return false;
+	}
+	return fileStat.st_size >  MAX_ALLOWED_FILE_SIZE;
+}
+
+
 bool isDirectory(const std::string &path)
 {
 	struct stat info;
@@ -28,6 +40,13 @@ bool pathExtension(const std::string &path)
 {
 	return path.find('.') != std::string::npos;
 }
+
+std::string intToHexa(ssize_t num) {
+    std::stringstream stream;
+    stream << std::hex << num;
+    return stream.str();
+}
+
 
 // --- Utils ---
 
