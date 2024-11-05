@@ -20,7 +20,7 @@ std::string LocationConfig::getIndex() const
 	return index;
 }
 
-std::string LocationConfig::getRedirect() const
+std::map<int, std::string> LocationConfig::getRedirect() const
 {
 	return redirect;
 }

@@ -1,7 +1,7 @@
 #include "Client.hpp"
 #include "../Response/HTTPResponse.hpp"
 
-Client::Client(int socket) : _clientSocket(socket), _request(new HTTPRequest(this)) {}
+Client::Client(int socket) : _clientSocket(socket), _request(new HTTPRequest(this)), _response(new HTTPResponse(this)) {}
 
 void Client::clientConnectionProcess()
 {
@@ -21,7 +21,6 @@ void Client::handleRequest()
 {
 	char buffer[MAX_BUFFER_SIZE + 1];
 	int bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
-
 	if (bytesRead > 0)
 	{
 		buffer[bytesRead] = '\0'; // Null-terminate the buffer
@@ -44,6 +43,7 @@ void Client::handleRequest()
 
 void Client::handleResponse()
 {
+<<<<<<< HEAD
 	HTTPResponse response;
 	response.generateResponse(_request->getMethod(), _request->getPath());
 	sendResponse(response.getData());
@@ -51,6 +51,36 @@ void Client::handleResponse()
 	// _response = new HTTPResponse(this);
 	// _response->generateResponse();
 	// sendResponse(_response->getData());
+=======
+	// HTTPResponse response;
+	// checkLocationPath(_request->getPath());
+	// std::cout << "server root: " << _server->getConfigs()._servers[0].getRoot() << std::endl;
+	// std::cout << "location path: " << _server->getConfigs()._servers[0].getLocations()[0].getLocationPath() << std::endl;
+	_response->generateResponse();
+	sendResponse(_response->getData());
+}
+
+std::string Client::checkLocationPath(const std::string &path)
+{
+	std::cout << "Checking location path: " << path << std::endl;
+	std::cout << "before for loop" << std::endl;
+	for (auto &server : _server->getConfigs()._servers)
+	{
+		std::cout << "inside for loop 2" << std::endl;
+		for (LocationConfig &location : server.getLocations())
+		{
+			std::cout << "inside for loop 2" << std::endl;
+			if (path == location.getLocationPath() || path.find(location.getLocationPath()) == 0)
+			{ // Path matches location
+				std::cout << "Location found: " << location.getLocationPath() << std::endl;
+				return location.getLocationPath(); // Return the matched location configuration
+				break;
+			}
+		}
+		std::cout << "server location index: " << server.getIndex() << std::endl;
+	}
+	return "";
+>>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 }
 
 void Client::sendResponse(const std::string &response)

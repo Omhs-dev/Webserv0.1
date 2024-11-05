@@ -179,10 +179,16 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
                     serverConfig._requestAllowed.push_back(type);
                 }
             }
-            else if (key == "return")
-            {
-                serverConfig._redirect = value;
-            }
+            // else if (key == "return")
+            // {
+            //     size_t pos = value.find(" ");
+			// 	if (pos != std::string::npos)
+			// 	{
+			// 		int code = std::stoi(value.substr(0, pos));
+			// 		std::string path = value.substr(pos + 1);
+			// 		serverConfig._redirect[code] = path;
+			// 	}
+            // }
             else
             {
                 throw std::runtime_error("Unknown directive in server block: " + key);
@@ -277,7 +283,13 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
             }
             else if (key == "return")
             {
-                confLocation.redirect = value;
+                size_t pos = value.find(" ");
+				if (pos != std::string::npos)
+				{
+					int code = std::stoi(value.substr(0, pos));
+					std::string path = value.substr(pos + 1);
+					confLocation.redirect[code] = path;
+				}
             }
             else
             {
@@ -292,7 +304,8 @@ void ConfigParser::locationPath(const std::string &line, LocationConfig &confLoc
     size_t pos = line.find('{');
     if (pos != std::string::npos)
     {
-        confLocation.locationPath = line.substr(0, pos);
+        size_t pos2 = line.find('/');
+        confLocation.locationPath = line.substr(pos2, pos - pos2);
         removeWhiteSpace(confLocation.locationPath);
     }
     else
@@ -411,7 +424,7 @@ void ConfigParser::printLocationConfig(const LocationConfig& location)
         std::cout << std::endl;
     }
     if (!location.redirect.empty()) {
-        std::cout << "  Redirect: " << location.redirect << std::endl;
+        std::cout << "  Redirect: " << location.redirect.begin()->first << " -> " << location.redirect.begin()->second << std::endl;
     }
 }
 

@@ -1,19 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cgi get Request</title>
-    <link rel="stylesheet" href="../style.css">
-  </head>
-  <body>
-    <div class="container">
-        <h2>CGI GET Request Page</h2>
-        <form action="../cgi-bin/get_post_cgi.py" method="get">
-            Username: <input type="text" name="username" />
-            <br />
-            Email Address: <input type="email" name="emailaddress" />
-            <input type="submit" value="Submit" />
-        </form>
-    </div>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Simple GET Response</title>
+	<style>
+		/* Basic reset and styling */
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			background-color: #f0f8ff;
+			font-family: Arial, sans-serif;
+			color: #333;
+		}
+
+		.message-container {
+			text-align: center;
+			padding: 20px 40px;
+			background-color: #fff;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+
+		h1 {
+			font-size: 2rem;
+			color: #4caf50;
+		}
+
+		p {
+			font-size: 1.2rem;
+			color: #555;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="message-container">
+		<h1>Hey!</h1>
+		<p>This is a simple GET.</p>
+	</div>
+
+</body>
+
 </html>

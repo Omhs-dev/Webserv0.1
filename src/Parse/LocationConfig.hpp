@@ -26,7 +26,7 @@ struct LocationConfig
 	bool autoindex;
 	std::string alias;
 	std::string index;
-	std::string redirect;
+	std::map<int, std::string> redirect;
 	std::string locationPath;
 	std::string clientMaxBodySize;
 	std::map<int, std::string> errorPage;
@@ -38,7 +38,7 @@ struct LocationConfig
 	bool getAutoindex() const;
 	std::string getAlias() const;
 	std::string getIndex() const;
-	std::string getRedirect() const;
+	std::map<int, std::string> getRedirect() const;
 	std::string getLocationPath() const;
 	std::string getClientMaxBodySize() const;
 	std::map<int, std::string> getErrorPage() const;

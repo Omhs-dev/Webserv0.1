@@ -3,8 +3,24 @@
 
 #include <string>
 #include <iostream>
+<<<<<<< HEAD
 
 std::string getMimeType(const std::string &path);
 std::string getErrorMesssage(const std::string &code);
+=======
+#include <sstream>
+#include <sys/stat.h>
+
+bool isFile(const std::string &path);
+bool isDirectory(const std::string &path);
+bool isLargeFile(const std::string &path);
+bool pathExtension(const std::string &path);
+std::string intToHexa(ssize_t num);
+
+std::string iToString(int integer);
+std::string getMimeType(const std::string &path);
+std::string getErrorMesssage(const std::string &code);
+std::string errorPage(const std::string &path, const std::string &root);
+>>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 
 #endif

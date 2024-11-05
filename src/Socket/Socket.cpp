@@ -25,12 +25,21 @@ void Socket::bind(int port) {
     _address.sin_family = AF_INET;
     _address.sin_addr.s_addr = INADDR_ANY;
     _address.sin_port = htons(port);
+<<<<<<< HEAD
 	
 	int opt = 1;
 	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
 		handleError("Failed to set socket options");
 	}
 	
+=======
+    
+     int opt = 1;
+    if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+        handleError("Failed to set socket options");
+    }
+
+>>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
     if (::bind(_sockfd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
         handleError("Failed to bind socket");
     }

@@ -1,7 +1,154 @@
 #include "HTTPResponse.hpp"
 #include "HTTPResponseUtils.hpp"
 
+<<<<<<< HEAD
 // --- Utils ---
+=======
+std::string iToString(int integer)
+{
+	std::ostringstream oss;
+	oss << integer;
+	return oss.str();
+}
+
+// --- Checkers ---
+
+bool isFile(const std::string &path)
+{
+	struct stat buffer;
+	return (stat(path.c_str(), &buffer) == 0 && S_ISREG(buffer.st_mode));
+}
+
+bool isLargeFile(const std::string &path)
+{
+	struct stat fileStat;
+	if (stat(path.c_str(), &fileStat) != 0)
+	{
+        std::cerr << "Failed to stat largefile: " << path << ". Error: " << std::strerror(errno) << std::endl;
+		return false;
+	}
+	return fileStat.st_size >  MAX_ALLOWED_FILE_SIZE;
+}
+
+
+bool isDirectory(const std::string &path)
+{
+	struct stat info;
+	if (stat(path.c_str(), &info) != 0)
+		return false;
+	return S_ISDIR(info.st_mode);
+}
+
+bool pathExtension(const std::string &path)
+{
+	return path.find('.') != std::string::npos;
+}
+
+std::string intToHexa(ssize_t num) {
+    std::stringstream stream;
+    stream << std::hex << num;
+    return stream.str();
+}
+
+
+// --- Utils ---
+
+#include <string>
+#include <sstream>
+
+std::string errorPage(const std::string &path, const std::string &root)
+{
+	std::string fullPath = root + path;
+	std::ostringstream html;
+
+	html << "<!DOCTYPE html>\n"
+		<< " <html lang=\"en\">\n"
+		<< " <head>\n"
+		<< " <meta charset=\"UTF-8\">\n"
+		<< " <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+		<< " <title>404 - Page Not Found</title>\n"
+		<< " <style>\n"
+		<< "    * {\n"
+		<< "      margin: 0;\n"
+		<< "      padding: 0;\n"
+		<< "      box-sizing: border-box;\n"
+		<< "    }\n"
+		<< "    body {\n"
+		<< "      font-family: 'Roboto', sans-serif;\n"
+		<< "      background-color: #f4f4f9;\n"
+		<< "      color: #333;\n"
+		<< "      display: flex;\n"
+		<< "      justify-content: center;\n"
+		<< "      align-items: center;\n"
+		<< "      height: 100vh;\n"
+		<< "      overflow: hidden;\n"
+		<< "    }\n"
+		<< "    .error-container {\n"
+		<< "      text-align: center;\n"
+		<< "      padding: 40px;\n"
+		<< "      max-width: 600px;\n"
+		<< "      width: 100%;\n"
+		<< "      background-color: #fff;\n"
+		<< "      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);\n"
+		<< "      border-radius: 10px;\n"
+		<< "    }\n"
+		<< "    .error-code {\n"
+		<< "      font-size: 8rem;\n"
+		<< "      font-weight: 700;\n"
+		<< "      color: #4c49ea;\n"
+		<< "    }\n"
+		<< "    .error-message {\n"
+		<< "      font-size: 2rem;\n"
+		<< "      margin: 20px 0;\n"
+		<< "      color: #333;\n"
+		<< "    }\n"
+		<< "    .error-description {\n"
+		<< "      color: #666;\n"
+		<< "      font-size: 1rem;\n"
+		<< "      margin-bottom: 30px;\n"
+		<< "    }\n"
+		<< "    .back-button {\n"
+		<< "      display: inline-block;\n"
+		<< "      padding: 12px 24px;\n"
+		<< "      font-size: 1rem;\n"
+		<< "      font-weight: bold;\n"
+		<< "      color: #fff;\n"
+		<< "      background-color: #4c49ea;\n"
+		<< "      border-radius: 8px;\n"
+		<< "      text-decoration: none;\n"
+		<< "      transition: background-color 0.3s ease;\n"
+		<< "    }\n"
+		<< "    .back-button:hover {\n"
+		<< "      background-color: #3ecd5e;\n"
+		<< "    }\n"
+		<< "    .error-code {\n"
+		<< "      position: relative;\n"
+		<< "      animation: float 2s infinite ease-in-out;\n"
+		<< "    }\n"
+		<< "    @keyframes float {\n"
+		<< "      0%, 100% {\n"
+		<< "        transform: translateY(0);\n"
+		<< "      }\n"
+		<< "      50% {\n"
+		<< "        transform: translateY(-10px);\n"
+		<< "      }\n"
+		<< "    }\n"
+		<< " </style>\n"
+		<< " </head>\n"
+		<< " <body>\n"
+		<< " <div class=\"error-container\">\n"
+		<< "   <div class=\"error-code\">404</div>\n"
+		<< "   <div class=\"error-message\">Page Not Found</div>\n"
+		<< "   <div class=\"error-description\">Sorry " << root + path<<  " does not exist or has been moved.</div>\n"
+		<< "   <a href=\"/\" class=\"back-button\">Go Back Home</a>\n"
+		<< " </div>\n"
+		<< "</body>\n"
+		<< "</html>\n";
+
+	return html.str();
+}
+
+>>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 std::string getMimeType(const std::string &path)
 {
 	std::string extension = path.substr(path.find_last_of('.') + 1);
@@ -64,7 +211,11 @@ std::string getMimeType(const std::string &path)
 	else if (extension == "csv")
 		return "text/csv";
 	else
+<<<<<<< HEAD
 		return "text/plain";
+=======
+		return "text/html";
+>>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 }
 
 std::string getErrorMesssage(const std::string &code)
@@ -109,7 +260,11 @@ std::string getErrorMesssage(const std::string &code)
 	{
 		return "Permanent Redirect";
 	}
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 	else if (code == "400")
 	{
 		return "Bad Request";

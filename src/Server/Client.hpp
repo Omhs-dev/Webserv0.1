@@ -5,10 +5,6 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <iostream>
-#include <cstring>
-#include <iostream>
-
-// #include "../header.hpp"
 #include "../Request/HTTPRequest.hpp"
 #include "../Response/HTTPResponse.hpp"
 #include "Server.hpp"
@@ -24,7 +20,7 @@ class Client
 	    int _clientSocket;
 	    Server *_server;
 	    HTTPRequest *_request;
-	    HTTPResponse *_response;
+	    HTTPResponse *_response; // initialize this in constructor
 	    void sendResponse(const std::string& response);
 
 	public:
@@ -32,6 +28,10 @@ class Client
 	    void clientConnectionProcess();
 	    void handleRequest();
 	    void handleResponse();
+		
+		HTTPRequest *getRequest() const { return _request; }
+		std::string checkLocationPath(const std::string& path);
+		
 	    ~Client();
 		
 		Server *getServer() const { return _server; }
@@ -48,3 +48,4 @@ class Client
 };
 
 #endif
+		
