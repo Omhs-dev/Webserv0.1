@@ -15,70 +15,93 @@ HTTPRequest::HTTPRequest(Client *client)
 	_method = "";
 	_uriPath = "";
 	_version = "";
-	_state = REQUEST_LINE;
+	_state = IS_REQUEST_LINE;
 }
 
 void HTTPRequest::parseRequest(const std::string &requestData)
 {
-    _rawRequest = requestData;
-    std::istringstream stream(requestData);
-    std::string line;
+	Logger::VerticalSeparator();
+	Logger::Itroduction("parseRequest ↗️");
+	Logger::VerticalSeparator();
+	_rawRequest = requestData;
+	Logger::Specifique(_rawRequest, "This is the raw request");
+	std::istringstream stream(requestData);
+	std::string line;
 
-    while (std::getline(stream, line) && !line.empty())
-    {
-        // line = getLineSanitizer(stream);
-        if (_state == REQUEST_LINE)
-        {
-            parseRequestLine(line);
-            _state = HEADERS;
-        }
-        else if (_state == HEADERS)
-        {
-            parseHeaderLine(line);
-        }
-    }
-
-    if (!checkHostHeader())
-    {
-        errorOccur(400);  // Bad Request: Host header missing in HTTP/1.1 request
-    }
-
-    // Parse the body for methods like POST
-    if (_method == "POST" && _state == HEADERS)
-    {
-        std::string bodyData((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        if (checkTransferEncoding() == 1)
-            parseChunkedBody(bodyData);
-        else if (checkContentLength() == 1)
-            parseBody(bodyData);
-    }
-
-    _state = COMPLETE;
+	while (std::getline(stream, line) && !line.empty())
+	{
+		// line = getLineSanitizer(stream);
+		if (_state == IS_REQUEST_LINE)
+		{
+			parseRequestLine(line);
+			_state = IS_HEADERS;
+		}
+		else if (_state == IS_HEADERS)
+		{
+			parseHeaderLine(line);
+			_state = IS_HEADERS_END;
+		}
+	}
+	if (!checkHostHeader())
+	{
+		Logger::NormalCout("Host header missing in HTTP/1.1 request");
+		errorOccur(400); // Bad Request: Host header missing in HTTP/1.1 request
+		return;
+	}
+	// // Parse the body for methods like POST
+	_state = IS_BODY_START;
+	if (_method == "POST")
+	{
+		std::string bodyData((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+		if (checkTransferEncoding() == 1)
+			parseChunkedBody(bodyData);
+		else if (checkContentLength() == 1)
+			parseNormalBody(bodyData);
+		_state = IS_BODY_END;
+	}
+	_state = COMPLETE;
 }
 
 void HTTPRequest::parseRequestLine(const std::string &line)
 {
+	// Logger::Itroduction("parseRequestLine 📜");
+	// Logger::VerticalSeparator();
 	std::stringstream ss(line);
-	_method = parseMethod(ss.str());
-	_uriPath = parsePath(ss.str());
-	_version = parseVersion(ss.str());
-	
-	if (checkHttpVersion() == false)
-	{   
-		errorOccur(505);  // HTTP Version Not Supported
-        return;
-	}
+	// _method = parseMethod(ss.str());
+	// _uriPath = parsePath(ss.str());
+	// _version = parseVersion(ss.str());attempting
+	_state = IS_REQUEST_LINE;
 
-	if (_uriPath.find('?') != std::string::npos) {
-        size_t pos = _uriPath.find('?');
-        _query = _uriPath.substr(pos + 1);
-        _uriPath = _uriPath.substr(0, pos);
-    }
-	std::cout << "Parsed Request Line: " << _method << " " << _uriPath << " " << _version << std::endl;
+	ss >> _method >> _uriPath >> _version;
+
+	if (!checkMethod())
+	{
+		errorOccur(405);
+		return;
+	}
+	if (!checkHttpVersion())
+	{
+		errorOccur(505); // HTTP Version Not Supported
+		return;
+	}
+	if (_uriPath.find('?') != std::string::npos)
+	{
+		size_t pos = _uriPath.find('?');
+		_query = _uriPath.substr(pos + 1);
+		_uriPath = _uriPath.substr(0, pos);
+	}
+	Logger::NormalCout("Parsed Request Line : ");
+	Logger::Specifique(_method, "Method");
+	Logger::Specifique(_uriPath, "Path");
+	Logger::Specifique(_version, "Version");
 }
 
 void HTTPRequest::parseHeaderLine(const std::string &line)
 {
+	// Logger::Itroduction("parseHeaderLine 📰");
+	// Logger::VerticalSeparator();
+	// _state = IS_HEADERS;
+	EnumState(_state);
 	size_t colonPos = line.find(':');
 	if (colonPos != std::string::npos)
 	{
@@ -91,74 +114,68 @@ void HTTPRequest::parseHeaderLine(const std::string &line)
 		_headers[key] = value;
 		std::cout << "Parsed Header: " << key << ": " << value << std::endl;
 	}
+	// else
+	// {
+	// 	Logger::NormalCout("Header line is invalid");
+	// 	errorOccur(400);
+	// }
+	// _state = IS_HEADERS_END;
+	EnumState(_state);
 }
-// void HTTPRequest::parseHeaderLine(const std::string &line)
+
+// void HTTPRequest::parseBody(std::istringstream stream)
 // {
-//     std::string key = parseHeaderKey(line);
-//     std::string value = parseHeaderValue(line);
-//     _headers[key] = value;
+	
 // }
 
-std::string HTTPRequest::parseMethod(const std::string &line)
+void HTTPRequest::parseNormalBody(const std::string &bodyData)
 {
-    std::stringstream ss(line);
-    std::string method;
-    ss >> method;
-    // if (checkMethod() == 0)
-	// {
-	// 	errorOccur(405);  // Method Not Allowed
-	// 	return "";
-	// }
-    return method;
-}
-
-std::string HTTPRequest::parsePath(const std::string &line)
-{
-    std::stringstream ss(line);
-    std::string method, path;
-    ss >> method >> path;
-    return path;
-}
-
-std::string HTTPRequest::parseVersion(const std::string &line)
-{
-    std::stringstream ss(line);
-    std::string method, path, version;
-    ss >> method >> path >> version;
-    return version;
-}
-
-void HTTPRequest::parseBody(const std::string &bodyData)
-{
-    _body = bodyData;
+	_state = IS_BODY_NORMAL;
+	_body = bodyData.substr(0, _iscontentLength);
 }
 
 void HTTPRequest::parseChunkedBody(const std::string &bodyData)
 {
-    std::stringstream ss(bodyData);
-    std::string line;
+	Logger::VerticalSeparator();
+	Logger::Itroduction("parseChunkedBody");
+	Logger::VerticalSeparator();
+	std::stringstream ss(bodyData);
+	std::string line;
+	_state = IS_BODY_CHUNKED;
+	EnumState(_state);
 
-    while (std::getline(ss, line))
-    {
-        try {
-            _chunkSize = std::stoi(line, nullptr, 16);
-        } catch (const std::invalid_argument&) {
-            errorOccur(400);  // Bad Request: Invalid chunk size
-            break;
-        }
+	while (std::getline(ss, line))
+	{
+		try
+		{
+			_chunkSize = std::stoi(line, nullptr, 16);
+		}
+		catch (const std::invalid_argument &)
+		{
+			errorOccur(400); // Bad Request: Invalid chunk size
+			break;
+		}
+		if (_isChunked && _headers.find("Content-Length") != _headers.end())
+		{
+			errorOccur(400);
+			return;
+		}
+		if (_chunkSize == 0)
+		{
+			_state = COMPLETE;
+			EnumState(_state);
+			break;
+		}
 
-        if (_chunkSize == 0)
-        {
-            _state = COMPLETE;
-            break;
-        }
+		std::string buffer(_chunkSize, '\0');
+		ss.read(&buffer[0], _chunkSize);
+		_body.append(buffer);
 
-        std::string buffer(_chunkSize, '\0');
-        ss.read(&buffer[0], _chunkSize);
-        _body.append(buffer);
-
-        if (ss.peek() == '\r') ss.ignore(2); // Ignore \r\n after the chunk
-    }
+		if (ss.peek() == '\r')
+			ss.ignore(2);
+	}
+	// _state = IS_BODY_END;
+	EnumState(_state);
 }
 
 ////////////////////////////////////////////////////
@@ -167,67 +184,67 @@ void HTTPRequest::parseChunkedBody(const std::string &bodyData)
 
 bool HTTPRequest::checkHttpVersion()
 {
-    return (_version == "HTTP/1.1" || _version == "HTTP/1.0");
+	return (_version == "HTTP/1.1" || _version == "HTTP/1.0");
 }
 
 bool HTTPRequest::checkHostHeader()
 {
-    return _headers.find("host") != _headers.end();
+	return (_headers.find("Host") != _headers.end());
 }
 
 int HTTPRequest::checkTransferEncoding()
 {
-    auto it = _headers.find("transfer-encoding");
-    if (it != _headers.end() && it->second == "chunked")
-    {
-        _isChunked = true;
-        return 1;
-    }
-    return 0;
+	auto it = _headers.find("transfer-encoding");
+	if (it != _headers.end() && it->second == "chunked")
+	{
+		_isChunked = true;
+		return 1;
+	}
+	return 0;
 }
 
 int HTTPRequest::checkContentLength()
 {
-    auto it = _headers.find("content-length");
-    if (it != _headers.end())
-    {
-        try {
-            _iscontentLength = std::stoull(it->second);
-        } catch (const std::invalid_argument&) {
-            errorOccur(400);  // Bad Request: Invalid Content-Length
-            return 0;
-        }
-        return 1;
-    }
-    return 0;
+	auto it = _headers.find("content-length");
+	if (it != _headers.end())
+	{
+		try
+		{
+			_iscontentLength = std::stoull(it->second);
+		}
+		catch (const std::invalid_argument &)
+		{
+			errorOccur(400); // Bad Request: Invalid Content-Length
+			return 0;
+		}
+		return 1;
+	}
+	return 0;
 }
 
 int HTTPRequest::checkMethod()
 {
-	if (_method != "GET" && _method != "POST" && _method != "DELETE") {
+	if (_method != "GET" && _method != "POST" && _method != "DELETE")
 		return 0;
-	}
 	return 1;
 }
 
 int HTTPRequest::checkCgi()
 {
-	if (_location->getCgi().empty()) {
+	if (_location->getCgi().empty())
 		return 0;
-	}
 	return 1;
 }
-
 
 ////////////////////////////////////////////////////
 // ------------------- GETTERS -------------------//
 ////////////////////////////////////////////////////
 
-Client* HTTPRequest::getClient() const { return _client; }
+Client *HTTPRequest::getClient() const { return _client; }
 
-LocationConfig* HTTPRequest::getLocation() const { return _location; }
+LocationConfig *HTTPRequest::getLocation() const { return _location; }
 
-ServerConfig* HTTPRequest::getServer() const { return _server; }
+ServerConfig *HTTPRequest::getServer() const { return _server; }
 
 std::string HTTPRequest::getMethod() const { return _method; }
 
@@ -253,16 +270,63 @@ int HTTPRequest::getStateCode() const { return _stateCode; }
 
 void HTTPRequest::errorOccur(int code)
 {
-    _stateCode = code;
-    _state = COMPLETE;
+	_stateCode = code;
+	_state = COMPLETE;
+	Logger::SpecifiqueForInt(_stateCode, "an error occured");
+	EnumState(_state);
 }
 
 // make sure to remove the '\r' character from the line
 std::string HTTPRequest::getLineSanitizer(std::stringstream &ss)
 {
-    std::string line;
-    std::getline(ss, line);
-    if (line.find('\r') != std::string::npos)
-        line.erase(line.find('\r'));
-    return line;
+	std::string line;
+	std::getline(ss, line);
+	if (line.find('\r') != std::string::npos)
+		line.erase(line.find('\r'));
+	return line;
+}
+
+void HTTPRequest::EnumState(HTTPRequest::ParseState state)
+{
+	std::string stateName;
+	switch (state)
+	{
+	case HTTPRequest::START:
+		stateName = "START";
+		break;
+	case HTTPRequest::IS_REQUEST_LINE:
+		stateName = "REQUEST_LINE";
+		break;
+	case HTTPRequest::IS_METHODE:
+		stateName = "METHOD";
+		break;
+	case HTTPRequest::IS_PATH:
+		stateName = "PATH";
+		break;
+	case HTTPRequest::IS_VERSION:
+		stateName = "VERSION";
+		break;
+	case HTTPRequest::IS_HEADERS:
+		stateName = "HEADERS";
+		break;
+	case HTTPRequest::IS_HEADERS_END:
+		stateName = "HEADERS_END";
+		break;
+	case HTTPRequest::IS_BODY_START:
+		stateName = "BODY_START";
+		break;
+	case HTTPRequest::IS_BODY_NORMAL:
+		stateName = "BODY_NORMAL";
+		break;
+	case HTTPRequest::IS_BODY_CHUNKED:
+		stateName = "BODY_CHUNKED";
+		break;
+	case HTTPRequest::IS_BODY_END:
+		stateName = "BODY_END";
+		break;
+	case HTTPRequest::COMPLETE:
+		stateName = "COMPLETE";
+		break;
+	}
+	Logger::Specifique(stateName, "State");
 }

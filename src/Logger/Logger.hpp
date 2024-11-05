@@ -2,6 +2,9 @@
 #define LOGGER_HPP
 
 #include <iostream>
+#include "../Request/HTTPRequest.hpp"
+
+class HTTPRequest;
 
 class Logger
 {
@@ -18,8 +21,10 @@ class Logger
 		static void SpecifiqueForBool(bool elemt, std::string elemMessage);
 		static void SpecifiqueForInt(int elemt, std::string elemMessage);
 		
+		// request loggers
+		// static void EnumState(HTTPRequest::ParseState state);
+		
 		~Logger();
 };
-
 
 #endif

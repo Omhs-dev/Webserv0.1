@@ -22,7 +22,7 @@ void Logger::Separator()
 
 void Logger::VerticalSeparator()
 {
-	std::cout << "|\n|\n|\n" << std::endl;
+	std::cout << "|\n|\n" << std::endl;
 }
 
 void Logger::Checker(std::string string)
@@ -62,3 +62,24 @@ void Logger::NormalCout(std::string string)
 {
 	std::cout << string << std::endl;
 }
+
+// void Logger::EnumState(HTTPRequest::ParseState state)
+// {
+//     std::string stateName;
+//     switch (state) {
+//         case HTTPRequest::START: stateName = "START"; break;
+//         case HTTPRequest::IS_REQUEST_LINE: stateName = "REQUEST_LINE"; break;
+//         case HTTPRequest::IS_METHODE: stateName = "METHOD"; break;
+//         case HTTPRequest::IS_PATH: stateName = "PATH"; break;
+//         case HTTPRequest::IS_VERSION: stateName = "VERSION"; break;
+//         case HTTPRequest::IS_HEADERS: stateName = "HEADERS"; break;
+//         case HTTPRequest::IS_HEADERS_END: stateName = "HEADERS_END"; break;
+//         case HTTPRequest::IS_BODY_START: stateName = "BODY_START"; break;
+//         case HTTPRequest::IS_BODY_NORMAL: stateName = "BODY_NORMAL"; break;
+//         case HTTPRequest::IS_BODY_CHUNKED: stateName = "BODY_CHUNKED"; break;
+//         case HTTPRequest::IS_BODY_END: stateName = "BODY_END"; break;
+//         case HTTPRequest::COMPLETE: stateName = "COMPLETE"; break;
+//         default: stateName = "UNKNOWN";
+//     }
+//     std::cout << "Current Parse State: " << stateName << std::endl;
+// }
