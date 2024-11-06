@@ -47,7 +47,6 @@ std::string intToHexa(ssize_t num) {
     return stream.str();
 }
 
-
 // --- Utils ---
 
 #include <string>

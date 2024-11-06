@@ -12,6 +12,12 @@ HTTPResponse::HTTPResponse(Client *client)
 	_headers = {};
 	_body = "";
 	_errorPage = "";
+	_fileFd = -1;
+}
+HTTPResponse::~HTTPResponse()
+{
+	if (_fileFd != -1)
+		close(_fileFd);
 }
 
 // --------- Response Generation ---------
@@ -51,8 +57,11 @@ void HTTPResponse::handleGet()
 	else if (isFile(indexFilePath))
 	{
 		Logger::Cout("File found here 📄");
-		if(isLargeFile(indexFilePath) && _state == IS_CHUNK)
+		if(isLargeFile(indexFilePath))
+		{
+		    _state = IS_CHUNK;
 			setChunkResponse(indexFilePath);
+		}
 		else
 			serveFile(indexFilePath);
 	}
@@ -90,7 +99,10 @@ void HTTPResponse::handleGet()
 		if (isFile(aliasPathIndex))
 		{
 			if (isLargeFile(aliasPathIndex))
+			{
+				_state = IS_CHUNK;
 				setChunkResponse(aliasPathIndex);
+			}
 			else
 				serveFile(aliasPathIndex);
 		}
@@ -106,43 +118,74 @@ void HTTPResponse::handleGet()
 }
 
 
-//setting the chunkResponse
-void HTTPResponse::setChunkResponse(const std::string &path)
-{
-	std::cout << "here is Chunk response reading!!" << std::endl;
-    std::ifstream file(path, std::ios::binary);
-    if (!file.is_open())
-    {
-        _errorPage = errorPage(path, "./www/");
+void HTTPResponse::setChunkResponse(const std::string &path) {
+    std::cout << "Starting Chunked Response..." << std::endl;
+    _fileFd = open(path.c_str(), O_RDONLY);
+    if (_fileFd == -1) {
+        std::cerr << "Failed to open file: " << path << std::endl;
         setStatus("404", "Not Found");
-        setBody(_errorPage);
+        setBody("<html><body><h1>404 Not Found</h1></body></html>");
         return;
     }
-    setStatus("200", "OK");
 
     std::ostringstream responseBody;
-    // Read the file in chunks
-    char buffer[MAX_RESPONSE_BODY_SIZE]; 
-    while (file)
-    {
-        file.read(buffer, sizeof(buffer));
-        std::streamsize bytesRead = file.gcount(); // Get number of bytes read
+    // responseBody << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+    // responseBody << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
+    // responseBody << "Transfer-Encoding: chunked\r\n\r\n";  // End of headers
 
-        if (bytesRead > 0)
-        {
-            // Convert bytesRead to hexadecimal
-            std::string chunkSize = intToHexa(bytesRead) + "\r\n";
-            std::string chunkData(buffer, bytesRead);
-            responseBody << chunkSize << chunkData << "\r\n"; // Append chunk to response body
-        }
+    char buffer[RESPONSE_READ_BUFFER_SIZE];
+    ssize_t bytesRead;
+
+    // Read and send each chunk
+    while ((bytesRead = read(_fileFd, buffer, RESPONSE_READ_BUFFER_SIZE)) > 0) {
+        // Convert bytesRead to hexadecimal format
+        std::stringstream hexSizeStream;
+        hexSizeStream << std::hex << bytesRead;
+        responseBody << hexSizeStream.str() << "\r\n";  // Write the chunk size in hex followed by CRLF
+        responseBody.write(buffer, bytesRead);          // Write the actual chunk data
+        responseBody << "\r\n";                         // End the chunk with CRLF
     }
-    responseBody << "0\r\n\r\n"; // Final chunk to signal end
-    file.close();
-		std::cout << "here is Chunk response endingggggggggg!!" << std::endl;
 
-    setBody(responseBody.str());
+    // Error checking
+    if (bytesRead == -1) {
+        std::cerr << "Error reading from file: " << path << std::endl;
+        setStatus("500", "Internal Server Error");
+        setBody("<html><body><h1>500 Internal Server Error</h1></body></html>");
+    } else {
+        responseBody << "0\r\n\r\n";  // Send the last chunk with "0" size to signal end of response
+        setBody(responseBody.str());  // Set the entire response body
+        setStatus("200", "OK");
+    }
 
+    close(_fileFd);
+    std::cout << "Finished Chunked Response" << std::endl;
 }
+
+
+
+
+
+
+    // while (true) {
+    //     file.read(buffer, sizeof(buffer));
+    //     std::streamsize bytesRead = file.gcount(); // Get number of bytes read
+
+    //     if (bytesRead > 0) {
+    //         // Convert bytesRead to hexadecimal
+    //         responseBody << std::hex << bytesRead << "\r\n";
+    //         responseBody.write(buffer, bytesRead);
+    //         responseBody << "\r\n";
+    //     }
+	// 	else
+	// 		break;
+    // }
+    // responseBody << "0\r\n\r\n"; // End of chunked transfer
+    // setBody(responseBody.str()); // Set the body with the chunked response
+    // setStatus("200", "OK"); // Set HTTP status as 200 OK
+
+    // file.close();
+    // std::cout << "Finished Chunked Response" << std::endl;
+
 
 
 void HTTPResponse::setDefaultResponse(std::string path, LocationConfig config)
@@ -301,25 +344,26 @@ std::string HTTPResponse::getData() const
 		oss << "\r\n";
 		return oss.str();
 	}
-	else if (_state == IS_CHUNK)
+	else if (_state == IS_NORMAL)
 	{
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
 		oss << "Content-Length: " << _body.size() << "\r\n";
-		oss << "Transfer-Encoding: chunked"  << "r\n";
+	    // oss << "Transfer-Encoding: chunked\r\n";
 		oss << "\r\n";
 		oss << _body;
 	}
-	else
-	{
+	else {
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
-		oss << "Content-Length: " << _body.size() << "\r\n";
-		oss << "\r\n";
-		oss << _body;
-	}
+		oss << "Transfer-Encoding: chunked\r\n";
+		// oss << "\r\n";
+		oss << _body; 
+	}	
+	// oss << _body;
 	return oss.str();
 }
+
 
 // --------- Utils Functions ---------
 

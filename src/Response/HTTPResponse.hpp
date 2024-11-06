@@ -2,6 +2,7 @@
 #define HTTPRESPONSE_HPP
 
 #include <iostream>
+# include <fcntl.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -9,6 +10,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <vector>
+// #include <iomanip>
 
 #include "../Request/HTTPRequest.hpp"
 #include "../Response/HTTPResponse.hpp"
@@ -21,6 +23,7 @@
 
 #define MAX_ALLOWED_FILE_SIZE 1024 * 1024
 #define MAX_RESPONSE_BODY_SIZE 1024 * 1024
+#define RESPONSE_READ_BUFFER_SIZE 4096	
 
 class HTTPRequest;
 class Client;
@@ -91,9 +94,11 @@ class HTTPResponse
 		ResponseState _state;
 		std::string _statusCode;
 		std::string _statusMessage;
+		std::string _chunkEncoding;
 		std::vector<std::string> _headers;
 		std::string _body;
 		std::string _errorPage;
+		int _fileFd;
 		void serveFile(const std::string &path);
 		
 		// check if a request is a redirection
@@ -103,6 +108,7 @@ class HTTPResponse
 		void handleGet();
 		void setDefaultResponse(std::string path, LocationConfig config);
 		void setChunkResponse(const std::string &path);
+		// void setChunlEncoding(std::string &chunk);
 		void setStandardResponse();
 		// void setRedirection(const std::string &location, int code);
 		void setHeaders(const std::string &key, const std::string &value);
@@ -123,5 +129,4 @@ class HTTPResponse
 		LocationConfig checkLocationPath(const std::string& path);
 		// std::string checkLocationPath(const std::string& path);
 };
-
 #endif
