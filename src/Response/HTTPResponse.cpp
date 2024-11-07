@@ -5,7 +5,7 @@ HTTPResponse::HTTPResponse(Client *client)
 {
 	_client = client;
 	_server = client->getServer();
-	_request = client->getRequest();
+	_request = client->getRequest();	
 	_state = INIT;
 	_statusCode = "200";
 	_statusMessage = "OK";
@@ -14,6 +14,7 @@ HTTPResponse::HTTPResponse(Client *client)
 	_errorPage = "";
 	_fileFd = -1;
 }
+
 HTTPResponse::~HTTPResponse()
 {
 	if (_fileFd != -1)
@@ -27,10 +28,54 @@ void HTTPResponse::generateResponse()
 	std::string reqMethod = _request->getMethod();
 
 	if (reqMethod == "GET")
-	{
 		handleGet();
-	}
+	if (reqMethod == "POST")
+		handlePost();
+	if (reqMethod == "DELETE")
+		handleDelete();
 }
+
+
+void HTTPResponse::handlePost(void)
+{
+	// std::string responseBody;
+	std::string jsonBody = "{\n";
+	jsonBody += "\"message\": \"File uploaded successfully.\",\n";
+	jsonBody += "\"filename\": \"" + _request->getPath() + "\",\n";
+	jsonBody += "\"size\": " + ullToStr(_body.size()) + "\n";
+	jsonBody += "}\n";
+
+    // responseBody += "HTTP/1.1 200 OK\r\n";
+    // responseBody += "Content-Type: application/json\r\n";
+    // responseBody += "Content-Length: " + intToString(jsonBody.size()) + "\r\n";
+    // responseBody += "\r\n";
+    // responseBody += jsonBody;
+	setBody(jsonBody);
+}
+
+void HTTPResponse::handleDelete(void)
+{
+	std::string reqPath = _request->getPath();
+	if (!isFile(reqPath))
+		 (getErrorMesssage("404"));
+	if (isDirectory(reqPath) || remove(reqPath.c_str()) != 0)
+		 (getErrorMesssage("403"));
+ 	std::string jsonBody = "{\n";
+    jsonBody += "  \"message\": \"File deleted successfully.\",\n";
+    jsonBody += "  \"filename\": \"" + reqPath + "\"\n";
+    jsonBody += "}\n";
+
+    // Prepare the HTTP response with headers and JSON body
+    // std::string responseBody;
+    // responseBody += "HTTP/1.1 200 OK\r\n";
+    // responseBody += "Content-Type: application/json\r\n";
+    // responseBody += "Content-Length: " + intToString(jsonBody.size()) + "\r\n";
+    // responseBody += "\r\n";
+	setBody(jsonBody);
+
+}
+
+
 
 // --------- Handling Requests ---------
 
@@ -60,6 +105,7 @@ void HTTPResponse::handleGet()
 		if(isLargeFile(indexFilePath))
 		{
 		    _state = IS_CHUNK;
+			std::cout << _state << std::endl;
 			setChunkResponse(indexFilePath);
 		}
 		else
@@ -81,7 +127,7 @@ void HTTPResponse::handleGet()
 			if (red.first == 301)
 			{
 				Logger::Cout("301 Redirect found 🔄");
-				setStatus(iToString(red.first), getErrorMesssage(iToString(red.first)));
+				setStatus(intToString(red.first), getErrorMesssage(intToString(red.first)));
 				break;
 			}
 		}
@@ -132,7 +178,6 @@ void HTTPResponse::setChunkResponse(const std::string &path) {
     // responseBody << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
     // responseBody << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
     // responseBody << "Transfer-Encoding: chunked\r\n\r\n";  // End of headers
-
     char buffer[RESPONSE_READ_BUFFER_SIZE];
     ssize_t bytesRead;
 
@@ -156,35 +201,10 @@ void HTTPResponse::setChunkResponse(const std::string &path) {
         setBody(responseBody.str());  // Set the entire response body
         setStatus("200", "OK");
     }
-
     close(_fileFd);
     std::cout << "Finished Chunked Response" << std::endl;
 }
 
-
-
-
-
-
-    // while (true) {
-    //     file.read(buffer, sizeof(buffer));
-    //     std::streamsize bytesRead = file.gcount(); // Get number of bytes read
-
-    //     if (bytesRead > 0) {
-    //         // Convert bytesRead to hexadecimal
-    //         responseBody << std::hex << bytesRead << "\r\n";
-    //         responseBody.write(buffer, bytesRead);
-    //         responseBody << "\r\n";
-    //     }
-	// 	else
-	// 		break;
-    // }
-    // responseBody << "0\r\n\r\n"; // End of chunked transfer
-    // setBody(responseBody.str()); // Set the body with the chunked response
-    // setStatus("200", "OK"); // Set HTTP status as 200 OK
-
-    // file.close();
-    // std::cout << "Finished Chunked Response" << std::endl;
 
 
 
@@ -344,7 +364,7 @@ std::string HTTPResponse::getData() const
 		oss << "\r\n";
 		return oss.str();
 	}
-	else if (_state == IS_NORMAL)
+	else
 	{
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
@@ -353,13 +373,13 @@ std::string HTTPResponse::getData() const
 		oss << "\r\n";
 		oss << _body;
 	}
-	else {
-		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
-		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
-		oss << "Transfer-Encoding: chunked\r\n";
-		// oss << "\r\n";
-		oss << _body; 
-	}	
+	// else {
+	// 	oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
+	// 	oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
+	// 	oss << "Transfer-Encoding: chunked\r\n";
+	// 	// oss << "\r\n";
+	// 	oss << _body; 
+	// }	
 	// oss << _body;
 	return oss.str();
 }

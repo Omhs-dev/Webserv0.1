@@ -3,6 +3,7 @@
 
 #include <iostream>
 # include <fcntl.h>
+#include <unistd.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -97,6 +98,7 @@ class HTTPResponse
 		std::string _chunkEncoding;
 		std::vector<std::string> _headers;
 		std::string _body;
+		unsigned long long _size;
 		std::string _errorPage;
 		int _fileFd;
 		void serveFile(const std::string &path);
@@ -106,6 +108,8 @@ class HTTPResponse
 		// bool isRedirecUrl(const std::string &path);
 		
 		void handleGet();
+		void handlePost();
+		void handleDelete();
 		void setDefaultResponse(std::string path, LocationConfig config);
 		void setChunkResponse(const std::string &path);
 		// void setChunlEncoding(std::string &chunk);
@@ -114,6 +118,8 @@ class HTTPResponse
 		void setHeaders(const std::string &key, const std::string &value);
 		void setStatus(const std::string &code, const std::string &message);
 		void setBody(const std::string &body);
+		unsigned long long	getSize(void) const { return this->_size; }
+
 	
 	public:
 		HTTPResponse(Client *client);

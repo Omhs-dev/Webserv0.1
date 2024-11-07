@@ -1,5 +1,7 @@
 #include "HTTPResponse.hpp"
 #include "HTTPResponseUtils.hpp"
+#include <string>
+#include <sstream>
 
 std::string iToString(int integer)
 {
@@ -47,10 +49,20 @@ std::string intToHexa(ssize_t num) {
     return stream.str();
 }
 
-// --- Utils ---
+std::string ullToStr(unsigned long long ull){
+	std::ostringstream oss;
+	oss << ull;
+	return (oss.str());
+}
 
-#include <string>
-#include <sstream>
+std::string intToString(int value)
+{
+	std::ostringstream oss;
+	oss << value;
+	return oss.str();
+}
+
+// --- Utils ---
 
 std::string errorPage(const std::string &path, const std::string &root)
 {

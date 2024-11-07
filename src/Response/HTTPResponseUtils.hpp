@@ -11,8 +11,10 @@ bool isDirectory(const std::string &path);
 bool isLargeFile(const std::string &path);
 bool pathExtension(const std::string &path);
 std::string intToHexa(ssize_t num);
+std::string ullToStr(unsigned long long ull);
 
-std::string iToString(int integer);
+
+std::string intToString(int value);
 std::string getMimeType(const std::string &path);
 std::string getErrorMesssage(const std::string &code);
 std::string errorPage(const std::string &path, const std::string &root);
