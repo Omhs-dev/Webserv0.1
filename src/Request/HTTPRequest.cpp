@@ -20,17 +20,21 @@ HTTPRequest::HTTPRequest(Client *client)
 
 void HTTPRequest::parseRequest(const std::string &requestData)
 {
-	Logger::VerticalSeparator();
-	Logger::Itroduction("parseRequest ↗️");
-	Logger::VerticalSeparator();
+	// Logger::VerticalSeparator();
+	// Logger::Itroduction("parseRequest ↗️");
+	// Logger::VerticalSeparator();
 	_rawRequest = requestData;
-	Logger::Specifique(_rawRequest, "This is the raw request");
-	std::istringstream stream(requestData);
+	// Logger::Specifique(_rawRequest, "This is the raw request");
+	std::istringstream stream(_rawRequest);
 	std::string line;
 
+	if (_state == COMPLETE)
+	{
+		// Logger::NormalCout("Request already parsed");
+		return;
+	}
 	while (std::getline(stream, line) && !line.empty())
 	{
-		// line = getLineSanitizer(stream);
 		if (_state == IS_REQUEST_LINE)
 		{
 			parseRequestLine(line);
@@ -44,7 +48,7 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 	}
 	if (!checkHostHeader())
 	{
-		Logger::NormalCout("Host header missing in HTTP/1.1 request");
+		// Logger::NormalCout("Host header missing in HTTP/1.1 request");
 		errorOccur(400); // Bad Request: Host header missing in HTTP/1.1 request
 		return;
 	}
@@ -52,8 +56,15 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 	_state = IS_BODY_START;
 	if (_method == "POST")
 	{
+		// Logger::NormalCout("POST method detected");
 		std::string bodyData((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-		if (checkTransferEncoding() == 1)
+		
+		if (_headers.find("Content-Type") != _headers.end() && _headers["Content-Type"].find("multipart/form-data") != std::string::npos)
+		{
+			// Logger::NormalCout("Multipart form data detected");
+			parseMultipartBody(bodyData);
+		}
+		else if (checkTransferEncoding() == 1)
 			parseChunkedBody(bodyData);
 		else if (checkContentLength() == 1)
 			parseNormalBody(bodyData);
@@ -64,8 +75,8 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 
 void HTTPRequest::parseRequestLine(const std::string &line)
 {
-	// Logger::Itroduction("parseRequestLine 📜");
-	// Logger::VerticalSeparator();
+	Logger::Itroduction("parseRequestLine 📜");
+	Logger::VerticalSeparator();
 	std::stringstream ss(line);
 	// _method = parseMethod(ss.str());
 	// _uriPath = parsePath(ss.str());
@@ -90,16 +101,16 @@ void HTTPRequest::parseRequestLine(const std::string &line)
 		_query = _uriPath.substr(pos + 1);
 		_uriPath = _uriPath.substr(0, pos);
 	}
-	Logger::NormalCout("Parsed Request Line : ");
-	Logger::Specifique(_method, "Method");
-	Logger::Specifique(_uriPath, "Path");
-	Logger::Specifique(_version, "Version");
+	// Logger::NormalCout("Parsed Request Line : ");
+	// Logger::Specifique(_method, "Method");
+	// Logger::Specifique(_uriPath, "Path");
+	// Logger::Specifique(_version, "Version");
 }
 
 void HTTPRequest::parseHeaderLine(const std::string &line)
 {
-	// Logger::Itroduction("parseHeaderLine 📰");
-	// Logger::VerticalSeparator();
+	Logger::Itroduction("parseHeaderLine 📰");
+	Logger::VerticalSeparator();
 	// _state = IS_HEADERS;
 	EnumState(_state);
 	size_t colonPos = line.find(':');
@@ -116,7 +127,7 @@ void HTTPRequest::parseHeaderLine(const std::string &line)
 	}
 	// else
 	// {
-	// 	Logger::NormalCout("Header line is invalid");
+		Logger::NormalCout("Header line is invalid");
 	// 	errorOccur(400);
 	// }
 	// _state = IS_HEADERS_END;
@@ -136,9 +147,9 @@ void HTTPRequest::parseNormalBody(const std::string &bodyData)
 
 void HTTPRequest::parseChunkedBody(const std::string &bodyData)
 {
-	Logger::VerticalSeparator();
-	Logger::Itroduction("parseChunkedBody");
-	Logger::VerticalSeparator();
+	// Logger::VerticalSeparator();
+	// Logger::Itroduction("parseChunkedBody");
+	// Logger::VerticalSeparator();
 	std::stringstream ss(bodyData);
 	std::string line;
 	_state = IS_BODY_CHUNKED;
@@ -176,6 +187,95 @@ void HTTPRequest::parseChunkedBody(const std::string &bodyData)
 	}
 	// _state = IS_BODY_END;
 	EnumState(_state);
+}
+
+////////////////////////////////////////////////////
+// ------------------- UPLOADS -------------------//
+////////////////////////////////////////////////////
+
+std::string HTTPRequest::getBoundary()
+{
+	auto it = _headers.find("Content-Type");
+	if (it != _headers.end())
+	{
+		size_t pos = it->second.find("boundary=");
+		if (pos != std::string::npos)
+			return it->second.substr(pos + 9);
+	}
+	return "";
+}
+
+void HTTPRequest::parseMultipartBody(const std::string &bodyData)
+{
+	std::string boundary = getBoundary();
+	if (boundary.empty())
+	{
+		errorOccur(400); // Bad Request: Invalid boundary
+		return;
+	}
+	std::string delimiter = "--" + boundary;
+	std::string endDelimiter = "--" + boundary + "--";
+	size_t pos = bodyData.find(delimiter);
+	if (pos == std::string::npos)
+	{
+		errorOccur(400); // Bad Request: Invalid boundary
+		return;
+	}
+	pos += delimiter.length();
+	while (pos != std::string::npos)
+	{
+		size_t endPos = bodyData.find(delimiter, pos);
+		if (endPos == std::string::npos)
+			break;
+		std::string part = bodyData.substr(pos, endPos - pos);
+		size_t headerPos = part.find("\r\n\r\n");
+		if (headerPos == std::string::npos)
+			break;
+		std::string header = part.substr(0, headerPos);
+		std::string content = part.substr(headerPos + 4);
+		std::istringstream stream(header);
+		std::string line;
+		std::string key;
+		std::string value;
+		while (std::getline(stream, line) && !line.empty())
+		{
+			size_t colonPos = line.find(':');
+			if (colonPos != std::string::npos)
+			{
+				key = line.substr(0, colonPos);
+				value = line.substr(colonPos + 1);
+				std::string::iterator it = value.begin();
+				while (it != value.end() && std::isspace(*it))
+					it++;
+				value.erase(value.begin(), it);
+			}
+		}
+		// Save the file
+		std::string filename;
+		std::string::size_type pos = key.find("filename=");
+		if (pos != std::string::npos)
+		{
+			filename = key.substr(pos + 10);
+			filename.erase(filename.end() - 1);
+			std::ofstream file(filename, std::ios::binary);
+			file << content;
+			file.close();
+		}
+		pos = endPos + delimiter.length();
+	}
+}
+
+void HTTPRequest::saveFile(const std::string &filename, const std::string &content)
+{
+	std::ofstream file("./uploads/" + filename, std::ios::binary);
+	if (file.is_open())
+	{
+		// Logger::NormalCout("File opened successfully");
+		file << content;
+		file.close();
+	}
+	// else
+	// 	Logger::NormalCout("File failed to open");
 }
 
 ////////////////////////////////////////////////////
@@ -272,7 +372,7 @@ void HTTPRequest::errorOccur(int code)
 {
 	_stateCode = code;
 	_state = COMPLETE;
-	Logger::SpecifiqueForInt(_stateCode, "an error occured");
+	// Logger::SpecifiqueForInt(_stateCode, "an error occured");
 	EnumState(_state);
 }
 
@@ -328,5 +428,5 @@ void HTTPRequest::EnumState(HTTPRequest::ParseState state)
 		stateName = "COMPLETE";
 		break;
 	}
-	Logger::Specifique(stateName, "State");
+	// Logger::Specifique(stateName, "State");
 }

@@ -81,5 +81,6 @@ void Client::sendResponse(const std::string &response)
 Client::~Client()
 {
 	delete _request;
+	// delete _response;
 	close(_clientSocket);
 }

@@ -21,8 +21,16 @@ void HTTPResponse::generateResponse()
 	std::string reqMethod = _request->getMethod();
 
 	if (reqMethod == "GET")
-	{
 		handleGet();
+	else if (reqMethod == "DELETE")
+		handleDelete();
+	else if (reqMethod == "POST")
+		handlePost();
+	else
+	{
+		_errorPage = errorPage(_request->getPath(), _server->getConfigs()._servers[0].getRoot());
+		setStatus("405", "Method Not Allowed");
+		setBody(_errorPage);
 	}
 }
 
@@ -35,13 +43,13 @@ void HTTPResponse::handleGet()
 	std::string indexFilePath = reqRooth + reqPath;
 	LocationConfig location = checkLocationPath(reqPath);
 
-	// Logger::Separator();
-	// Logger::VerticalSeparator();
-	// Logger::Itroduction("handleGet");
-	// Logger::Specifique(reqPath, "Request Path 🪜 ");
-	// Logger::Specifique(location.getLocationPath(), "Location Path 🪜 ");
-	// Logger::Specifique(reqRooth, "Request Root 🛤️ ");
-	// Logger::Specifique(indexFilePath, "Request Root + path + index 🪜 ");
+	Logger::Separator();
+	Logger::VerticalSeparator();
+	Logger::Itroduction("handleGet");
+	Logger::Specifique(reqPath, "Request Path 🪜 ");
+	Logger::Specifique(location.getLocationPath(), "Location Path 🪜 ");
+	Logger::Specifique(reqRooth, "Request Root 🛤️ ");
+	Logger::Specifique(indexFilePath, "Request Root + path + index 🪜 ");
 
 	if (reqPath == "/")
 	{
@@ -50,7 +58,7 @@ void HTTPResponse::handleGet()
 	}
 	else if (isFile(indexFilePath))
 	{
-		// Logger::Cout("File found here 📄");
+		Logger::Cout("File found here 📄");
 		if(isLargeFile(indexFilePath) && _state == IS_CHUNK)
 			setChunkResponse(indexFilePath);
 		else
@@ -58,10 +66,10 @@ void HTTPResponse::handleGet()
 	}
 	else if (reqPath == location.getLocationPath() && _state == IS_NORMAL)
 	{
-		// Logger::Cout("Path matches location path here ✅");
+		Logger::Cout("Path matches location path here ✅");
 		cleanPath(reqPath);
 		setStandardResponse();
-		// Logger::Specifique(reqPath, "Request Path 🪜");
+		Logger::Specifique(reqPath, "Request Path 🪜");
 	}
 	else if (reqPath == location.getLocationPath() && _state == IS_REDIRECT)
 	{
@@ -71,22 +79,22 @@ void HTTPResponse::handleGet()
 		{
 			if (red.first == 301)
 			{
-				// Logger::Cout("301 Redirect found 🔄");
+				Logger::Cout("301 Redirect found 🔄");
 				setStatus(iToString(red.first), getErrorMesssage(iToString(red.first)));
 				break;
 			}
 		}
-		// Logger::Checker(location.getRedirect().begin()->second);
+		Logger::Checker(location.getRedirect().begin()->second);
 		setHeaders("Location", location.getRedirect().begin()->second);
 	}
 	else if (location.getAlias() != "" && location.getAutoindex() && _state == IS_ALIAS)
 	{
-		// Logger::Cout("Alias found 🪜");
-		// Logger::Specifique(location.getAlias(), "Here is the Alias 🪜 :");
+		Logger::Cout("Alias found 🪜");
+		Logger::Specifique(location.getAlias(), "Here is the Alias 🪜 :");
 		std::string aliasPath = location.getAlias();
 		std::string aliasPathIndex = aliasPath + location.getIndex();
-		// Logger::Specifique(aliasPath, "Alias Path 🪜");
-		// Logger::Specifique(aliasPathIndex, "aliasPathIndex Path 🪜");
+		Logger::Specifique(aliasPath, "Alias Path 🪜");
+		Logger::Specifique(aliasPathIndex, "aliasPathIndex Path 🪜");
 		if (isFile(aliasPathIndex))
 		{
 			if (isLargeFile(aliasPathIndex))
@@ -105,6 +113,65 @@ void HTTPResponse::handleGet()
 	}
 }
 
+
+void HTTPResponse::handleDelete()
+{
+	Logger::Itroduction("handleDelete");
+	Logger::VerticalSeparator();
+	
+	std::string reqPath = _request->getPath();
+	
+	Logger::Specifique(reqPath, "Request Path in handleDelete 🪜");
+	LocationConfig location = checkLocationPath(reqPath);
+	
+	std::string serverRooth = _server->getConfigs()._servers[0].getRoot();
+	Logger::Specifique(serverRooth, "serverRooth Root 🛤️");
+	
+	std::string reqFilePath = serverRooth + reqPath;
+	Logger::Specifique(reqFilePath, "Request File Path 🪜");
+	
+	if (reqPath != location.getLocationPath())
+	{
+		Logger::Cout("Path not found 🚫");
+		// std::string reqRootTest = _request->getServer()->getRoot();
+		
+		// Logger::Specifique(reqRootTest, "Request Root Test 🛤️");
+	
+		if (!isFile(reqFilePath))
+		{
+			Logger::Cout("File not found 🚫");
+			setStatus("404", getErrorMesssage("404"));
+			return;
+		}
+		Logger::Cout("File found here 📄");
+		if (isDirectory(reqFilePath) || remove(reqFilePath.c_str()) != 0)
+			setStatus("403", getErrorMesssage("403"));
+		std::string jsonBody = "{\n";
+	    jsonBody += "  \"message\": \"File deleted successfully.\",\n";
+	    jsonBody += "  \"filename\": \"" + reqFilePath + "\"\n";
+	    jsonBody += "}\n";
+		
+		Logger::Specifique(jsonBody, "Json Body 🪜");
+		setBody(jsonBody);
+	}
+}
+
+void HTTPResponse::handlePost(void)
+{
+	// std::string responseBody;
+	std::string jsonBody = "{\n";
+	jsonBody += "\"message\": \"File uploaded successfully.\",\n";
+	jsonBody += "\"filename\": \"" + _request->getPath() + "\",\n";
+	jsonBody += "\"size\": " + ullToStr(_body.size()) + "\n";
+	jsonBody += "}\n";
+
+    // responseBody += "HTTP/1.1 200 OK\r\n";
+    // responseBody += "Content-Type: application/json\r\n";
+    // responseBody += "Content-Length: " + intToString(jsonBody.size()) + "\r\n";
+    // responseBody += "\r\n";
+    // responseBody += jsonBody;
+	setBody(jsonBody);
+}
 
 //setting the chunkResponse
 void HTTPResponse::setChunkResponse(const std::string &path)
@@ -149,8 +216,8 @@ void HTTPResponse::setDefaultResponse(std::string path, LocationConfig config)
 {
 	std::string indexPath = config.getRoot() + path + config.getIndex();
 
-	// Logger::Itroduction("setDefaultResponse");
-	// Logger::Specifique(config.getRoot() + path + config.getIndex(), "Index file path 📄");
+	Logger::Itroduction("setDefaultResponse");
+	Logger::Specifique(config.getRoot() + path + config.getIndex(), "Index file path 📄");
 
 	serveFile(indexPath);
 }
@@ -161,37 +228,37 @@ void HTTPResponse::setStandardResponse()
 	LocationConfig location = checkLocationPath(reqPath);
 	cleanPath(reqPath);
 
-	// Logger::VerticalSeparator();
-	// Logger::Itroduction("setStandardResponse");
+	Logger::VerticalSeparator();
+	Logger::Itroduction("setStandardResponse");
 
 	std::string fullPath = location.getRoot() + reqPath;
 	std::string indexFilePath = fullPath + location.getIndex();
 
-	// Logger::Specifique(reqPath, "Request Path 🪜");
-	// Logger::Specifique(fullPath, "FullPath here 🪜");
-	// Logger::Specifique(indexFilePath, "Index File Path 🪜");
+	Logger::Specifique(reqPath, "Request Path 🪜");
+	Logger::Specifique(fullPath, "FullPath here 🪜");
+	Logger::Specifique(indexFilePath, "Index File Path 🪜");
 
 	if (isDirectory(fullPath))
 	{
-		// Logger::Cout("Directory found 📁");
-		// Logger::Cout("Checking for index file or autoindex 📁");
-		// Logger::SpecifiqueForBool(location.getAutoindex(), "Autoindex 🪜  ");
-		// Logger::Specifique(location.getAlias(), "Alias 🪜");
-		// Logger::Specifique(location.getRoot(), "Root 🪜");
+		Logger::Cout("Directory found 📁");
+		Logger::Cout("Checking for index file or autoindex 📁");
+		Logger::SpecifiqueForBool(location.getAutoindex(), "Autoindex 🪜  ");
+		Logger::Specifique(location.getAlias(), "Alias 🪜");
+		Logger::Specifique(location.getRoot(), "Root 🪜");
 
 		// check if the directory has an index file if yes serve the index file
 		if (isFile(indexFilePath))
 		{
-			// Logger::Cout("Index file found 📄");
+			Logger::Cout("Index file found 📄");
 			serveFile(indexFilePath);
 			return;
 		}
 		// if not check if the directory has an autoindex on or off
 		else if (location.getAutoindex() == true)
 		{
-			// Logger::Cout("Autoindex found 📁");
-			// Logger::Specifique(reqPath, "Request Path 🪜");
-			// Logger::Specifique(location.getRoot(), "Root 🪜");
+			Logger::Cout("Autoindex found 📁");
+			Logger::Specifique(reqPath, "Request Path 🪜");
+			Logger::Specifique(location.getRoot(), "Root 🪜");
 
 			std::string directoryListing = listDirectory(reqPath, location.getRoot());
 			if (!directoryListing.empty() && _state != IS_ALIAS)
@@ -214,24 +281,24 @@ void HTTPResponse::setStandardResponse()
 
 LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {
-	// Logger::NormalCout("-------------- checkLocationPath --------------");
-	// Logger::Specifique(path, "Request Path 🪜");
-	// Logger::NormalCout("before for loop 1 \n|");
+	Logger::NormalCout("-------------- checkLocationPath --------------");
+	Logger::Specifique(path, "Request Path 🪜");
+	Logger::NormalCout("before for loop 1 \n|");
 	for (auto &server : _server->getConfigs()._servers)
 	{
-			// Logger::NormalCout("before for loop 2\n|");
-			// Logger::NormalCout("Liste of locations ../../ ⬇");
-			// Logger::NormalCout("|");
+			Logger::NormalCout("before for loop 2\n|");
+			Logger::NormalCout("Liste of locations ../../ ⬇");
+			Logger::NormalCout("|");
 		for (LocationConfig &location : server.getLocations())
 		{
-			// Logger::Separator();
-			// Logger::Specifique(location.getLocationPath(), "Location Path to look for 🪜");
+			Logger::Separator();
+			Logger::Specifique(location.getLocationPath(), "Location Path to look for 🪜");
 			if (path == location.getLocationPath()
 					&& location.getRedirect().begin()->second == "https://github.com/")
 			{
 				_state = IS_REDIRECT;
-				// Logger::NormalCout("Redirect found 🔄");
-				// Logger::Specifique(location.getRedirect().begin()->second, "Redirect Link found 🔗");
+				Logger::NormalCout("Redirect found 🔄");
+				Logger::Specifique(location.getRedirect().begin()->second, "Redirect Link found 🔗");
 				return location;
 				break;
 			}
@@ -239,15 +306,15 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 						&& location.getAlias() != location.getLocationPath())
 			{
 				_state = IS_ALIAS;
-				// Logger::Specifique(location.getLocationPath(), "Location Path 🪜");
-				// Logger::Specifique(location.getAlias(), "Alias found 🪜");
-				// Logger::Specifique(location.getAlias(), "Alias path 🪜");
+				Logger::Specifique(location.getLocationPath(), "Location Path 🪜");
+				Logger::Specifique(location.getAlias(), "Alias found 🪜");
+				Logger::Specifique(location.getAlias(), "Alias path 🪜");
 				return location;
 				break;
 			}
 			else if (path == location.getLocationPath())
 			{
-				// Logger::NormalCout("Location found ✅");
+				Logger::NormalCout("Location found ✅");
 				_state = IS_NORMAL;
 				return location;
 				break;
@@ -256,16 +323,16 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 			{
 				if (path == location.getLocationPath() + location.getIndex())
 				{
-					// Logger::NormalCout("File found here 📄");
+					Logger::NormalCout("File found here 📄");
 					_state = IS_FILE;
 					return location;
 					break;
 				}
 			}
-			// Logger::NormalCout("Location not found ❗");
+			Logger::NormalCout("Location not found ❗");
 		}
 		// std::cout << "server location index: " << server.getIndex() << std::endl;
-		// Logger::NormalCout("|\nNext server 🚀");
+		Logger::NormalCout("|\nNext server 🚀");
 	}
 	return LocationConfig();
 }
@@ -391,7 +458,7 @@ void HTTPResponse::cleanPath(std::string &path)
 
 std::string HTTPResponse::listDirectory(const std::string &path, const std::string &root)
 {
-	// Logger::Itroduction("listDirectory 📁 📂");
+	Logger::Itroduction("listDirectory 📁 📂");
 	std::string fullPath = root + path;
 	DIR *dir = opendir(fullPath.c_str());
 	if (!dir)

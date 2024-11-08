@@ -8,6 +8,12 @@ std::string iToString(int integer)
 	return oss.str();
 }
 
+std::string ullToStr(unsigned long long ull){
+	std::ostringstream oss;
+	oss << ull;
+	return (oss.str());
+}
+
 // --- Checkers ---
 
 bool isFile(const std::string &path)
@@ -252,7 +258,6 @@ std::string getErrorMesssage(const std::string &code)
 	{
 		return "Permanent Redirect";
 	}
-
 	else if (code == "400")
 	{
 		return "Bad Request";

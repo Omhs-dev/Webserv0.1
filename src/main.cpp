@@ -16,7 +16,8 @@ int main(int argc, char* argv[]) {
         ConfigParser parser;
 		parser.parseConfigFile(argv[1]);
         HTTPConfigs configs = parser.getHTTPConfigs();
-
+		
+		// parser.printLocationConfig(configs._servers[0]._locations[1]);
         // Loop through all the server configs and start the servers
         Server server(configs);
         server.run();

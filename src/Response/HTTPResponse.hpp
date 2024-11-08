@@ -101,6 +101,8 @@ class HTTPResponse
 		// bool isRedirecUrl(const std::string &path);
 		
 		void handleGet();
+		void handleDelete();
+		void handlePost();
 		void setDefaultResponse(std::string path, LocationConfig config);
 		void setChunkResponse(const std::string &path);
 		void setStandardResponse();
