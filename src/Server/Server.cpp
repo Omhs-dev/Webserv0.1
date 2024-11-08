@@ -100,8 +100,7 @@ void Server::closeClient(int client_fd)
 {
 	close(client_fd);
 	pollfds.erase(std::remove_if(pollfds.begin(), pollfds.end(), [client_fd](const pollfd &pfd)
-								 { return pfd.fd == client_fd; }),
-				  pollfds.end());
+								{ return pfd.fd == client_fd; }),pollfds.end());
 }
 
 // add a signal handler to close the server socket

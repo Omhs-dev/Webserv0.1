@@ -28,6 +28,7 @@ class Client;
 // a timeout function for the request
 
 // a function to define the body destination
+
 class HTTPRequest
 {
 	friend class HTTPRequestTest;
@@ -52,7 +53,6 @@ class HTTPRequest
 		Client          *_client;
 		LocationConfig  *_location;
 		ServerConfig    *_server;
-		// HTTPConfigs     _httpConfigs;
 		
 		// Request Line
 		std::string     _method;
@@ -73,8 +73,6 @@ class HTTPRequest
 		time_t          _timeout;
 		int             _stateCode;
 		
-		 // Parsing states
-	
 		// --- Parse Request Line ---
 		void        parseRequestLine(const std::string &line);
 		
@@ -100,35 +98,34 @@ class HTTPRequest
 		void parseRequest(const std::string &requestData);
 		
 		// --- CHECKERS ---
-		bool checkHttpVersion();
-		bool checkHostHeader();
-		int 	   checkTransferEncoding();
-		int 	  checkContentLength();
-		int checkMethod();
-		int checkCgi();
+		bool    checkHttpVersion();
+		bool    checkHostHeader();
+		int     checkTransferEncoding();
+		int     checkContentLength();
+		int     checkMethod();
+		int     checkCgi();
 		// --- GETTERS ---
 		Client          *getClient() const;
 		LocationConfig  *getLocation() const;
 		ServerConfig    *getServer() const;
 		
 		// --- Request Line ---
-		std::string getMethod() const;
-		std::string getPath() const;
-		std::string getVersion() const;
+		std::string     getMethod() const;
+		std::string     getPath() const;
+		std::string     getVersion() const;
 		// --- Headers ---
 		
 		std::map<std::string, std::string> getHeaders() const;
-		std::string getHeaderKey() const;
-		std::string getHeaderValue() const;
-		std::string getBody() const;
-		std::string getQuery() const;
-		std::string getRawRequest() const;
+		std::string     getHeaderKey() const;
+		std::string     getHeaderValue() const;
+		std::string     getBody() const;
+		std::string     getQuery() const;
+		std::string     getRawRequest() const;
 		bool getIsChunked() const;
 		unsigned long long getContentLength() const;
 		int getChunkSize() const;
 		time_t getTimeout() const;
 		int getStateCode() const;
-		
 
 		//Setters
 		void setStateCode(int stateCode) {_stateCode = stateCode;}
@@ -138,6 +135,9 @@ class HTTPRequest
 		void errorOccur(int code);
 		bool validateLocation(const std::string& path);
 		LocationConfig* findLocationConfig(const std::string& path);
+		void parseMultipartBody(const std::string& bodyData);
+		void saveFile(const std::string& filename, const std::string& content);
+		std::string getBoundary();
 };
 
 #endif

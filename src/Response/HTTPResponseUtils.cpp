@@ -1,14 +1,17 @@
 #include "HTTPResponse.hpp"
 #include "HTTPResponseUtils.hpp"
 
-<<<<<<< HEAD
-// --- Utils ---
-=======
 std::string iToString(int integer)
 {
 	std::ostringstream oss;
 	oss << integer;
 	return oss.str();
+}
+
+std::string ullToStr(unsigned long long ull){
+	std::ostringstream oss;
+	oss << ull;
+	return (oss.str());
 }
 
 // --- Checkers ---
@@ -148,7 +151,6 @@ std::string errorPage(const std::string &path, const std::string &root)
 	return html.str();
 }
 
->>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 std::string getMimeType(const std::string &path)
 {
 	std::string extension = path.substr(path.find_last_of('.') + 1);
@@ -211,11 +213,7 @@ std::string getMimeType(const std::string &path)
 	else if (extension == "csv")
 		return "text/csv";
 	else
-<<<<<<< HEAD
-		return "text/plain";
-=======
 		return "text/html";
->>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 }
 
 std::string getErrorMesssage(const std::string &code)
@@ -260,11 +258,6 @@ std::string getErrorMesssage(const std::string &code)
 	{
 		return "Permanent Redirect";
 	}
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 	else if (code == "400")
 	{
 		return "Bad Request";

@@ -43,15 +43,6 @@ void Client::handleRequest()
 
 void Client::handleResponse()
 {
-<<<<<<< HEAD
-	HTTPResponse response;
-	response.generateResponse(_request->getMethod(), _request->getPath());
-	sendResponse(response.getData());
-	
-	// _response = new HTTPResponse(this);
-	// _response->generateResponse();
-	// sendResponse(_response->getData());
-=======
 	// HTTPResponse response;
 	// checkLocationPath(_request->getPath());
 	// std::cout << "server root: " << _server->getConfigs()._servers[0].getRoot() << std::endl;
@@ -80,7 +71,6 @@ std::string Client::checkLocationPath(const std::string &path)
 		std::cout << "server location index: " << server.getIndex() << std::endl;
 	}
 	return "";
->>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 }
 
 void Client::sendResponse(const std::string &response)

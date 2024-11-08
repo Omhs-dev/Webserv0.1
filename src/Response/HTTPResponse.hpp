@@ -25,14 +25,6 @@
 class HTTPRequest;
 class Client;
 
-<<<<<<< HEAD
-// Create a content type mime type map function
-
-// Create a function to highlight all the status codes
-
-// Set a content type based on the file extension
-// set an error page message
-=======
 /*
 	↗️ ✔️ ✅ ❎ 🔗 ➡️ ▶️📄
 */
@@ -63,7 +55,6 @@ class Client;
 // Request for a Directory (Without Trailing Slash)
 	// if a directory is requested whithout "/" at the end, the server should redirect to the same URL with a trailing slash
 	// example: /directory -> /directory/
->>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 
 // Generate reponse
 	// handle methodes
@@ -82,46 +73,14 @@ class Client;
 								// if yes serve the index file
 							// check if the directory has an autoindex on or off
 								// if yes serve the directory
-<<<<<<< HEAD
-						// if is a recirect
-=======
 							// check if directory has an alias
 								// if yes set path to the alias - or create a function to handle that
 						// if is a redirect
->>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 							// if yes serve the redirect
 					// if no serve 404
 
 class HTTPResponse
 {
-<<<<<<< HEAD
-private:
-	Client *_client;
-	HTTPRequest *_request;
-	std::string _statusCode;
-	std::string _statusMessage;
-	std::vector<std::string> _headers;
-	std::string _body;
-	
-	void handleGet(const std::string &path);
-	void setDefaultResponse();
-	void setStandardResponse(const std::string &path);
-	void setStatus(const std::string &code, const std::string &message);
-	void setBody(const std::string &body);
-
-public:
-	HTTPResponse();
-	void generateResponse(const std::string &method, const std::string &path);
-	std::string getData() const;
-	std::vector<std::string> getHeaders() const { return _headers; }
-	std::string getMimeType(const std::string &path);
-	std::string getErrorMesssage(const std::string &code);
-	
-	bool isFileLarge(const std::string &path);
-	bool isFile(const std::string &path);
-	bool isDirectory(const std::string &path);
-	bool isPathValid(const std::string &path);
-=======
 	public:
 		enum ResponseState { INIT, IS_REDIRECT, IS_CHUNK, IS_FILE, IS_NORMAL, IS_ALIAS, COMPLETE };
 	private:
@@ -142,6 +101,8 @@ public:
 		// bool isRedirecUrl(const std::string &path);
 		
 		void handleGet();
+		void handleDelete();
+		void handlePost();
 		void setDefaultResponse(std::string path, LocationConfig config);
 		void setChunkResponse(const std::string &path);
 		void setStandardResponse();
@@ -163,7 +124,6 @@ public:
 		std::string listDirectory(const std::string &path, const std::string& root);
 		LocationConfig checkLocationPath(const std::string& path);
 		// std::string checkLocationPath(const std::string& path);
->>>>>>> b1db622744670f71aa8edfe574af9dd3c50fa0f8
 };
 
 #endif
