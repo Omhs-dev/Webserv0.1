@@ -47,4 +47,3 @@ class Client
 };
 
 #endif
-		

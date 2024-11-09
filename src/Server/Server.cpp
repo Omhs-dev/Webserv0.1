@@ -6,9 +6,22 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <iostream>
+#include <csignal>
+
+static volatile bool serverRunning = true;
+
+void signalHandler(int signum) {
+	if (signum == SIGINT)
+	{
+	    std::cout << "\nInterrupt signal (" << signum << ") received : ";
+	    serverRunning = false;
+	}
+}
 
 Server::Server(const HTTPConfigs &config) : _httpConfigs(config)
 {
+	// _state = SERVER_START;
+	_serverRun = true;
 	for (auto &serverConfig : config._servers)
 	{
 		_socketObject.create();
@@ -34,14 +47,15 @@ Server::Server(const HTTPConfigs &config) : _httpConfigs(config)
 
 void Server::run()
 {
-	while (true)
+	std::signal(SIGINT, signalHandler);
+	while (serverRunning)
 	{
 		// Use poll() to handle multiple connections
 		int activity = poll(pollfds.data(), pollfds.size(), -1);
 		if (activity < 0)
 		{
-			std::cerr << "Error with poll" << std::endl;
-			continue;
+			// Logger::ErrorCout("Error in poll");
+			break;
 		}
 
 		for (size_t i = 0; i < pollfds.size(); ++i)
@@ -51,6 +65,7 @@ void Server::run()
 				// Check if it's a new connection on the server socket
 				if (_serverSockets.size() > 0 && pollfds[i].fd == _serverSockets[i])
 				{
+					// Logger::NormalCout("New connection on server socket");
 					handleNewConnection(_serverSockets[i]);
 				}
 				else
@@ -61,6 +76,7 @@ void Server::run()
 			}
 		}
 	}
+	// Logger::NormalCout("Server stopped ! I am out of the loop");
 }
 
 // Handle a new connection on the server socket
@@ -75,7 +91,7 @@ void Server::handleNewConnection(int server_fd)
 		std::cerr << "Failed to accept client connection" << std::endl;
 		return;
 	}
-
+	
 	// Set client socket to non-blocking mode
 	fcntl(clientSocket, F_SETFL, O_NONBLOCK);
 
@@ -92,7 +108,7 @@ void Server::handleClient(int client_fd)
 {
 	Client client(client_fd);		  // Create a client object to handle the connection
 	client.clientConnectionProcess(); // Process the client's request
-	closeClient(client_fd);			  // Close the client connection
+	// closeClient(client_fd);			  // Close the client connection
 }
 
 // After handling the client, remove it from the pollfd set
@@ -101,6 +117,7 @@ void Server::closeClient(int client_fd)
 	close(client_fd);
 	pollfds.erase(std::remove_if(pollfds.begin(), pollfds.end(), [client_fd](const pollfd &pfd)
 								{ return pfd.fd == client_fd; }),pollfds.end());
+	// Logger::NormalCout("cleanup and close sockets");
 }
 
 // add a signal handler to close the server socket
@@ -120,15 +137,45 @@ Socket Server::getSocketObject()
 
 // --- DESTRUCTOR ---
 
-void Server::stop()
+void Server::shutdown()
 {
-	for (int serverSocket : _serverSockets)
+	Logger::NormalCout("Shutting down server...");
+	// for (auto &clientSocket : _clientSockets)
+	// {
+		// Logger::NormalCout("Closing client socket...");
+	// 	close(clientSocket);
+	// }
+	
+	for (auto &serverSocket : _serverSockets)
 	{
+		// Logger::NormalCout("Closing server socket...");
 		close(serverSocket);
+		for (size_t i = 0; i < pollfds.size(); ++i)
+		{
+			// Logger::NormalCout("Removing server socket from pollfds...");
+			if (pollfds[i].fd == serverSocket)
+			{
+				pollfds.erase(pollfds.begin() + i);
+				break;
+			}
+		}
 	}
+	
+	// _clientSockets.clear();
+	_serverSockets.clear();
+	// Logger::NormalCout("Server shutdown complete");
 }
+
+// void Server::stop()
+// {
+// 	for (int serverSocket : _serverSockets)
+// 	{
+// 		close(serverSocket);
+// 	}
+// }
 
 Server::~Server()
 {
-	stop();
+	// stop();
+	shutdown();
 }

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <unistd.h>
+# include <fcntl.h>
 #include <sstream>
 #include <algorithm>
 #include <dirent.h>
@@ -19,8 +21,8 @@
 #include "../Logger/Logger.hpp"
 
 
-#define MAX_ALLOWED_FILE_SIZE 1024 * 1024
-#define MAX_RESPONSE_BODY_SIZE 1024 * 1024
+#define MAX_FILE_SIZE 512000
+#define MAX_RESPONSE_BODY_SIZE 1000000
 
 class HTTPRequest;
 class Client;
@@ -94,15 +96,16 @@ class HTTPResponse
 		std::vector<std::string> _headers;
 		std::string _body;
 		std::string _errorPage;
-		void serveFile(const std::string &path);
-		
+		int _fileFd;
 		// check if a request is a redirection
 		// bool isReqRedirection(const std::string &path);
 		// bool isRedirecUrl(const std::string &path);
 		
+		std::string chunkFile(const std::string &path);
 		void handleGet();
 		void handleDelete();
 		void handlePost();
+		void serveFile(const std::string &path);
 		void setDefaultResponse(std::string path, LocationConfig config);
 		void setChunkResponse(const std::string &path);
 		void setStandardResponse();
@@ -110,7 +113,7 @@ class HTTPResponse
 		void setHeaders(const std::string &key, const std::string &value);
 		void setStatus(const std::string &code, const std::string &message);
 		void setBody(const std::string &body);
-	
+
 	public:
 		HTTPResponse(Client *client);
 		~HTTPResponse();
