@@ -30,9 +30,8 @@ bool isLargeFile(const std::string &path)
         std::cerr << "Failed to stat largefile: " << path << ". Error: " << std::strerror(errno) << std::endl;
 		return false;
 	}
-	return fileStat.st_size >  MAX_ALLOWED_FILE_SIZE;
+	return fileStat.st_size >  MAX_FILE_SIZE;
 }
-
 
 bool isDirectory(const std::string &path)
 {
@@ -52,7 +51,6 @@ std::string intToHexa(ssize_t num) {
     stream << std::hex << num;
     return stream.str();
 }
-
 
 // --- Utils ---
 
@@ -174,6 +172,8 @@ std::string getMimeType(const std::string &path)
 		return "image/x-icon";
 	else if (extension == "json")
 		return "application/json";
+	else if (extension == "md")
+		return "text/markdown";
 	else if (extension == "pdf")
 		return "application/pdf";
 	else if (extension == "zip")
@@ -297,6 +297,10 @@ std::string getErrorMesssage(const std::string &code)
 	else if (code == "504")
 	{
 		return "Gateway Timeout";
+	}
+	else if (code == "505")
+	{
+		return "HTTP Version Not Supported";
 	}
 	else
 	{

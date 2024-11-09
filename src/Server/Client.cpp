@@ -14,7 +14,7 @@ void Client::clientConnectionProcess()
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	close(_clientSocket);
+	// close(_clientSocket);
 }
 
 void Client::handleRequest()
@@ -34,10 +34,6 @@ void Client::handleRequest()
 	else if (bytesRead == 0)
 	{
 		throw ClientException();
-	}
-	else
-	{
-		std::cerr << "Error reading from client socket" << std::endl;
 	}
 }
 

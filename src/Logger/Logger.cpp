@@ -63,6 +63,11 @@ void Logger::NormalCout(std::string string)
 	std::cout << string << std::endl;
 }
 
+void Logger::ErrorCout(std::string string)
+{
+	std::cerr << string << std::endl;
+}
+
 // void Logger::EnumState(HTTPRequest::ParseState state)
 // {
 //     std::string stateName;

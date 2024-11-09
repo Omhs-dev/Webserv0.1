@@ -14,6 +14,12 @@ HTTPResponse::HTTPResponse(Client *client)
 	_errorPage = "";
 }
 
+HTTPResponse::~HTTPResponse()
+{
+	if (_fileFd > 0)
+		close(_fileFd);
+}
+
 // --------- Response Generation ---------
 
 void HTTPResponse::generateResponse()
@@ -26,12 +32,6 @@ void HTTPResponse::generateResponse()
 		handleDelete();
 	else if (reqMethod == "POST")
 		handlePost();
-	else
-	{
-		_errorPage = errorPage(_request->getPath(), _server->getConfigs()._servers[0].getRoot());
-		setStatus("405", "Method Not Allowed");
-		setBody(_errorPage);
-	}
 }
 
 // --------- Handling Requests ---------
@@ -59,8 +59,12 @@ void HTTPResponse::handleGet()
 	else if (isFile(indexFilePath))
 	{
 		Logger::Cout("File found here 📄");
-		if(isLargeFile(indexFilePath) && _state == IS_CHUNK)
+		if(isLargeFile(indexFilePath))
+		{
+			Logger::Cout("File is large 📄");
+			_state = IS_CHUNK;
 			setChunkResponse(indexFilePath);
+		}
 		else
 			serveFile(indexFilePath);
 	}
@@ -96,12 +100,7 @@ void HTTPResponse::handleGet()
 		Logger::Specifique(aliasPath, "Alias Path 🪜");
 		Logger::Specifique(aliasPathIndex, "aliasPathIndex Path 🪜");
 		if (isFile(aliasPathIndex))
-		{
-			if (isLargeFile(aliasPathIndex))
-				setChunkResponse(aliasPathIndex);
-			else
-				serveFile(aliasPathIndex);
-		}
+			serveFile(aliasPathIndex);
 		else
 			setBody(listDirectory(aliasPath, location.getRoot()));
 	}
@@ -113,30 +112,26 @@ void HTTPResponse::handleGet()
 	}
 }
 
-
 void HTTPResponse::handleDelete()
 {
 	Logger::Itroduction("handleDelete");
 	Logger::VerticalSeparator();
-	
+
 	std::string reqPath = _request->getPath();
-	
+
 	Logger::Specifique(reqPath, "Request Path in handleDelete 🪜");
 	LocationConfig location = checkLocationPath(reqPath);
-	
+
 	std::string serverRooth = _server->getConfigs()._servers[0].getRoot();
 	Logger::Specifique(serverRooth, "serverRooth Root 🛤️");
-	
+
 	std::string reqFilePath = serverRooth + reqPath;
 	Logger::Specifique(reqFilePath, "Request File Path 🪜");
 	
 	if (reqPath != location.getLocationPath())
 	{
 		Logger::Cout("Path not found 🚫");
-		// std::string reqRootTest = _request->getServer()->getRoot();
-		
-		// Logger::Specifique(reqRootTest, "Request Root Test 🛤️");
-	
+
 		if (!isFile(reqFilePath))
 		{
 			Logger::Cout("File not found 🚫");
@@ -147,10 +142,10 @@ void HTTPResponse::handleDelete()
 		if (isDirectory(reqFilePath) || remove(reqFilePath.c_str()) != 0)
 			setStatus("403", getErrorMesssage("403"));
 		std::string jsonBody = "{\n";
-	    jsonBody += "  \"message\": \"File deleted successfully.\",\n";
-	    jsonBody += "  \"filename\": \"" + reqFilePath + "\"\n";
-	    jsonBody += "}\n";
-		
+		jsonBody += "  \"message\": \"File deleted successfully.\",\n";
+		jsonBody += "  \"filename\": \"" + reqFilePath + "\"\n";
+		jsonBody += "}\n";
+	
 		Logger::Specifique(jsonBody, "Json Body 🪜");
 		setBody(jsonBody);
 	}
@@ -165,52 +160,52 @@ void HTTPResponse::handlePost(void)
 	jsonBody += "\"size\": " + ullToStr(_body.size()) + "\n";
 	jsonBody += "}\n";
 
-    // responseBody += "HTTP/1.1 200 OK\r\n";
-    // responseBody += "Content-Type: application/json\r\n";
-    // responseBody += "Content-Length: " + intToString(jsonBody.size()) + "\r\n";
-    // responseBody += "\r\n";
-    // responseBody += jsonBody;
 	setBody(jsonBody);
 }
 
-//setting the chunkResponse
 void HTTPResponse::setChunkResponse(const std::string &path)
 {
-	std::cout << "here is Chunk response reading!!" << std::endl;
-    std::ifstream file(path, std::ios::binary);
-    if (!file.is_open())
+    Logger::Itroduction("setChunkResponse");
+    Logger::NormalCout("Starting Chunked Response");
+    _fileFd = open(path.c_str(), O_RDONLY);
+    if (_fileFd == -1)
     {
-        _errorPage = errorPage(path, "./www/");
+        std::cerr << "Failed to open file: " << path << std::endl;
         setStatus("404", "Not Found");
-        setBody(_errorPage);
+        setBody("<html><body><h1>404 Not Found</h1></body></html>");
         return;
     }
-    setStatus("200", "OK");
 
     std::ostringstream responseBody;
-    // Read the file in chunks
-    char buffer[MAX_RESPONSE_BODY_SIZE]; 
-    while (file)
+    char buffer[MAX_FILE_SIZE];
+    ssize_t bytesRead;
+
+    while ((bytesRead = read(_fileFd, buffer, MAX_FILE_SIZE)) > 0)
     {
-        file.read(buffer, sizeof(buffer));
-        std::streamsize bytesRead = file.gcount(); // Get number of bytes read
-
-        if (bytesRead > 0)
-        {
-            // Convert bytesRead to hexadecimal
-            std::string chunkSize = intToHexa(bytesRead) + "\r\n";
-            std::string chunkData(buffer, bytesRead);
-            responseBody << chunkSize << chunkData << "\r\n"; // Append chunk to response body
-        }
+        std::stringstream hexSizeStream;
+        hexSizeStream << std::hex << bytesRead;
+        responseBody << hexSizeStream.str() << "\r\n";  // Write the chunk size in hex followed by CRLF
+        responseBody.write(buffer, bytesRead);          // Write the actual chunk data
+        responseBody << "\r\n";                         // End the chunk with CRLF
+        std::cout << "Chunk size: " << bytesRead << std::endl;
     }
-    responseBody << "0\r\n\r\n"; // Final chunk to signal end
-    file.close();
-		std::cout << "here is Chunk response endingggggggggg!!" << std::endl;
 
-    setBody(responseBody.str());
+    if (bytesRead == -1)
+    {
+        std::cerr << "Error reading from file: " << path << std::endl;
+        setStatus("500", "Internal Server Error");
+        setBody("<html><body><h1>500 Internal Server Error</h1></body></html>");
+    }
+    else
+    {
+        responseBody << "0\r\n\r\n";
+        setBody(responseBody.str());
+        setStatus("200", "OK");
+    }
 
+    close(_fileFd);
+    Logger::NormalCout("Chunked Response Completed");
 }
-
 
 void HTTPResponse::setDefaultResponse(std::string path, LocationConfig config)
 {
@@ -359,6 +354,8 @@ void HTTPResponse::setBody(const std::string &body)
 
 std::string HTTPResponse::getData() const
 {
+	Logger::Itroduction("getData 📊");
+	
 	std::ostringstream oss;
 	if (_state == IS_REDIRECT)
 	{
@@ -372,8 +369,7 @@ std::string HTTPResponse::getData() const
 	{
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
-		oss << "Content-Length: " << _body.size() << "\r\n";
-		oss << "Transfer-Encoding: chunked"  << "r\n";
+		oss << "Transfer-Encoding: chunked"  << "\r\n";
 		oss << "\r\n";
 		oss << _body;
 	}
