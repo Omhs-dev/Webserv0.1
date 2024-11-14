@@ -60,11 +60,17 @@ void Server::run()
 
 		for (size_t i = 0; i < pollfds.size(); ++i)
 		{
+			std::cout << "Server sockets: " << _serverSockets.size() << "; pollfds: " << pollfds.size() << std::endl;
 			if (pollfds[i].revents & POLLIN)
 			{
+				    // if (i >= _serverSockets.size()) {
+            		// 	std::cerr << "Error: pollfd index out of bounds!" << std::endl;
+            		// 	continue;
+        			// }
 				// Check if it's a new connection on the server socket
-				if (_serverSockets.size() > 0 && pollfds[i].fd == _serverSockets[i])
+				if (_serverSockets.size() > 0 && (pollfds[i].fd == _serverSockets[0] || pollfds[i].fd == _serverSockets[1]))
 				{
+					std::cout << "Handling new connection" << std::endl;
 					// Logger::NormalCout("New connection on server socket");
 					handleNewConnection(_serverSockets[i]);
 				}
@@ -101,11 +107,12 @@ void Server::handleNewConnection(int server_fd)
 	clientPollFd.events = POLLIN; // We're interested in reading data from the client
 	pollfds.push_back(clientPollFd);
 
-	std::cout << "New client connected" << std::endl;
+	std::cout << "New client connected. fd: "<< clientSocket << std::endl;
 }
 
 void Server::handleClient(int client_fd)
 {
+	std::cout << "Handling client.." << std::endl;
 	Client client(client_fd);		  // Create a client object to handle the connection
 	client.clientConnectionProcess(); // Process the client's request
 	// closeClient(client_fd);			  // Close the client connection

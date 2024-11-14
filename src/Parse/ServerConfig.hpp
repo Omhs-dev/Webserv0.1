@@ -33,7 +33,7 @@ struct ServerConfig
 	std::map<int, std::string>  _errorPage;
 	std::vector<RequestType>    _requestAllowed;
 	std::vector<LocationConfig> _locations;
-	bool            _autoindex;
+	bool            _autoindex = false;
 	
 	// Functions
 	std::string getRoot() const;

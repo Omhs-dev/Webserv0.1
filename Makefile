@@ -4,7 +4,7 @@ TESTNAME = runTests
 
 # Compiler settings
 CXX = c++
-CXXFLAGS = -std=c++11 -Wall -Wextra -Werror
+CXXFLAGS = -std=c++11 -Wall -Wextra -Werror #-fsanitize=address -fsanitize=undefined -g 
 
 # Directories
 SRC_DIR = src

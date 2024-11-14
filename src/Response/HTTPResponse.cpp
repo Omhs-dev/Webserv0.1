@@ -24,6 +24,7 @@ HTTPResponse::~HTTPResponse()
 
 void HTTPResponse::generateResponse()
 {
+	std::cout << "In generateResponse()..\n";
 	std::string reqMethod = _request->getMethod();
 
 	if (reqMethod == "GET")
@@ -32,6 +33,8 @@ void HTTPResponse::generateResponse()
 		handleDelete();
 	else if (reqMethod == "POST")
 		handlePost();
+	else
+		std::cout << "WTF\n";
 }
 
 // --------- Handling Requests ---------
@@ -43,6 +46,7 @@ void HTTPResponse::handleGet()
 	std::string indexFilePath = reqRooth + reqPath;
 	LocationConfig location = checkLocationPath(reqPath);
 
+	std::cout << "In handleGet()..\n";
 	Logger::Separator();
 	Logger::VerticalSeparator();
 	Logger::Itroduction("handleGet");
@@ -50,7 +54,7 @@ void HTTPResponse::handleGet()
 	Logger::Specifique(location.getLocationPath(), "Location Path 🪜 ");
 	Logger::Specifique(reqRooth, "Request Root 🛤️ ");
 	Logger::Specifique(indexFilePath, "Request Root + path + index 🪜 ");
-
+	std::cout << "In handleGet()..\n";
 	if (reqPath == "/")
 	{
 		// checkLocationPath(path);
@@ -359,6 +363,7 @@ std::string HTTPResponse::getData() const
 	std::ostringstream oss;
 	if (_state == IS_REDIRECT)
 	{
+		std::cout << "HERE 1\n";
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << _headers[0] << "\r\n";
 		oss << "Content-Length: 0\r\n";
@@ -367,6 +372,7 @@ std::string HTTPResponse::getData() const
 	}
 	else if (_state == IS_CHUNK)
 	{
+		std::cout << "HERE 2\n";
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
 		oss << "Transfer-Encoding: chunked"  << "\r\n";
@@ -375,12 +381,14 @@ std::string HTTPResponse::getData() const
 	}
 	else
 	{
+		std::cout << "HERE 3\n";
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
 		oss << "Content-Length: " << _body.size() << "\r\n";
 		oss << "\r\n";
 		oss << _body;
 	}
+	std::cout << oss.str();
 	return oss.str();
 }
 

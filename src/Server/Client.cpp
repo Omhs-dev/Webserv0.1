@@ -5,6 +5,7 @@ Client::Client(int socket) : _clientSocket(socket), _request(new HTTPRequest(thi
 
 void Client::clientConnectionProcess()
 {
+	std::cout << "Processing client (fd: " << _clientSocket << ") request..\n";
 	try
 	{
 		handleRequest();
@@ -19,6 +20,7 @@ void Client::clientConnectionProcess()
 
 void Client::handleRequest()
 {
+	std::cout << "Handling request..\n";
 	char buffer[MAX_BUFFER_SIZE + 1];
 	int bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
 	if (bytesRead > 0)
@@ -35,6 +37,8 @@ void Client::handleRequest()
 	{
 		throw ClientException();
 	}
+	else 
+		std::cout << "Error: bytes read: " << bytesRead << std::endl;
 }
 
 void Client::handleResponse()
@@ -43,8 +47,10 @@ void Client::handleResponse()
 	// checkLocationPath(_request->getPath());
 	// std::cout << "server root: " << _server->getConfigs()._servers[0].getRoot() << std::endl;
 	// std::cout << "location path: " << _server->getConfigs()._servers[0].getLocations()[0].getLocationPath() << std::endl;
+	std::cout << "Handling response..\n";
 	_response->generateResponse();
 	sendResponse(_response->getData());
+	std::cout << "CHECK\n";
 }
 
 std::string Client::checkLocationPath(const std::string &path)
@@ -71,7 +77,9 @@ std::string Client::checkLocationPath(const std::string &path)
 
 void Client::sendResponse(const std::string &response)
 {
-	send(_clientSocket, response.c_str(), response.size(), 0);
+	std::cout << "Sending response to fd:" << _clientSocket <<"\n";
+	ssize_t sent = send(_clientSocket, response.c_str(), response.size(), 0);
+	std::cout << sent;
 }
 
 Client::~Client()

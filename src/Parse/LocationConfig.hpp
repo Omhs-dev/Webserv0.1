@@ -23,7 +23,7 @@
 struct LocationConfig
 {
 	std::string root;
-	bool autoindex;
+	bool autoindex = false;
 	std::string alias;
 	std::string index;
 	std::map<int, std::string> redirect;

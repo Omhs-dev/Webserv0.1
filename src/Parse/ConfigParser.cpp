@@ -208,6 +208,7 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
     std::string key, value;
     while (!this->blockStack.empty() && std::getline(file, line))
     {
+        std::cout << "Line: '" << line << "'" << std::endl;
         line = trim(line);
         if (line.empty() || line[0] == '#')
             continue;
@@ -220,7 +221,7 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
         else
         {
             setKeyValue(line, key, value);
-
+            // confLocation.autoindex = false;
             if (key == "allow_methods")
             {
                 std::istringstream iss(value);
@@ -237,6 +238,7 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
             }
             else if (key == "autoindex")
             {
+                std::cout << "Parsing autoindex with value: '" << value << "'" << std::endl;
                 if (value == "on")
 				{
 					confLocation.autoindex = true;
