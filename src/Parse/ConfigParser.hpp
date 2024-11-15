@@ -61,15 +61,11 @@
 #include "ServerConfig.hpp"
 
 
-struct HTTPConfigs
-{
-	std::vector<ServerConfig> _servers;
-};
 
 class ConfigParser
 {
 	private:
-		HTTPConfigs httpConfigs;
+		std::vector<ServerConfig> configs;
 		std::vector<BlockType> blockStack;
 		std::vector<std::string> required;
 		std::vector<std::string> defined;
@@ -84,7 +80,7 @@ class ConfigParser
 		ConfigParser();
 		~ConfigParser();
 	
-		HTTPConfigs getHTTPConfigs();
+		std::vector<ServerConfig> getConfigs();
 		void parseConfigFile(const std::string &filename);
 		
 		//---------utils function----------//

@@ -27,7 +27,7 @@ void Socket::bind(int port) {
     _address.sin_port = htons(port);
     
     int opt = 1;
-    if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+    if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
         handleError("Failed to set socket options");
     }
 

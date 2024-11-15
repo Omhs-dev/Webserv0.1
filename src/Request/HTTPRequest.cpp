@@ -7,7 +7,7 @@ HTTPRequest::HTTPRequest(Client *client)
 {
 	_client = client;
 	_location = nullptr;
-	_server = nullptr;
+	// _server = nullptr;
 	_isChunked = false;
 	_iscontentLength = 0;
 	_timeout = 0;
@@ -343,8 +343,6 @@ int HTTPRequest::checkCgi()
 Client *HTTPRequest::getClient() const { return _client; }
 
 LocationConfig *HTTPRequest::getLocation() const { return _location; }
-
-ServerConfig *HTTPRequest::getServer() const { return _server; }
 
 std::string HTTPRequest::getMethod() const { return _method; }
 

@@ -52,7 +52,7 @@ class HTTPRequest
 	private:
 		Client          *_client;
 		LocationConfig  *_location;
-		ServerConfig    *_server;
+		std::vector<ServerConfig>    _configs;
 		
 		// Request Line
 		std::string     _method;
@@ -107,7 +107,6 @@ class HTTPRequest
 		// --- GETTERS ---
 		Client          *getClient() const;
 		LocationConfig  *getLocation() const;
-		ServerConfig    *getServer() const;
 		
 		// --- Request Line ---
 		std::string     getMethod() const;

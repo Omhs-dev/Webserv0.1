@@ -19,12 +19,13 @@ class Client
 	private:
 	    int _clientSocket;
 	    Server *_server;
+		std::vector<ServerConfig>	_configs;
 	    HTTPRequest *_request;
 	    HTTPResponse *_response; // initialize this in constructor
 	    void sendResponse(const std::string& response);
 
 	public:
-	    Client(int clientSocket);
+	    Client(int clientSocket, std::vector<ServerConfig> &configs);
 	    void clientConnectionProcess();
 	    void handleRequest();
 	    void handleResponse();
@@ -35,6 +36,8 @@ class Client
 		
 		Server *getServer() const { return _server; }
 		HTTPRequest *getRequest() const { return _request; }
+
+		std::vector<ServerConfig> getConfigs() const;
 		
 		class ClientException : public std::exception
 		{

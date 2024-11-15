@@ -5,9 +5,9 @@
 ConfigParser::ConfigParser() {}
 ConfigParser::~ConfigParser() {}
 
-HTTPConfigs ConfigParser::getHTTPConfigs()
+std::vector<ServerConfig> ConfigParser::getConfigs()
 {
-    return this->httpConfigs;
+    return this->configs;
 }
 
 void ConfigParser::parseConfigFile(const std::string &filename)
@@ -71,7 +71,7 @@ void ConfigParser::parseHttpBlock(std::ifstream &file)
             ServerConfig serverConfig;
             initConfigServer(serverConfig);
             parseServerBlock(file, serverConfig);
-            this->httpConfigs._servers.push_back(serverConfig);
+            this->configs.push_back(serverConfig);
         }
         else if (line == "}")
         {

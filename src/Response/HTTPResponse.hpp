@@ -89,7 +89,7 @@ class HTTPResponse
 		Client *_client;
 		Server *_server;
 		HTTPRequest	*_request;
-		HTTPConfigs *_httpConfigs;
+	
 		ResponseState _state;
 		std::string _statusCode;
 		std::string _statusMessage;

@@ -27,13 +27,12 @@ private:
 	bool _serverRun;
 	// std::atomic<bool> running(true);
 	Socket _socketObject;
-	HTTPConfigs _httpConfigs;
-	ServerConfig serverConfigs;
+	std::vector<ServerConfig> _configs;
 	std::vector<pollfd> pollfds;
 	ServerState _state;
 
 public:
-	Server(const HTTPConfigs &config);
+	Server(const std::vector<ServerConfig> &config);
 	~Server();
 	
 	void run();
@@ -44,7 +43,7 @@ public:
 	void handleClient(int client_fd);
 	void closeClient(int client_fd);
 
-	HTTPConfigs getConfigs();
+	std::vector<ServerConfig> getConfigs();
 	Socket getSocketObject();
 	std::vector<pollfd> getPollfds() { return pollfds; }
 	std::vector<int> getClientSockets() { return _clientSockets; }

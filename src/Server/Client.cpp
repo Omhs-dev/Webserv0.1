@@ -1,7 +1,7 @@
 #include "Client.hpp"
 #include "../Response/HTTPResponse.hpp"
 
-Client::Client(int socket) : _clientSocket(socket), _request(new HTTPRequest(this)), _response(new HTTPResponse(this)) {}
+Client::Client(int socket, std::vector<ServerConfig> &configs) : _clientSocket(socket),  _configs(configs),  _request(new HTTPRequest(this)), _response(new HTTPResponse(this)) {}
 
 void Client::clientConnectionProcess()
 {
@@ -57,7 +57,7 @@ std::string Client::checkLocationPath(const std::string &path)
 {
 	std::cout << "Checking location path: " << path << std::endl;
 	std::cout << "before for loop" << std::endl;
-	for (auto &server : _server->getConfigs()._servers)
+	for (auto &server : _server->getConfigs())
 	{
 		std::cout << "inside for loop 2" << std::endl;
 		for (LocationConfig &location : server.getLocations())
@@ -80,6 +80,12 @@ void Client::sendResponse(const std::string &response)
 	std::cout << "Sending response to fd:" << _clientSocket <<"\n";
 	ssize_t sent = send(_clientSocket, response.c_str(), response.size(), 0);
 	std::cout << sent;
+}
+
+//Getters
+std::vector<ServerConfig> Client::getConfigs() const
+{
+	return _configs;
 }
 
 Client::~Client()

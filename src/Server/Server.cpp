@@ -18,11 +18,11 @@ void signalHandler(int signum) {
 	}
 }
 
-Server::Server(const HTTPConfigs &config) : _httpConfigs(config)
+Server::Server(const std::vector<ServerConfig> &config) : _configs(config)
 {
 	// _state = SERVER_START;
 	_serverRun = true;
-	for (auto &serverConfig : config._servers)
+	for (auto &serverConfig : _configs)
 	{
 		_socketObject.create();
 		_socketObject.bind(std::stoi(serverConfig._listen));
@@ -48,6 +48,7 @@ Server::Server(const HTTPConfigs &config) : _httpConfigs(config)
 void Server::run()
 {
 	std::signal(SIGINT, signalHandler);
+
 	while (serverRunning)
 	{
 		// Use poll() to handle multiple connections
@@ -60,7 +61,7 @@ void Server::run()
 
 		for (size_t i = 0; i < pollfds.size(); ++i)
 		{
-			std::cout << "Server sockets: " << _serverSockets.size() << "; pollfds: " << pollfds.size() << std::endl;
+			std::cout << "Server sockets: " << _serverSockets.size() << "; pollfds: " << pollfds.size() << "i = " << i << std::endl;
 			if (pollfds[i].revents & POLLIN)
 			{
 				    // if (i >= _serverSockets.size()) {
@@ -70,12 +71,20 @@ void Server::run()
 				// Check if it's a new connection on the server socket
 				if (_serverSockets.size() > 0 && (pollfds[i].fd == _serverSockets[0] || pollfds[i].fd == _serverSockets[1]))
 				{
+					for (auto &conf :_configs)
+					{
+						std::cout << "In run before handling new connection: " << conf.getRoot() << std::endl;
+					}
 					std::cout << "Handling new connection" << std::endl;
 					// Logger::NormalCout("New connection on server socket");
 					handleNewConnection(_serverSockets[i]);
 				}
 				else
 				{
+					for (auto &conf :_configs)
+					{
+						std::cout << "In run before handling client: " << conf.getRoot() << std::endl;
+					}
 					// Otherwise, it's a client connection
 					handleClient(pollfds[i].fd);
 				}
@@ -113,9 +122,9 @@ void Server::handleNewConnection(int server_fd)
 void Server::handleClient(int client_fd)
 {
 	std::cout << "Handling client.." << std::endl;
-	Client client(client_fd);		  // Create a client object to handle the connection
+	Client client(client_fd, _configs);		  // Create a client object to handle the connection
 	client.clientConnectionProcess(); // Process the client's request
-	// closeClient(client_fd);			  // Close the client connection
+	closeClient(client_fd);			  // Close the client connection
 }
 
 // After handling the client, remove it from the pollfd set
@@ -132,9 +141,9 @@ void Server::closeClient(int client_fd)
 
 // --- GETTERS ---
 
-HTTPConfigs Server::getConfigs()
+std::vector<ServerConfig> Server::getConfigs()
 {
-	return _httpConfigs;
+	return _configs;
 }
 
 Socket Server::getSocketObject()

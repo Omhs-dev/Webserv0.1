@@ -42,7 +42,9 @@ void HTTPResponse::generateResponse()
 void HTTPResponse::handleGet()
 {
 	std::string reqPath = _request->getPath();
-	std::string reqRooth = _server->getConfigs()._servers[0].getRoot();
+	std::string reqRooth = _client->getConfigs()[0].getRoot();
+	std::cout << "Got root\n";
+
 	std::string indexFilePath = reqRooth + reqPath;
 	LocationConfig location = checkLocationPath(reqPath);
 
@@ -126,7 +128,7 @@ void HTTPResponse::handleDelete()
 	Logger::Specifique(reqPath, "Request Path in handleDelete 🪜");
 	LocationConfig location = checkLocationPath(reqPath);
 
-	std::string serverRooth = _server->getConfigs()._servers[0].getRoot();
+	std::string serverRooth = _server->getConfigs()[0].getRoot();
 	Logger::Specifique(serverRooth, "serverRooth Root 🛤️");
 
 	std::string reqFilePath = serverRooth + reqPath;
@@ -283,7 +285,7 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 	Logger::NormalCout("-------------- checkLocationPath --------------");
 	Logger::Specifique(path, "Request Path 🪜");
 	Logger::NormalCout("before for loop 1 \n|");
-	for (auto &server : _server->getConfigs()._servers)
+	for (auto &server : _server->getConfigs())
 	{
 			Logger::NormalCout("before for loop 2\n|");
 			Logger::NormalCout("Liste of locations ../../ ⬇");
