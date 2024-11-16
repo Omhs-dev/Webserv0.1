@@ -22,6 +22,7 @@ Server::Server(const std::vector<ServerConfig> &config) : _configs(config)
 {
 	// _state = SERVER_START;
 	_serverRun = true;
+	Logger::SpecifiqueForInt(_configs.size(), "the server size in Server ");
 	for (auto &serverConfig : _configs)
 	{
 		_socketObject.create();
@@ -122,7 +123,7 @@ void Server::handleNewConnection(int server_fd)
 void Server::handleClient(int client_fd)
 {
 	std::cout << "Handling client.." << std::endl;
-	Client client(client_fd, _configs);		  // Create a client object to handle the connection
+	Client client(client_fd, (this));		  // Create a client object to handle the connection
 	client.clientConnectionProcess(); // Process the client's request
 	closeClient(client_fd);			  // Close the client connection
 }

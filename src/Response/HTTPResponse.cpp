@@ -4,7 +4,7 @@
 HTTPResponse::HTTPResponse(Client *client)
 {
 	_client = client;
-	_server = client->getServer();
+	// _server = client->getServer();
 	_request = client->getRequest();
 	_state = INIT;
 	_statusCode = "200";
@@ -42,9 +42,10 @@ void HTTPResponse::generateResponse()
 void HTTPResponse::handleGet()
 {
 	std::string reqPath = _request->getPath();
-	std::string reqRooth = _client->getConfigs()[0].getRoot();
+	std::string reqRooth = "./www";
 	std::cout << "Got root\n";
-
+	
+	Logger::SpecifiqueForInt(_client->getServer()->getConfigs().size(), "size of server in handleGet");
 	std::string indexFilePath = reqRooth + reqPath;
 	LocationConfig location = checkLocationPath(reqPath);
 
@@ -128,7 +129,7 @@ void HTTPResponse::handleDelete()
 	Logger::Specifique(reqPath, "Request Path in handleDelete 🪜");
 	LocationConfig location = checkLocationPath(reqPath);
 
-	std::string serverRooth = _server->getConfigs()[0].getRoot();
+	std::string serverRooth = "./www";
 	Logger::Specifique(serverRooth, "serverRooth Root 🛤️");
 
 	std::string reqFilePath = serverRooth + reqPath;
@@ -285,18 +286,32 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 	Logger::NormalCout("-------------- checkLocationPath --------------");
 	Logger::Specifique(path, "Request Path 🪜");
 	Logger::NormalCout("before for loop 1 \n|");
-	for (auto &server : _server->getConfigs())
+	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
+	for (auto &server : configs)
 	{
 			Logger::NormalCout("before for loop 2\n|");
 			Logger::NormalCout("Liste of locations ../../ ⬇");
 			Logger::NormalCout("|");
+			Logger::Specifique(server._root, "server root here");
+			Logger::SpecifiqueForInt(server._locations.size(), "location size in the checklocationpath function");
 		for (LocationConfig &location : server.getLocations())
 		{
 			Logger::Separator();
 			Logger::Specifique(location.getLocationPath(), "Location Path to look for 🪜");
-			if (path == location.getLocationPath()
-					&& location.getRedirect().begin()->second == "https://github.com/")
+			// if (path == location.locationPath)
+			// 	Logger::NormalCout("yes...");
+			// if (location.redirect.begin()->second.find("github"))
+			// 	Logger::NormalCout("github redirect found here");
+			if (path == location.getLocationPath())
 			{
+				Logger::NormalCout("Location found ✅");
+				_state = IS_NORMAL;
+				return location;
+				break;
+			}
+			else if (path == location.locationPath && location.redirect.begin()->second.find("github"))
+			{
+				Logger::NormalCout("in redirection ");
 				_state = IS_REDIRECT;
 				Logger::NormalCout("Redirect found 🔄");
 				Logger::Specifique(location.getRedirect().begin()->second, "Redirect Link found 🔗");
@@ -310,13 +325,6 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 				Logger::Specifique(location.getLocationPath(), "Location Path 🪜");
 				Logger::Specifique(location.getAlias(), "Alias found 🪜");
 				Logger::Specifique(location.getAlias(), "Alias path 🪜");
-				return location;
-				break;
-			}
-			else if (path == location.getLocationPath())
-			{
-				Logger::NormalCout("Location found ✅");
-				_state = IS_NORMAL;
 				return location;
 				break;
 			}
@@ -390,7 +398,7 @@ std::string HTTPResponse::getData() const
 		oss << "\r\n";
 		oss << _body;
 	}
-	std::cout << oss.str();
+	// std::cout << oss.str();
 	return oss.str();
 }
 

@@ -87,7 +87,7 @@ class HTTPResponse
 		enum ResponseState { INIT, IS_REDIRECT, IS_CHUNK, IS_FILE, IS_NORMAL, IS_ALIAS, COMPLETE };
 	private:
 		Client *_client;
-		Server *_server;
+		// Server *_server;
 		HTTPRequest	*_request;
 	
 		ResponseState _state;

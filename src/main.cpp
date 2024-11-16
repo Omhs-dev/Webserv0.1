@@ -1,5 +1,6 @@
 #include "Parse/ConfigParser.hpp"
 #include "Server/Server.hpp"
+#include "Logger/Logger.hpp"
 #include <iostream>
 
 int main(int argc, char* argv[]) {
@@ -16,8 +17,12 @@ int main(int argc, char* argv[]) {
         ConfigParser parser;
 		parser.parseConfigFile(argv[1]);
         std::vector<ServerConfig> configs = parser.getConfigs();
-		// parser.printLocationConfig(configs._servers[0]._locations[1]);
-        // Loop through all the server configs and start the servers
+		
+		// Logger::NormalCout("Server configuration:");
+		// for (auto &config : configs) {
+		// 	parser.printServerConfig(config);
+		// }
+		
         Server server(configs);
         server.run();
     } catch (const std::exception& e) {

@@ -1,7 +1,7 @@
 #include "Client.hpp"
 #include "../Response/HTTPResponse.hpp"
 
-Client::Client(int socket, std::vector<ServerConfig> &configs) : _clientSocket(socket),  _configs(configs),  _request(new HTTPRequest(this)), _response(new HTTPResponse(this)) {}
+Client::Client(int socket, Server *server) : _server(server), _clientSocket(socket),  _request(new HTTPRequest(this)), _response(new HTTPResponse(this)) {}
 
 void Client::clientConnectionProcess()
 {
@@ -53,28 +53,6 @@ void Client::handleResponse()
 	std::cout << "CHECK\n";
 }
 
-std::string Client::checkLocationPath(const std::string &path)
-{
-	std::cout << "Checking location path: " << path << std::endl;
-	std::cout << "before for loop" << std::endl;
-	for (auto &server : _server->getConfigs())
-	{
-		std::cout << "inside for loop 2" << std::endl;
-		for (LocationConfig &location : server.getLocations())
-		{
-			std::cout << "inside for loop 2" << std::endl;
-			if (path == location.getLocationPath() || path.find(location.getLocationPath()) == 0)
-			{ // Path matches location
-				std::cout << "Location found: " << location.getLocationPath() << std::endl;
-				return location.getLocationPath(); // Return the matched location configuration
-				break;
-			}
-		}
-		std::cout << "server location index: " << server.getIndex() << std::endl;
-	}
-	return "";
-}
-
 void Client::sendResponse(const std::string &response)
 {
 	std::cout << "Sending response to fd:" << _clientSocket <<"\n";
@@ -82,11 +60,11 @@ void Client::sendResponse(const std::string &response)
 	std::cout << sent;
 }
 
-//Getters
-std::vector<ServerConfig> Client::getConfigs() const
-{
-	return _configs;
-}
+// //Getters
+// std::vector<ServerConfig> Client::getConfigs() const
+// {
+// 	return _configs;
+// }
 
 Client::~Client()
 {

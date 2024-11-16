@@ -1,0 +1,10 @@
+Cause fo memory errors:
+
+In main function line 23 the function run is called after call of the instance of Server
+
+In Server.cpp abscence of RAII.
+	- Lack of initialisation of ServerSocket and pollfds
+
+----SOLUTION----
+
+Make a RAII Implementation

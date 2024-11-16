@@ -1,0 +1,353 @@
+==80653== Memcheck, a memory error detector
+==80653== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==80653== Using Valgrind-3.21.0.GIT-lbmacos and LibVEX; rerun with -h for copyright info
+==80653== Command: ./webserv config/test.conf
+==80653== Parent PID: 6672
+==80653== 
+--80653-- run: /usr/bin/dsymutil "./webserv"
+==80653== Conditional jump or move depends on uninitialised value(s)
+==80653==    at 0x100004C3B: Server::run() (Server.cpp:75)
+==80653==    by 0x100052940: main (main.cpp:23)
+==80653==  Uninitialised value was created by a stack allocation
+==80653==    at 0x100005080: Server::handleNewConnection(int) (Server.cpp:101)
+==80653== 
+==80653== Use of uninitialised value of size 8
+==80653==    at 0x1000047CC: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::size() const (vector:656)
+==80653==    by 0x100005C78: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::vector(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1254)
+==80653==    by 0x10000477C: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::vector(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1250)
+==80653==    by 0x10002A0DC: HTTPConfigs::HTTPConfigs(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x10002A0AC: HTTPConfigs::HTTPConfigs(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x1000250DC: Server::getConfigs() (Server.hpp:52)
+==80653==    by 0x10002260D: HTTPResponse::checkLocationPath(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (HTTPResponse.cpp:285)
+==80653==    by 0x100020828: HTTPResponse::handleGet() (HTTPResponse.cpp:44)
+==80653==    by 0x100020676: HTTPResponse::generateResponse() (HTTPResponse.cpp:30)
+==80653==    by 0x10001203C: Client::handleResponse() (Client.cpp:46)
+==80653==    by 0x100011C39: Client::clientConnectionProcess() (Client.cpp:11)
+==80653==    by 0x1000051F3: Server::handleClient(int) (Server.cpp:127)
+==80653==  Uninitialised value was created by a heap allocation
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000051C0: Server::handleClient(int) (Server.cpp:126)
+==80653==    by 0x100004EC1: Server::run() (Server.cpp:90)
+==80653==    by 0x100052940: main (main.cpp:23)
+==80653== 
+==80653== Invalid read of size 8
+==80653==    at 0x1000047CC: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::size() const (vector:656)
+==80653==    by 0x100005C78: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::vector(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1254)
+==80653==    by 0x10000477C: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::vector(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1250)
+==80653==    by 0x10002A0DC: HTTPConfigs::HTTPConfigs(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x10002A0AC: HTTPConfigs::HTTPConfigs(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x1000250DC: Server::getConfigs() (Server.hpp:52)
+==80653==    by 0x10002260D: HTTPResponse::checkLocationPath(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (HTTPResponse.cpp:285)
+==80653==    by 0x100020828: HTTPResponse::handleGet() (HTTPResponse.cpp:44)
+==80653==    by 0x100020676: HTTPResponse::generateResponse() (HTTPResponse.cpp:30)
+==80653==    by 0x10001203C: Client::handleResponse() (Client.cpp:46)
+==80653==    by 0x100011C39: Client::clientConnectionProcess() (Client.cpp:11)
+==80653==    by 0x1000051F3: Server::handleClient(int) (Server.cpp:127)
+==80653==  Address 0x48 is not stack'd, malloc'd or (recently) free'd
+==80653== 
+==80653== 
+==80653== Process terminating with default action of signal 11 (SIGSEGV)
+==80653==  Access not within mapped region at address 0x48
+==80653==    at 0x1000047CC: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::size() const (vector:656)
+==80653==    by 0x100005C78: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::vector(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1254)
+==80653==    by 0x10000477C: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::vector(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1250)
+==80653==    by 0x10002A0DC: HTTPConfigs::HTTPConfigs(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x10002A0AC: HTTPConfigs::HTTPConfigs(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x1000250DC: Server::getConfigs() (Server.hpp:52)
+==80653==    by 0x10002260D: HTTPResponse::checkLocationPath(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (HTTPResponse.cpp:285)
+==80653==    by 0x100020828: HTTPResponse::handleGet() (HTTPResponse.cpp:44)
+==80653==    by 0x100020676: HTTPResponse::generateResponse() (HTTPResponse.cpp:30)
+==80653==    by 0x10001203C: Client::handleResponse() (Client.cpp:46)
+==80653==    by 0x100011C39: Client::clientConnectionProcess() (Client.cpp:11)
+==80653==    by 0x1000051F3: Server::handleClient(int) (Server.cpp:127)
+==80653==  If you believe this happened as a result of a stack
+==80653==  overflow in your program's main thread (unlikely but
+==80653==  possible), you can try to increase the size of the
+==80653==  main thread stack using the --main-stacksize= flag.
+==80653==  The main thread stack size used in this run was 8388608.
+==80653== 
+==80653== HEAP SUMMARY:
+==80653==     in use at exit: 30,459 bytes in 231 blocks
+==80653==   total heap usage: 403 allocs, 172 frees, 62,431 bytes allocated
+==80653== 
+==80653== 8 bytes in 1 blocks are still reachable in loss record 1 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10000F412: std::__1::allocator<int>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x10000F250: std::__1::allocator_traits<std::__1::allocator<int> >::allocate(std::__1::allocator<int>&, unsigned long) (memory:1586)
+==80653==    by 0x100010DB1: std::__1::__split_buffer<int, std::__1::allocator<int>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<int>&) (__split_buffer:318)
+==80653==    by 0x100010C2C: std::__1::__split_buffer<int, std::__1::allocator<int>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<int>&) (__split_buffer:317)
+==80653==    by 0x100010A9C: void std::__1::vector<int, std::__1::allocator<int> >::__push_back_slow_path<int>(int&&) (vector:1623)
+==80653==    by 0x100004A66: std::__1::vector<int, std::__1::allocator<int> >::push_back(int&&) (vector:1655)
+==80653==    by 0x100004683: Server::initializer() (Server.cpp:49)
+==80653==    by 0x10005292F: main (main.cpp:22)
+==80653== 
+==80653== 16 bytes in 1 blocks are still reachable in loss record 5 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x100038E68: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x100040E62: std::__1::allocator<BlockType>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x100040CF0: std::__1::allocator_traits<std::__1::allocator<BlockType> >::allocate(std::__1::allocator<BlockType>&, unsigned long) (memory:1586)
+==80653==    by 0x100040C41: std::__1::__split_buffer<BlockType, std::__1::allocator<BlockType>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<BlockType>&) (__split_buffer:318)
+==80653==    by 0x10004099C: std::__1::__split_buffer<BlockType, std::__1::allocator<BlockType>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<BlockType>&) (__split_buffer:317)
+==80653==    by 0x10004072C: void std::__1::vector<BlockType, std::__1::allocator<BlockType> >::__push_back_slow_path<BlockType>(BlockType&&) (vector:1623)
+==80653==    by 0x100034CC6: std::__1::vector<BlockType, std::__1::allocator<BlockType> >::push_back(BlockType&&) (vector:1655)
+==80653==    by 0x100035BDE: ConfigParser::parseLocationBlock(std::__1::basic_ifstream<char, std::__1::char_traits<char> >&, LocationConfig&) (ConfigParser.cpp:208)
+==80653==    by 0x100034FC1: ConfigParser::parseServerBlock(std::__1::basic_ifstream<char, std::__1::char_traits<char> >&, ServerConfig&) (ConfigParser.cpp:111)
+==80653==    by 0x1000344E4: ConfigParser::parseHttpBlock(std::__1::basic_ifstream<char, std::__1::char_traits<char> >&) (ConfigParser.cpp:76)
+==80653== 
+==80653== 20 bytes in 1 blocks are still reachable in loss record 6 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x10000439D: Server::initializer() (Server.cpp:36)
+==80653==    by 0x10005292F: main (main.cpp:22)
+==80653== 
+==80653== 20 bytes in 1 blocks are definitely lost in loss record 7 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x10000439D: Server::initializer() (Server.cpp:36)
+==80653==    by 0x10005292F: main (main.cpp:22)
+==80653== 
+==80653== 32 bytes in 1 blocks are still reachable in loss record 18 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10000FF42: std::__1::allocator<pollfd>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x10000FD80: std::__1::allocator_traits<std::__1::allocator<pollfd> >::allocate(std::__1::allocator<pollfd>&, unsigned long) (memory:1586)
+==80653==    by 0x1000104B1: std::__1::__split_buffer<pollfd, std::__1::allocator<pollfd>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<pollfd>&) (__split_buffer:318)
+==80653==    by 0x10001032C: std::__1::__split_buffer<pollfd, std::__1::allocator<pollfd>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<pollfd>&) (__split_buffer:317)
+==80653==    by 0x10001146C: void std::__1::vector<pollfd, std::__1::allocator<pollfd> >::__push_back_slow_path<pollfd const&>(pollfd const&) (vector:1623)
+==80653==    by 0x100005276: std::__1::vector<pollfd, std::__1::allocator<pollfd> >::push_back(pollfd const&) (vector:1640)
+==80653==    by 0x10000512B: Server::handleNewConnection(int) (Server.cpp:119)
+==80653==    by 0x100004E0E: Server::run() (Server.cpp:85)
+==80653==    by 0x100052940: main (main.cpp:23)
+==80653== 
+==80653== 32 bytes in 1 blocks are still reachable in loss record 19 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000051C0: Server::handleClient(int) (Server.cpp:126)
+==80653==    by 0x100004EC1: Server::run() (Server.cpp:90)
+==80653==    by 0x100052940: main (main.cpp:23)
+==80653== 
+==80653== 80 bytes in 1 blocks are still reachable in loss record 25 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x10001D748: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10001D69F: std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> >::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x10001D520: std::__1::allocator_traits<std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> > >::allocate(std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> >&, unsigned long) (memory:1586)
+==80653==    by 0x10001E8DB: std::__1::unique_ptr<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>, std::__1::__tree_node_destructor<std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> > > > std::__1::__tree<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__map_value_compare<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::__construct_node<std::__1::piecewise_construct_t const&, std::__1::tuple<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&>, std::__1::tuple<> >(std::__1::piecewise_construct_t const&, std::__1::tuple<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&>&&, std::__1::tuple<>&&) (__tree:2193)
+==80653==    by 0x10001E7CE: std::__1::pair<std::__1::__tree_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long>, bool> std::__1::__tree<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__map_value_compare<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::__emplace_unique_key_args<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::piecewise_construct_t const&, std::__1::tuple<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&>, std::__1::tuple<> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::piecewise_construct_t const&, std::__1::tuple<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&>&&, std::__1::tuple<>&&) (__tree:2139)
+==80653==    by 0x100016C00: std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::operator[](std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (map:1519)
+==80653==    by 0x100014B9C: HTTPRequest::parseHeaderLine(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (HTTPRequest.cpp:125)
+==80653==    by 0x1000140A1: HTTPRequest::parseRequest(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (HTTPRequest.cpp:45)
+==80653==    by 0x100011D8D: Client::handleRequest() (Client.cpp:27)
+==80653==    by 0x100011C2B: Client::clientConnectionProcess() (Client.cpp:10)
+==80653== 
+==80653== 96 bytes in 3 blocks are still reachable in loss record 28 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1002F1B87: std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::basic_string(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (in /usr/lib/libc++.1.dylib)
+==80653==    by 0x10000A886: LocationConfig::LocationConfig(LocationConfig const&) (LocationConfig.hpp:23)
+==80653==    by 0x10000A81C: LocationConfig::LocationConfig(LocationConfig const&) (LocationConfig.hpp:23)
+==80653==    by 0x10000A7F0: void std::__1::allocator<LocationConfig>::construct<LocationConfig, LocationConfig&>(LocationConfig*, LocationConfig&) (memory:1881)
+==80653==    by 0x10000A79F: void std::__1::allocator_traits<std::__1::allocator<LocationConfig> >::__construct<LocationConfig, LocationConfig&>(std::__1::integral_constant<bool, true>, std::__1::allocator<LocationConfig>&, LocationConfig*, LocationConfig&) (memory:1773)
+==80653==    by 0x10000A74F: void std::__1::allocator_traits<std::__1::allocator<LocationConfig> >::construct<LocationConfig, LocationConfig&>(std::__1::allocator<LocationConfig>&, LocationConfig*, LocationConfig&) (memory:1600)
+==80653==    by 0x10000A69C: void std::__1::allocator_traits<std::__1::allocator<LocationConfig> >::__construct_range_forward<LocationConfig*, LocationConfig*>(std::__1::allocator<LocationConfig>&, LocationConfig*, LocationConfig*, LocationConfig*&) (memory:1693)
+==80653==    by 0x10000A06C: std::__1::enable_if<__is_cpp17_forward_iterator<LocationConfig*>::value, void>::type std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::__construct_at_end<LocationConfig*>(LocationConfig*, LocationConfig*, unsigned long) (vector:1076)
+==80653==    by 0x100009E41: std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::vector(std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> > const&) (vector:1258)
+==80653==    by 0x100006AFC: std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::vector(std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> > const&) (vector:1250)
+==80653== 
+==80653== 160 bytes in 1 blocks are still reachable in loss record 33 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x100011B70: Client::Client(int) (Client.cpp:4)
+==80653==    by 0x100011BFA: Client::Client(int) (Client.cpp:4)
+==80653==    by 0x1000051D9: Server::handleClient(int) (Server.cpp:126)
+==80653==    by 0x100004EC1: Server::run() (Server.cpp:90)
+==80653==    by 0x100052940: main (main.cpp:23)
+==80653== 
+==80653== 192 bytes in 1 blocks are still reachable in loss record 35 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x100027708: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10002DD7F: std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x10002DBB0: std::__1::allocator_traits<std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::allocate(std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&, unsigned long) (memory:1586)
+==80653==    by 0x10002F491: std::__1::__split_buffer<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&) (__split_buffer:318)
+==80653==    by 0x10002F30C: std::__1::__split_buffer<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&) (__split_buffer:317)
+==80653==    by 0x10004451C: void std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::__push_back_slow_path<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&>(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (vector:1623)
+==80653==    by 0x100036CF6: std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::push_back(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (vector:1640)
+==80653==    by 0x1000357D0: ConfigParser::parseServerBlock(std::__1::basic_ifstream<char, std::__1::char_traits<char> >&, ServerConfig&) (ConfigParser.cpp:200)
+==80653==    by 0x1000344E4: ConfigParser::parseHttpBlock(std::__1::basic_ifstream<char, std::__1::char_traits<char> >&) (ConfigParser.cpp:76)
+==80653==    by 0x100033D0B: ConfigParser::parseConfigFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (ConfigParser.cpp:34)
+==80653== 
+==80653== 204 bytes in 30 blocks are still reachable in loss record 36 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x100009992: std::__1::allocator<RequestType>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x1000097D0: std::__1::allocator_traits<std::__1::allocator<RequestType> >::allocate(std::__1::allocator<RequestType>&, unsigned long) (memory:1586)
+==80653==    by 0x1000094D5: std::__1::vector<RequestType, std::__1::allocator<RequestType> >::__vallocate(unsigned long) (vector:994)
+==80653==    by 0x100009334: std::__1::vector<RequestType, std::__1::allocator<RequestType> >::vector(std::__1::vector<RequestType, std::__1::allocator<RequestType> > const&) (vector:1257)
+==80653==    by 0x100006ACC: std::__1::vector<RequestType, std::__1::allocator<RequestType> >::vector(std::__1::vector<RequestType, std::__1::allocator<RequestType> > const&) (vector:1250)
+==80653==    by 0x10000A98D: LocationConfig::LocationConfig(LocationConfig const&) (LocationConfig.hpp:23)
+==80653==    by 0x10000A81C: LocationConfig::LocationConfig(LocationConfig const&) (LocationConfig.hpp:23)
+==80653==    by 0x10000A7F0: void std::__1::allocator<LocationConfig>::construct<LocationConfig, LocationConfig&>(LocationConfig*, LocationConfig&) (memory:1881)
+==80653==    by 0x10000A79F: void std::__1::allocator_traits<std::__1::allocator<LocationConfig> >::__construct<LocationConfig, LocationConfig&>(std::__1::integral_constant<bool, true>, std::__1::allocator<LocationConfig>&, LocationConfig*, LocationConfig&) (memory:1773)
+==80653== 
+==80653== 304 bytes in 1 blocks are still reachable in loss record 41 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x100011B30: Client::Client(int) (Client.cpp:4)
+==80653==    by 0x100011BFA: Client::Client(int) (Client.cpp:4)
+==80653==    by 0x1000051D9: Server::handleClient(int) (Server.cpp:126)
+==80653==    by 0x100004EC1: Server::run() (Server.cpp:90)
+==80653==    by 0x100052940: main (main.cpp:23)
+==80653== 
+==80653== 384 bytes in 1 blocks are still reachable in loss record 42 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x100027708: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10002DD7F: std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x10002DBB0: std::__1::allocator_traits<std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::allocate(std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&, unsigned long) (memory:1586)
+==80653==    by 0x10002F491: std::__1::__split_buffer<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&) (__split_buffer:318)
+==80653==    by 0x10002F30C: std::__1::__split_buffer<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >&) (__split_buffer:317)
+==80653==    by 0x10003FB5C: void std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::__push_back_slow_path<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&&) (vector:1623)
+==80653==    by 0x100034BC6: std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >::push_back(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&&) (vector:1655)
+==80653==    by 0x1000349C0: ConfigParser::initConfigServer(ServerConfig&) (ConfigParser.cpp:57)
+==80653==    by 0x1000344C8: ConfigParser::parseHttpBlock(std::__1::basic_ifstream<char, std::__1::char_traits<char> >&) (ConfigParser.cpp:75)
+==80653==    by 0x100033D0B: ConfigParser::parseConfigFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (ConfigParser.cpp:34)
+==80653== 
+==80653== 480 bytes in 6 blocks are still reachable in loss record 43 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10000C5AF: std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> >::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x10000C3F0: std::__1::allocator_traits<std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> > >::allocate(std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> >&, unsigned long) (memory:1586)
+==80653==    by 0x10000B653: std::__1::unique_ptr<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>, std::__1::__tree_node_destructor<std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> > > > std::__1::__tree<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__map_value_compare<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::__construct_node<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&>(std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&) (__tree:2193)
+==80653==    by 0x10000B278: std::__1::__tree_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> std::__1::__tree<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__map_value_compare<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::__emplace_hint_unique_key_args<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&>(std::__1::__tree_const_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&) (__tree:2172)
+==80653==    by 0x10000B1B3: std::__1::__tree<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__map_value_compare<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::__insert_unique(std::__1::__tree_const_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long>, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&) (__tree:1274)
+==80653==    by 0x10000B05C: std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::insert(std::__1::__map_const_iterator<std::__1::__tree_const_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> >, std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&) (map:1178)
+==80653==    by 0x10000ABBF: void std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::insert<std::__1::__map_const_iterator<std::__1::__tree_const_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> > >(std::__1::__map_const_iterator<std::__1::__tree_const_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> >, std::__1::__map_const_iterator<std::__1::__tree_const_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> >) (map:1199)
+==80653==    by 0x10000AAEE: std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::map(std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > > const&) (map:1007)
+==80653==    by 0x10000AA6C: std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::map(std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > > const&) (map:1006)
+==80653== 
+==80653== 496 bytes in 1 blocks are still reachable in loss record 44 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x100038E68: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x100038DDF: std::__1::allocator<ServerConfig>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x100038BA0: std::__1::allocator_traits<std::__1::allocator<ServerConfig> >::allocate(std::__1::allocator<ServerConfig>&, unsigned long) (memory:1586)
+==80653==    by 0x100041721: std::__1::__split_buffer<ServerConfig, std::__1::allocator<ServerConfig>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<ServerConfig>&) (__split_buffer:318)
+==80653==    by 0x10004159C: std::__1::__split_buffer<ServerConfig, std::__1::allocator<ServerConfig>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<ServerConfig>&) (__split_buffer:317)
+==80653==    by 0x10004135C: void std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::__push_back_slow_path<ServerConfig const&>(ServerConfig const&) (vector:1623)
+==80653==    by 0x100035986: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::push_back(ServerConfig const&) (vector:1640)
+==80653==    by 0x1000344FC: ConfigParser::parseHttpBlock(std::__1::basic_ifstream<char, std::__1::char_traits<char> >&) (ConfigParser.cpp:77)
+==80653==    by 0x100033D0B: ConfigParser::parseConfigFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (ConfigParser.cpp:34)
+==80653==    by 0x1000528AD: main (main.cpp:17)
+==80653== 
+==80653== 496 bytes in 1 blocks are still reachable in loss record 45 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10000636F: std::__1::allocator<ServerConfig>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x1000060D0: std::__1::allocator_traits<std::__1::allocator<ServerConfig> >::allocate(std::__1::allocator<ServerConfig>&, unsigned long) (memory:1586)
+==80653==    by 0x100005E15: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::__vallocate(unsigned long) (vector:994)
+==80653==    by 0x100005C94: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::vector(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1257)
+==80653==    by 0x10000477C: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::vector(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1250)
+==80653==    by 0x10002A0DC: HTTPConfigs::HTTPConfigs(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x10002A0AC: HTTPConfigs::HTTPConfigs(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x100033AF2: ConfigParser::getHTTPConfigs() (ConfigParser.cpp:13)
+==80653==    by 0x1000528D1: main (main.cpp:18)
+==80653== 
+==80653== 496 bytes in 1 blocks are still reachable in loss record 46 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10000636F: std::__1::allocator<ServerConfig>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x1000060D0: std::__1::allocator_traits<std::__1::allocator<ServerConfig> >::allocate(std::__1::allocator<ServerConfig>&, unsigned long) (memory:1586)
+==80653==    by 0x100005E15: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::__vallocate(unsigned long) (vector:994)
+==80653==    by 0x100052DF9: std::__1::enable_if<__is_cpp17_forward_iterator<ServerConfig*>::value&&is_constructible<ServerConfig, std::__1::iterator_traits<ServerConfig*>::reference>::value, void>::type std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::assign<ServerConfig*>(ServerConfig*, ServerConfig*) (vector:1459)
+==80653==    by 0x100052C8C: std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> >::operator=(std::__1::vector<ServerConfig, std::__1::allocator<ServerConfig> > const&) (vector:1404)
+==80653==    by 0x100052C23: HTTPConfigs::operator=(HTTPConfigs const&) (ConfigParser.hpp:64)
+==80653==    by 0x100052BED: Server::setConfigs(HTTPConfigs) (Server.hpp:50)
+==80653==    by 0x100052912: main (main.cpp:21)
+==80653== 
+==80653== 576 bytes in 9 blocks are still reachable in loss record 48 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x100008462: std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> >::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x1000082A0: std::__1::allocator_traits<std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> > >::allocate(std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> >&, unsigned long) (memory:1586)
+==80653==    by 0x1000077F3: std::__1::unique_ptr<std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>, std::__1::__tree_node_destructor<std::__1::allocator<std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*> > > > std::__1::__tree<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__map_value_compare<int, std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::less<int>, true>, std::__1::allocator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::__construct_node<std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&>(std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&) (__tree:2193)
+==80653==    by 0x100007418: std::__1::__tree_iterator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> std::__1::__tree<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__map_value_compare<int, std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::less<int>, true>, std::__1::allocator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::__emplace_hint_unique_key_args<int, std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&>(std::__1::__tree_const_iterator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long>, int const&, std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&) (__tree:2172)
+==80653==    by 0x100007353: std::__1::__tree<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__map_value_compare<int, std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::less<int>, true>, std::__1::allocator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::__insert_unique(std::__1::__tree_const_iterator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long>, std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&) (__tree:1274)
+==80653==    by 0x1000071FC: std::__1::map<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<int>, std::__1::allocator<std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::insert(std::__1::__map_const_iterator<std::__1::__tree_const_iterator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> >, std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > const&) (map:1178)
+==80653==    by 0x100006C6F: void std::__1::map<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<int>, std::__1::allocator<std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::insert<std::__1::__map_const_iterator<std::__1::__tree_const_iterator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> > >(std::__1::__map_const_iterator<std::__1::__tree_const_iterator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> >, std::__1::__map_const_iterator<std::__1::__tree_const_iterator<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::__tree_node<std::__1::__value_type<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, void*>*, long> >) (map:1199)
+==80653==    by 0x100006B9E: std::__1::map<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<int>, std::__1::allocator<std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::map(std::__1::map<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<int>, std::__1::allocator<std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > > const&) (map:1007)
+==80653==    by 0x100006A9C: std::__1::map<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<int>, std::__1::allocator<std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >::map(std::__1::map<int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<int>, std::__1::allocator<std::__1::pair<int const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > > const&) (map:1006)
+==80653== 
+==80653== 704 bytes in 1 blocks are still reachable in loss record 49 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1002F233B: std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__grow_by_and_replace(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, char const*) (in /usr/lib/libc++.1.dylib)
+==80653==    by 0x1002F1E78: std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::assign(char const*, unsigned long) (in /usr/lib/libc++.1.dylib)
+==80653==    by 0x100013F43: HTTPRequest::parseRequest(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (HTTPRequest.cpp:26)
+==80653==    by 0x100011D8D: Client::handleRequest() (Client.cpp:27)
+==80653==    by 0x100011C2B: Client::clientConnectionProcess() (Client.cpp:10)
+==80653==    by 0x1000051F3: Server::handleClient(int) (Server.cpp:127)
+==80653==    by 0x100004EC1: Server::run() (Server.cpp:90)
+==80653==    by 0x100052940: main (main.cpp:23)
+==80653== 
+==80653== 2,464 bytes in 2 blocks are still reachable in loss record 56 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10000A49F: std::__1::allocator<LocationConfig>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x10000A2D0: std::__1::allocator_traits<std::__1::allocator<LocationConfig> >::allocate(std::__1::allocator<LocationConfig>&, unsigned long) (memory:1586)
+==80653==    by 0x100009FD5: std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::__vallocate(unsigned long) (vector:994)
+==80653==    by 0x100009E24: std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::vector(std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> > const&) (vector:1257)
+==80653==    by 0x100006AFC: std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::vector(std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> > const&) (vector:1250)
+==80653==    by 0x100006999: ServerConfig::ServerConfig(ServerConfig const&) (ServerConfig.hpp:24)
+==80653==    by 0x10000680C: ServerConfig::ServerConfig(ServerConfig const&) (ServerConfig.hpp:24)
+==80653==    by 0x1000414C0: void std::__1::allocator<ServerConfig>::construct<ServerConfig, ServerConfig const&>(ServerConfig*, ServerConfig const&) (memory:1881)
+==80653==    by 0x10004147F: void std::__1::allocator_traits<std::__1::allocator<ServerConfig> >::__construct<ServerConfig, ServerConfig const&>(std::__1::integral_constant<bool, true>, std::__1::allocator<ServerConfig>&, ServerConfig*, ServerConfig const&) (memory:1773)
+==80653== 
+==80653== 4,096 bytes in 1 blocks are still reachable in loss record 57 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100625367: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==80653==    by 0x100638C4D: __swsetup (in /usr/lib/system/libsystem_c.dylib)
+==80653==    by 0x100624596: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==80653==    by 0x100624B49: fwrite (in /usr/lib/system/libsystem_c.dylib)
+==80653==    by 0x10000DAD8: std::__1::basic_streambuf<char, std::__1::char_traits<char> >::sputn(char const*, long) (streambuf:229)
+==80653==    by 0x10000D91F: std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char) (locale:1411)
+==80653==    by 0x10000D625: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long) (ostream:730)
+==80653==    by 0x100004900: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::operator<< <char, std::__1::char_traits<char>, std::__1::allocator<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (ostream:1052)
+==80653==    by 0x100051CFE: Logger::NormalCout(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >) (Logger.cpp:63)
+==80653==    by 0x1000042EA: Server::initializer() (Server.cpp:30)
+==80653==    by 0x10005292F: main (main.cpp:22)
+==80653== 
+==80653== 4,928 bytes in 4 blocks are still reachable in loss record 58 of 58
+==80653==    at 0x1002AC545: malloc (in /Users/ohamadou/homebrew/Cellar/valgrind/HEAD-9da5605/libexec/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==80653==    by 0x100380DE9: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==80653==    by 0x1000063F8: std::__1::__libcpp_allocate(unsigned long, unsigned long) (new:253)
+==80653==    by 0x10000A49F: std::__1::allocator<LocationConfig>::allocate(unsigned long, void const*) (memory:1869)
+==80653==    by 0x10000A2D0: std::__1::allocator_traits<std::__1::allocator<LocationConfig> >::allocate(std::__1::allocator<LocationConfig>&, unsigned long) (memory:1586)
+==80653==    by 0x100009FD5: std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::__vallocate(unsigned long) (vector:994)
+==80653==    by 0x100009E24: std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::vector(std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> > const&) (vector:1257)
+==80653==    by 0x100006AFC: std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> >::vector(std::__1::vector<LocationConfig, std::__1::allocator<LocationConfig> > const&) (vector:1250)
+==80653==    by 0x100006999: ServerConfig::ServerConfig(ServerConfig const&) (ServerConfig.hpp:24)
+==80653==    by 0x10000680C: ServerConfig::ServerConfig(ServerConfig const&) (ServerConfig.hpp:24)
+==80653==    by 0x1000067E0: void std::__1::allocator<ServerConfig>::construct<ServerConfig, ServerConfig&>(ServerConfig*, ServerConfig&) (memory:1881)
+==80653==    by 0x10000678F: void std::__1::allocator_traits<std::__1::allocator<ServerConfig> >::__construct<ServerConfig, ServerConfig&>(std::__1::integral_constant<bool, true>, std::__1::allocator<ServerConfig>&, ServerConfig*, ServerConfig&) (memory:1773)
+==80653== 
+==80653== LEAK SUMMARY:
+==80653==    definitely lost: 20 bytes in 1 blocks
+==80653==    indirectly lost: 0 bytes in 0 blocks
+==80653==      possibly lost: 0 bytes in 0 blocks
+==80653==    still reachable: 16,264 bytes in 69 blocks
+==80653==         suppressed: 14,175 bytes in 161 blocks
+==80653== 
+==80653== For lists of detected and suppressed errors, rerun with: -s
+==80653== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 4 from 4)
