@@ -45,7 +45,8 @@ class Client
 			public:
 			    virtual const char* what() const throw()
 			    {
-			        return "Client is disconnected";
+			        return "";
+			        // return "Client is disconnected";
 			    }
 		};
 };

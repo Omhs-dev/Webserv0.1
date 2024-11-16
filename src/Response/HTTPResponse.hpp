@@ -45,13 +45,13 @@ class Client;
 	//remove the / from the path
 	// example: localhost:8080/ -> localhost:8080
 
+// create a serveFile function ✅
+// create a custom error page to serve when a file is not found ✅
+
+// Set a content type based on the file extension  ✅
 // --------------------------------------------------------------------
 
-// create a serveFile function
-// create a custom error page to serve when a file is not found
-
 // have an instance of Cgi
-// Set a content type based on the file extension 
 // a function to set the a chunked header
 
 // Request for a Directory (Without Trailing Slash)
@@ -96,12 +96,9 @@ class HTTPResponse
 		std::vector<std::string> _headers;
 		std::string _body;
 		std::string _errorPage;
+		std::string _serverRoot;
 		int _fileFd;
-		// check if a request is a redirection
-		// bool isReqRedirection(const std::string &path);
-		// bool isRedirecUrl(const std::string &path);
 		
-		std::string chunkFile(const std::string &path);
 		void handleGet();
 		void handleDelete();
 		void handlePost();
@@ -109,7 +106,7 @@ class HTTPResponse
 		void setDefaultResponse(std::string path, LocationConfig config);
 		void setChunkResponse(const std::string &path);
 		void setStandardResponse();
-		// void setRedirection(const std::string &location, int code);
+		void setServerRoot(const std::string &root);
 		void setHeaders(const std::string &key, const std::string &value);
 		void setStatus(const std::string &code, const std::string &message);
 		void setBody(const std::string &body);

@@ -135,7 +135,10 @@
         const filePath = files || file;
 
         if (!filePath) {
-            alert('Please select or enter a file name to delete.');
+            sucess.innerHTML = `<span style="color: #8684f5; font-size: 12px;">Please select a file to delete</span>`;
+            setInterval(() => {
+                sucess.innerHTML = '';
+			}, 4000);
             return;
         }
 

@@ -208,7 +208,7 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
     std::string key, value;
     while (!this->blockStack.empty() && std::getline(file, line))
     {
-        std::cout << "Line: '" << line << "'" << std::endl;
+        // std::cout << "Line: '" << line << "'" << std::endl;
         line = trim(line);
         if (line.empty() || line[0] == '#')
             continue;
@@ -238,7 +238,7 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
             }
             else if (key == "autoindex")
             {
-                std::cout << "Parsing autoindex with value: '" << value << "'" << std::endl;
+                // std::cout << "Parsing autoindex with value: '" << value << "'" << std::endl;
                 if (value == "on")
 				{
 					confLocation.autoindex = true;
@@ -285,13 +285,19 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
             }
             else if (key == "return")
             {
-                size_t pos = value.find(" ");
-				if (pos != std::string::npos)
-				{
-					int code = std::stoi(value.substr(0, pos));
-					std::string path = value.substr(pos + 1);
-					confLocation.redirect[code] = path;
-				}
+                std::stringstream ss(value);
+                std::string code; std::string link;
+                ss >> code >> link;
+                // size_t pos = value.find(" ");
+				// if (pos != std::string::npos)
+				// {
+				// 	int code = std::stoi(value.substr(0, pos));
+				// 	std::string path = value.substr(pos + 1);
+				// }
+				int codeInt = std::stoi(code);
+				std::cout << "key: " << codeInt << " and value: " << link << std::endl;
+				confLocation.redirect[codeInt] = link;
+				std::cout << "rederict link : " << confLocation.redirect.begin()->second << std::endl;
             }
             else
             {
