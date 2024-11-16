@@ -16,6 +16,7 @@
 #include "../Response/HTTPResponse.hpp"
 #include "../Server/Client.hpp"
 #include "../Parse/LocationConfig.hpp"
+#include "../Parse/ServerConfig.hpp"
 #include "../Parse/ConfigParser.hpp"
 #include "../Server/Server.hpp"
 #include "../Logger/Logger.hpp"
@@ -89,6 +90,7 @@ class HTTPResponse
 		Client *_client;
 		// Server *_server;
 		HTTPRequest	*_request;
+		ServerConfig *_server;
 	
 		ResponseState _state;
 		std::string _statusCode;
@@ -123,7 +125,9 @@ class HTTPResponse
 		void cleanPath(std::string &path);
 		std::string listDirectory(const std::string &path, const std::string& root);
 		LocationConfig checkLocationPath(const std::string& path);
-		// std::string checkLocationPath(const std::string& path);
+		ServerConfig checkServer(LocationConfig &location);
+		
+		std::string generateErrorPage(int code, ServerConfig server);
 };
 
 #endif

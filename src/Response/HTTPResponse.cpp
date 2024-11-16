@@ -5,6 +5,7 @@ HTTPResponse::HTTPResponse(Client *client)
 {
 	_client = client;
 	_request = client->getRequest();
+	_server = nullptr;
 	_state = INIT;
 	_statusCode = "200";
 	_statusMessage = "OK";
@@ -113,9 +114,11 @@ void HTTPResponse::handleGet()
 	}
 	else
 	{
-		_errorPage = errorPage(reqPath, root);
-		setStatus("404", "Not Found");
-		setBody(_errorPage);
+		Logger::NormalCout("before error");
+		_errorPage = generateErrorPage(404, _client->getServer()->getConfigs()[0]);
+		Logger::Specifique(_errorPage, "error page path");
+		setStatus("404", getErrorMesssage("404"));
+		serveFile(_errorPage);
 	}
 }
 
@@ -282,6 +285,24 @@ void HTTPResponse::setStandardResponse()
 }
 
 // --------- Engine of the code ---------
+
+ServerConfig HTTPResponse::checkServer(LocationConfig &location)
+{
+	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
+	for (ServerConfig &server : configs)
+	{
+		for (LocationConfig &loc : server.getLocations())
+		{
+			if (location.locationPath == loc.locationPath)
+			{
+				Logger::NormalCout("Location found in this server");
+				return server;
+				break;
+			}
+		}
+	}
+	return ServerConfig();
+}
 
 LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {
@@ -511,4 +532,18 @@ std::string HTTPResponse::listDirectory(const std::string &path, const std::stri
 	closedir(dir);
 	html << "</ul></body></html>";
 	return html.str();
+}
+
+std::string HTTPResponse::generateErrorPage(int code, ServerConfig server)
+{
+	std::map<int, std::string>  errorPages = server._errorPage;
+	for (auto &page : errorPages)
+	{
+	Logger::SpecifiqueForInt(page.first, "status code");
+		if (page.first == code && page.second.find("404.html"))
+			return page.second;
+		if (page.first == code && page.second.find("403.html"))
+			return page.second;
+	}
+	return "";
 }
