@@ -85,7 +85,7 @@ class Client;
 class HTTPResponse
 {
 	public:
-		enum ResponseState { INIT, IS_REDIRECT, IS_ALIAS, IS_NORMAL, IS_NO_LOCATION, IS_CHUNK, IS_FILE, COMPLETE };
+		enum ResponseState { INIT, IS_REDIRECT, IS_ALIAS, IS_NORMAL, IS_NO_LOCATION, IS_ERROR, IS_CHUNK, IS_FILE, COMPLETE };
 	private:
 		Client *_client;
 		// Server *_server;

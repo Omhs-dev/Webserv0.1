@@ -36,8 +36,8 @@ void HTTPResponse::generateResponse()
 		handlePost();
 	else
 	{
-		_errorPage = errorPage(405);
-		// setStatus("405", getErrorMesssage("405"));
+		Logger::SpecifiqueForInt(_client->getRequest()->getStateCode(), "request code");
+		_errorPage = errorPage2(_client->getRequest()->getStateCode());
 		serveFile(_errorPage, "405", getErrorMesssage("405"));
 	}
 }
@@ -116,17 +116,17 @@ void HTTPResponse::handleGet()
 		else
 			setBody(listDirectory(aliasPath, location.getRoot()));
 	}
-	else if (_state == IS_NO_LOCATION)
+	else if (IS_NO_LOCATION)
 	{
-		// Logger::NormalCout("no location found");
+		Logger::NormalCout("no location found");
 		_errorPage = serverErroPage(404);
-		// Logger::Specifique(_errorPage, "error page path");
+		Logger::Specifique(_errorPage, "error page path");
 		// setStatus("404", getErrorMesssage("404"));
 		serveFile(_errorPage, "404", getErrorMesssage("404"));
 	}
 	else
 	{
-		// Logger::NormalCout("default error page");
+		Logger::NormalCout("default error page");
 		_errorPage = errorPage(404);
 		// setStatus("404", getErrorMesssage("404"));
 		serveFile(_errorPage, "404", getErrorMesssage("404"));
@@ -315,9 +315,9 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 			// Logger::Separator();
 			// Logger::Specifique(location.getLocationPath(), "Location Path to look for 🪜");
 			// if (path == location.locationPath)
-				Logger::NormalCout("yes...");
+				// Logger::NormalCout("yes...");
 			// if (location.redirect.begin()->second.find("github"))
-				Logger::NormalCout("github redirect found here");
+				// Logger::NormalCout("github redirect found here");
 			if (path == location.locationPath && location.redirect.begin()->first > 0
 					&& location.redirect.begin()->second != "")
 			{
@@ -437,7 +437,8 @@ void HTTPResponse::serveFile(const std::string &path, const std::string &code, c
 	}
 	else
 	{
-		_errorPage = errorPage(404);
+		Logger::NormalCout("serving file failed !");
+		// _errorPage = errorPage(404);
 		setStatus("404", "Not Found");
 		setBody(_errorPage);
 	}
@@ -551,10 +552,10 @@ std::string HTTPResponse::serverErroPage(int code)
 		std::string errorPage = getErrorPagePath(code, server);
 		if (!errorPage.empty())
 		{
-			// Logger::Specifique(errorPage, "error page path in serverErrorPages");
+			Logger::Specifique(errorPage, "error page path in serverErrorPages");
 			return errorPage;
 		}
-		// Logger::NormalCout("path empty");
+		Logger::NormalCout("path empty");
 	}
 	return "";
 }
