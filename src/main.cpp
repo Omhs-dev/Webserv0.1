@@ -3,14 +3,17 @@
 #include "Logger/Logger.hpp"
 #include <iostream>
 
-// restructure the checkpathlocation in response
-// check the alias implementation
-// decide what to use as root or find a way to use the server root
 // find solution for the pollin fd and server
 // check the rest of things to do
 // continue hunting bugs
 // check chunk response again 
 // get a way to return to the home page once on directory listenning
+// check if i can connect to the same port with different tabs
+// compare allow_methods of the config and the incoming requests
+// check all appropriate status code for every request
+// Upload some file to the server and get it back.
+// Setup a list of methods accepted for a certain route (e.g., try to delete something with and without permission).
+
 
 int main(int argc, char *argv[])
 {

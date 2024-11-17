@@ -128,7 +128,6 @@ class HTTPRequest
 		std::string getLineSanitizer(std::stringstream &ss);
 		void EnumState(HTTPRequest::ParseState state);
 		void errorOccur(int code);
-		LocationConfig* findLocationConfig(const std::string& path);
 		void parseMultipartBody(const std::string& bodyData);
 		void saveFile(const std::string& filename, const std::string& content);
 		std::string getBoundary();
