@@ -41,7 +41,7 @@ void ConfigParser::parseConfigFile(const std::string &filename)
 
 void ConfigParser::initConfigServer(ServerConfig &serverConf)
 {
-    serverConf._clientMaxBodySize = "100";
+    serverConf._clientMaxBodySize = 100;
 
     this->required.push_back("index");
     this->required.push_back("root");
@@ -157,7 +157,7 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
             }
             else if (key == "max_body_size")
             {
-                serverConfig._clientMaxBodySize = value;
+                serverConfig._clientMaxBodySize = std::stoull(value);
             }
             else if (key == "error_page")
             {
@@ -279,25 +279,15 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
                     confLocation.errorPage[code] = path;
                 }
             }
-            else if (key == "max_body_size")
-            {
-                confLocation.clientMaxBodySize = value;
-            }
             else if (key == "return")
             {
                 std::stringstream ss(value);
                 std::string code; std::string link;
                 ss >> code >> link;
-                // size_t pos = value.find(" ");
-				// if (pos != std::string::npos)
-				// {
-				// 	int code = std::stoi(value.substr(0, pos));
-				// 	std::string path = value.substr(pos + 1);
-				// }
 				int codeInt = std::stoi(code);
-				std::cout << "key: " << codeInt << " and value: " << link << std::endl;
+				// std::cout << "key: " << codeInt << " and value: " << link << std::endl;
 				confLocation.redirect[codeInt] = link;
-				std::cout << "rederict link : " << confLocation.redirect.begin()->second << std::endl;
+				// std::cout << "rederict link : " << confLocation.redirect.begin()->second << std::endl;
             }
             else
             {

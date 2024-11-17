@@ -30,11 +30,6 @@ std::string LocationConfig::getLocationPath() const
 	return locationPath;
 }
 
-std::string LocationConfig::getClientMaxBodySize() const
-{
-	return clientMaxBodySize;
-}
-
 std::map<int, std::string> LocationConfig::getErrorPage() const
 {
 	return errorPage;

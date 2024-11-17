@@ -30,7 +30,7 @@ std::map<int, std::string> ServerConfig::getRedirect() const
 	return _redirect;
 }
 
-std::string ServerConfig::getClientMaxBodySize() const
+unsigned long long ServerConfig::getClientMaxBodySize() const
 {
 	return _clientMaxBodySize;
 }

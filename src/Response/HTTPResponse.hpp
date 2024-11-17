@@ -85,7 +85,7 @@ class Client;
 class HTTPResponse
 {
 	public:
-		enum ResponseState { INIT, IS_REDIRECT, IS_CHUNK, IS_FILE, IS_NORMAL, IS_ALIAS, COMPLETE };
+		enum ResponseState { INIT, IS_REDIRECT, IS_ALIAS, IS_NORMAL, IS_NO_LOCATION, IS_CHUNK, IS_FILE, COMPLETE };
 	private:
 		Client *_client;
 		// Server *_server;
@@ -125,9 +125,9 @@ class HTTPResponse
 		void cleanPath(std::string &path);
 		std::string listDirectory(const std::string &path, const std::string& root);
 		LocationConfig checkLocationPath(const std::string& path);
-		ServerConfig checkServer(LocationConfig &location);
+		std::string serverErroPage(int code);
 		
-		std::string generateErrorPage(int code, ServerConfig server);
+		std::string getErrorPagePath(int code, ServerConfig server);
 };
 
 #endif

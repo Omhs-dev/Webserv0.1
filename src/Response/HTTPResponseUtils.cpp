@@ -140,7 +140,7 @@ std::string errorPage(const std::string &path, const std::string &root)
 		<< " <div class=\"error-container\">\n"
 		<< "   <div class=\"error-code\">404</div>\n"
 		<< "   <div class=\"error-message\">Page Not Found</div>\n"
-		<< "   <div class=\"error-description\">Sorry " << root + path<<  " does not exist or has been moved.</div>\n"
+		<< "   <div class=\"error-description\">Sorry this page does not exist or has been moved.</div>\n"
 		<< "   <a href=\"/\" class=\"back-button\">Go Back Home</a>\n"
 		<< " </div>\n"
 		<< "</body>\n"

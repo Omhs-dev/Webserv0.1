@@ -29,7 +29,7 @@ struct ServerConfig
 	std::string     _port;
 	std::string     _index;
 	std::map<int, std::string> _redirect;
-	std::string     _clientMaxBodySize;
+	unsigned long long     _clientMaxBodySize;
 	std::map<int, std::string>  _errorPage;
 	std::vector<RequestType>    _requestAllowed;
 	std::vector<LocationConfig> _locations;
@@ -42,7 +42,7 @@ struct ServerConfig
 	std::string getPort() const;
 	std::string getIndex() const;
 	std::map<int, std::string> getRedirect() const;
-	std::string getClientMaxBodySize() const;
+	unsigned long long getClientMaxBodySize() const;
 	std::map<int, std::string> getErrorPage() const;
 	std::vector<RequestType> getRequestAllowed() const;
 	std::vector<LocationConfig> getLocations() const;

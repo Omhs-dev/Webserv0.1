@@ -28,7 +28,6 @@ struct LocationConfig
 	std::string index;
 	std::map<int, std::string> redirect;
 	std::string locationPath;
-	std::string clientMaxBodySize;
 	std::map<int, std::string> errorPage;
 	std::map<std::string, std::string> cgi;
 	std::vector<RequestType> requestAllowed;
@@ -40,7 +39,6 @@ struct LocationConfig
 	std::string getIndex() const;
 	std::map<int, std::string> getRedirect() const;
 	std::string getLocationPath() const;
-	std::string getClientMaxBodySize() const;
 	std::map<int, std::string> getErrorPage() const;
 	std::map<std::string, std::string> getCgi() const;
 	std::vector<RequestType> getRequestAllowed() const;

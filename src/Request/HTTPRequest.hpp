@@ -23,7 +23,6 @@ class Client;
 			// then read and extract the exact number of bytes needed by the body from the request stream and store them as body
 			// marque the body as complete once the bytes are read
 	// if the body is chunked body parse it
-	
 
 // a timeout function for the request
 
@@ -52,7 +51,6 @@ class HTTPRequest
 	private:
 		Client          *_client;
 		LocationConfig  *_location;
-		std::vector<ServerConfig>    _configs;
 		
 		// Request Line
 		std::string     _method;
@@ -84,11 +82,8 @@ class HTTPRequest
 		void        parseNormalBody(const std::string &line);
 		void        parseChunkedBody(const std::string &line);
 		
-		
 		// --- UTILS ---
-		int processPath();
-		void defineBodyDestination();
-		std::vector<std::string> getAllPathsLocation();
+		unsigned long long             _maxBody;
 		
 		// --- ENUM ---
         ParseState _state;
@@ -100,6 +95,7 @@ class HTTPRequest
 		// --- CHECKERS ---
 		bool    checkHttpVersion();
 		bool    checkHostHeader();
+		int     checkMaxBodySize();
 		int     checkTransferEncoding();
 		int     checkContentLength();
 		int     checkMethod();
@@ -132,11 +128,11 @@ class HTTPRequest
 		std::string getLineSanitizer(std::stringstream &ss);
 		void EnumState(HTTPRequest::ParseState state);
 		void errorOccur(int code);
-		bool validateLocation(const std::string& path);
 		LocationConfig* findLocationConfig(const std::string& path);
 		void parseMultipartBody(const std::string& bodyData);
 		void saveFile(const std::string& filename, const std::string& content);
 		std::string getBoundary();
+		void setMaxbodySize(unsigned long long size);
 };
 
 #endif

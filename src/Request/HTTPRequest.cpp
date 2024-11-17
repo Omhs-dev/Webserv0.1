@@ -15,13 +15,14 @@ HTTPRequest::HTTPRequest(Client *client)
 	_method = "";
 	_uriPath = "";
 	_version = "";
+	_maxBody = 0;
 	_state = IS_REQUEST_LINE;
 }
 
 void HTTPRequest::parseRequest(const std::string &requestData)
 {
 	// Logger::VerticalSeparator();
-	// Logger::Itroduction("parseRequest ↗️");
+	Logger::Itroduction("parseRequest ↗️");
 	// Logger::VerticalSeparator();
 	_rawRequest = requestData;
 	// Logger::Specifique(_rawRequest, "This is the raw request");
@@ -50,6 +51,12 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 	{
 		// Logger::NormalCout("Host header missing in HTTP/1.1 request");
 		errorOccur(400); // Bad Request: Host header missing in HTTP/1.1 request
+		return;
+	}
+	if (checkMaxBodySize())
+	{
+		errorOccur(413);
+		Logger::ErrorCout("Request Entity Too Large");
 		return;
 	}
 	// // Parse the body for methods like POST
@@ -322,6 +329,21 @@ int HTTPRequest::checkContentLength()
 	return 0;
 }
 
+int HTTPRequest::checkMaxBodySize()
+{
+	setMaxbodySize(_maxBody);
+	Logger::SpecifiqueForInt(_iscontentLength, "body length");
+	Logger::SpecifiqueForInt(_maxBody, "max body set successfully..");
+	if (_iscontentLength > _maxBody)
+	{
+		Logger::SpecifiqueForInt(_iscontentLength, "content legth size checkMaxBodySize");
+		Logger::SpecifiqueForInt(_maxBody, "maxBody size checkMaxBodySize");
+		Logger::NormalCout("Content too large !");
+		return 1;
+	}
+	return 0;
+}
+
 int HTTPRequest::checkMethod()
 {
 	if (_method != "GET" && _method != "POST" && _method != "DELETE")
@@ -365,6 +387,21 @@ int HTTPRequest::getStateCode() const { return _stateCode; }
 ////////////////////////////////////////////////////
 // ------------------- UTILS -------------------- //
 ////////////////////////////////////////////////////
+
+void HTTPRequest::setMaxbodySize(unsigned long long size)
+{
+	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
+	for (ServerConfig &server : configs)
+	{
+		if (server.getClientMaxBodySize() > 0)
+		{
+			Logger::SpecifiqueForInt(server.getClientMaxBodySize(), "client max body found");
+			size = server.getClientMaxBodySize();
+			Logger::SpecifiqueForInt(size, "size set at ");
+			break;
+		}
+	}
+}
 
 void HTTPRequest::errorOccur(int code)
 {
