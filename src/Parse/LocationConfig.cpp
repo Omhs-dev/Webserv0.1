@@ -40,7 +40,7 @@ std::map<std::string, std::string> LocationConfig::getCgi() const
 	return cgi;
 }
 
-std::vector<RequestType> LocationConfig::getRequestAllowed() const
+std::vector<std::string> LocationConfig::getRequestAllowed() const
 {
 	return requestAllowed;
 }

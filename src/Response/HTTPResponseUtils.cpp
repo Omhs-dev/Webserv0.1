@@ -57,18 +57,20 @@ std::string intToHexa(ssize_t num) {
 #include <string>
 #include <sstream>
 
-std::string errorPage(const std::string &path, const std::string &root)
+std::string errorPage(int code)
 {
-	std::string fullPath = root + path;
-	std::ostringstream html;
+	std::ostringstream head;
+	std::ostringstream css;
+	std::ostringstream body;
+	std::string html;
 
-	html << "<!DOCTYPE html>\n"
+	head << "<!DOCTYPE html>\n"
 		<< " <html lang=\"en\">\n"
 		<< " <head>\n"
 		<< " <meta charset=\"UTF-8\">\n"
 		<< " <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
-		<< " <title>404 - Page Not Found</title>\n"
-		<< " <style>\n"
+		<< " <title>404 - Page Not Found</title>\n";
+	css << " <style>\n"
 		<< "    * {\n"
 		<< "      margin: 0;\n"
 		<< "      padding: 0;\n"
@@ -135,18 +137,32 @@ std::string errorPage(const std::string &path, const std::string &root)
 		<< "      }\n"
 		<< "    }\n"
 		<< " </style>\n"
-		<< " </head>\n"
-		<< " <body>\n"
-		<< " <div class=\"error-container\">\n"
-		<< "   <div class=\"error-code\">404</div>\n"
-		<< "   <div class=\"error-message\">Page Not Found</div>\n"
-		<< "   <div class=\"error-description\">Sorry this page does not exist or has been moved.</div>\n"
-		<< "   <a href=\"/\" class=\"back-button\">Go Back Home</a>\n"
-		<< " </div>\n"
-		<< "</body>\n"
-		<< "</html>\n";
-
-	return html.str();
+		<< " </head>\n";
+	if (code == 405)
+	{
+		body << " <body>\n"
+			<< " <div class=\"error-container\">\n"
+			<< "   <div class=\"error-code\">" << code << "</div>\n"
+			<< "   <div class=\"error-message\">Page Not Found</div>\n"
+			<< "   <div class=\"error-description\">Sorry this page does not exist or has been moved.</div>\n"
+			<< "   <a href=\"/\" class=\"back-button\">Go Back Home</a>\n"
+			<< " </div>\n"
+			<< "</body>\n"
+			<< "</html>\n";
+	}
+	else
+	{
+		body << " <body>\n"
+			<< " <div class=\"error-container\">\n"
+			<< "   <div class=\"error-code\">" << code << "</div>\n"
+			<< "   <div class=\"error-message\">Method Not Allowed</div>\n"
+			<< "   <div class=\"error-description\">Please use an allowed Methode</div>\n"
+			<< " </div>\n"
+			<< "</body>\n"
+			<< "</html>\n";
+	}
+	html = head.str() + css.str() + body.str();
+	return html;
 }
 
 std::string getMimeType(const std::string &path)

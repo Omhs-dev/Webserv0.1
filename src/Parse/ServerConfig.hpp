@@ -31,7 +31,7 @@ struct ServerConfig
 	std::map<int, std::string> _redirect;
 	unsigned long long     _clientMaxBodySize;
 	std::map<int, std::string>  _errorPage;
-	std::vector<RequestType>    _requestAllowed;
+	std::vector<std::string>    _requestAllowed;
 	std::vector<LocationConfig> _locations;
 	bool            _autoindex = false;
 	
@@ -44,7 +44,7 @@ struct ServerConfig
 	std::map<int, std::string> getRedirect() const;
 	unsigned long long getClientMaxBodySize() const;
 	std::map<int, std::string> getErrorPage() const;
-	std::vector<RequestType> getRequestAllowed() const;
+	std::vector<std::string> getRequestAllowed() const;
 	std::vector<LocationConfig> getLocations() const;
 	bool getAutoindex() const;
 };

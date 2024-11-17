@@ -30,8 +30,8 @@ struct LocationConfig
 	std::string locationPath;
 	std::map<int, std::string> errorPage;
 	std::map<std::string, std::string> cgi;
-	std::vector<RequestType> requestAllowed;
-	
+	std::vector<std::string> requestAllowed;
+
 	// Functions
 	std::string getRoot() const;
 	bool getAutoindex() const;
@@ -41,7 +41,7 @@ struct LocationConfig
 	std::string getLocationPath() const;
 	std::map<int, std::string> getErrorPage() const;
 	std::map<std::string, std::string> getCgi() const;
-	std::vector<RequestType> getRequestAllowed() const;
+	std::vector<std::string> getRequestAllowed() const;
 };
 
 #endif

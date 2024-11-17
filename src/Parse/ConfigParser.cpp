@@ -175,8 +175,8 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
                 std::string method;
                 while (iss >> method)
                 {
-                    RequestType type = strToRequestType(trim(method));
-                    serverConfig._requestAllowed.push_back(type);
+                    // RequestType type = strToRequestType(trim(method));
+                    serverConfig._requestAllowed.push_back(method);
                 }
             }
             // else if (key == "return")
@@ -228,8 +228,7 @@ void ConfigParser::parseLocationBlock(std::ifstream &file, LocationConfig &confL
                 std::string method;
                 while (iss >> method)
                 {
-                    RequestType type = strToRequestType(trim(method));
-                    confLocation.requestAllowed.push_back(type);
+                    confLocation.requestAllowed.push_back(method);
                 }
             }
             else if (key == "root")
@@ -366,44 +365,48 @@ std::string ConfigParser::toUpperCase(const std::string& str)
     return upperStr;
 }
 
-RequestType ConfigParser::strToRequestType(const std::string& str)
-{
-    std::string trimmedStr = trim(str);
-    std::string upperStr = toUpperCase(trimmedStr);
+// RequestType ConfigParser::strToRequestType(const std::string& str)
+// {
+//     std::string trimmedStr = trim(str);
+//     std::string upperStr = toUpperCase(trimmedStr);
     
-    if (upperStr == "GET")
-        return GET;
-    if (upperStr == "POST")
-        return POST;
-    if (upperStr == "DELETE")
-        return DELETE;
-    throw std::runtime_error("Unsupported request: " + str);
-}
+//     if (upperStr == "GET")
+//         return GET;
+//     if (upperStr == "POST")
+//         return POST;
+//     if (upperStr == "DELETE")
+//         return DELETE;
+//     throw std::runtime_error("Unsupported request: " + str);
+// }
 
-void ConfigParser::printRequestTypes(const std::vector<RequestType>& requestTypes)
-{
-    for (std::vector<RequestType>::const_iterator it = requestTypes.begin(); it != requestTypes.end(); ++it)
-    {
-        switch (*it) {
-            case GET:
-                std::cout << "GET ";
-                break;
-            case POST:
-                std::cout << "POST ";
-                break;
-            case DELETE:
-                std::cout << "DELETE ";
-                break;
-        }
-    }
-    std::cout << std::endl;
-}
+// void ConfigParser::printRequestTypes(const std::vector<RequestType>& requestTypes)
+// {
+//     for (std::vector<RequestType>::const_iterator it = requestTypes.begin(); it != requestTypes.end(); ++it)
+//     {
+//         switch (*it) {
+//             case GET:
+//                 std::cout << "GET ";
+//                 break;
+//             case POST:
+//                 std::cout << "POST ";
+//                 break;
+//             case DELETE:
+//                 std::cout << "DELETE ";
+//                 break;
+//         }
+//     }
+//     std::cout << std::endl;
+// }
 
 void ConfigParser::printLocationConfig(const LocationConfig& location)
 {
     std::cout << "  Location Path: " << location.locationPath << std::endl;
     std::cout << "  Allowed Methods: ";
-    printRequestTypes(location.requestAllowed);
+    std::vector<std::string> methods = location.requestAllowed;
+    for (auto &meth : methods)
+    {
+        std::cout << "-> " << meth << std::endl;
+    }
     if (!location.root.empty()) {
         std::cout << "  Root: " << location.root << std::endl;
     }

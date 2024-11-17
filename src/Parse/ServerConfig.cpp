@@ -40,7 +40,7 @@ std::map<int, std::string> ServerConfig::getErrorPage() const
 	return _errorPage;
 }
 
-std::vector<RequestType> ServerConfig::getRequestAllowed() const
+std::vector<std::string> ServerConfig::getRequestAllowed() const
 {
 	return _requestAllowed;
 }

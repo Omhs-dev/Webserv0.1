@@ -75,6 +75,8 @@
 		"random": "cpp",
 		"numbers": "cpp",
 		"testheader.hpp": "c",
-		"csignal": "cpp"
+		"csignal": "cpp",
+		"__functional_base_03": "cpp",
+		"filesystem": "cpp"
 	}
 }

@@ -13,7 +13,7 @@
 // check all appropriate status code for every request
 // Upload some file to the server and get it back.
 // Setup a list of methods accepted for a certain route (e.g., try to delete something with and without permission).
-
+// use host header to know wich server i am dealing with
 
 int main(int argc, char *argv[])
 {
@@ -34,10 +34,10 @@ int main(int argc, char *argv[])
 		parser.parseConfigFile(configFile);
 		std::vector<ServerConfig> configs = parser.getConfigs();
 
-		// Logger::NormalCout("Server configuration:");
-		// for (auto &config : configs) {
-		// 	parser.printServerConfig(config);
-		// }
+		Logger::NormalCout("Server configuration:");
+		for (auto &config : configs) {
+			parser.printServerConfig(config);
+		}
 
 		Server server(configs);
 		server.run();

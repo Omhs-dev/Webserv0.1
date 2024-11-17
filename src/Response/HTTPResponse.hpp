@@ -104,7 +104,7 @@ class HTTPResponse
 		void handleGet();
 		void handleDelete();
 		void handlePost();
-		void serveFile(const std::string &path);
+		void serveFile(const std::string &path, const std::string &code, const std::string &mess);
 		void setDefaultResponse(std::string path, LocationConfig config);
 		void setChunkResponse(const std::string &path);
 		void setStandardResponse();

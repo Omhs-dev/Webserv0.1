@@ -16,6 +16,6 @@ std::string iToString(int integer);
 std::string ullToStr(unsigned long long ull);
 std::string getMimeType(const std::string &path);
 std::string getErrorMesssage(const std::string &code);
-std::string errorPage(const std::string &path, const std::string &root);
+std::string errorPage(int code);
 
 #endif

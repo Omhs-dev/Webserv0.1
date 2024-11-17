@@ -35,7 +35,11 @@ void HTTPResponse::generateResponse()
 	else if (reqMethod == "POST")
 		handlePost();
 	else
-		std::cout << "WTF\n";
+	{
+		_errorPage = errorPage(405);
+		// setStatus("405", getErrorMesssage("405"));
+		serveFile(_errorPage, "405", getErrorMesssage("405"));
+	}
 }
 
 // --------- Handling Requests ---------
@@ -74,7 +78,7 @@ void HTTPResponse::handleGet()
 			setChunkResponse(indexFilePath);
 		}
 		else
-			serveFile(indexFilePath);
+			serveFile(indexFilePath, "200", getErrorMesssage("200"));
 	}
 	else if (reqPath == location.getLocationPath() && _state == IS_NORMAL)
 	{
@@ -108,7 +112,7 @@ void HTTPResponse::handleGet()
 		// Logger::Specifique(aliasPath, "Alias Path 🪜");
 		// Logger::Specifique(aliasPathIndex, "aliasPathIndex Path 🪜");
 		if (isFile(aliasPathIndex))
-			serveFile(aliasPathIndex);
+			serveFile(aliasPathIndex, "200", getErrorMesssage("200"));
 		else
 			setBody(listDirectory(aliasPath, location.getRoot()));
 	}
@@ -117,15 +121,15 @@ void HTTPResponse::handleGet()
 		// Logger::NormalCout("no location found");
 		_errorPage = serverErroPage(404);
 		// Logger::Specifique(_errorPage, "error page path");
-		setStatus("404", getErrorMesssage("404"));
-		serveFile(_errorPage);
+		// setStatus("404", getErrorMesssage("404"));
+		serveFile(_errorPage, "404", getErrorMesssage("404"));
 	}
 	else
 	{
 		// Logger::NormalCout("default error page");
-		_errorPage = errorPage(reqPath, _serverRoot);
-		setStatus("404", getErrorMesssage("404"));
-		serveFile(_errorPage);
+		_errorPage = errorPage(404);
+		// setStatus("404", getErrorMesssage("404"));
+		serveFile(_errorPage, "404", getErrorMesssage("404"));
 	}
 }
 
@@ -233,7 +237,7 @@ void HTTPResponse::setDefaultResponse(std::string path, LocationConfig config)
 	// Logger::Itroduction("setDefaultResponse");
 	// Logger::Specifique(config.getRoot() + path + config.getIndex(), "Index file path 📄");
 
-	serveFile(indexPath);
+	serveFile(indexPath, "200", getErrorMesssage("200"));
 }
 
 void HTTPResponse::setStandardResponse()
@@ -264,7 +268,7 @@ void HTTPResponse::setStandardResponse()
 		if (isFile(indexFilePath))
 		{
 			// Logger::Cout("Index file found 📄");
-			serveFile(indexFilePath);
+			serveFile(indexFilePath, "200", getErrorMesssage("200"));
 			return;
 		}
 		// if not check if the directory has an autoindex on or off
@@ -277,18 +281,18 @@ void HTTPResponse::setStandardResponse()
 			std::string directoryListing = listDirectory(reqPath, location.getRoot());
 			if (!directoryListing.empty() && _state != IS_ALIAS)
 			{
-				setStatus("200", "OK");
+				setStatus("200", getErrorMesssage("200"));
 				setBody(directoryListing);
 				return;
 			}
 		}
 	}
-	else
-	{
-		_errorPage = errorPage(reqPath, location.getRoot());
-		setStatus("404", "Not Found");
-		setBody(_errorPage);
-	}
+	// else
+	// {
+	// 	_errorPage = errorPage(reqPath, location.getRoot());
+	// 	setStatus("404", "Not Found");
+	// 	setBody(_errorPage);
+	// }
 }
 
 // --------- Engine of the code ---------
@@ -420,20 +424,20 @@ std::string HTTPResponse::getData() const
 
 // --------- Utils Functions ---------
 
-void HTTPResponse::serveFile(const std::string &path)
+void HTTPResponse::serveFile(const std::string &path, const std::string &code, const std::string &mess)
 {
 	std::ifstream file(path);
 	if (file.is_open())
 	{
 		std::stringstream buffer;
 		buffer << file.rdbuf();
-		setStatus("200", "OK");
+		setStatus(code, mess);
 		setBody(buffer.str());
 		file.close();
 	}
 	else
 	{
-		_errorPage = errorPage(path, "/www/");
+		_errorPage = errorPage(404);
 		setStatus("404", "Not Found");
 		setBody(_errorPage);
 	}

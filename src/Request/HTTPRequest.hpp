@@ -99,6 +99,8 @@ class HTTPRequest
 		int     checkTransferEncoding();
 		int     checkContentLength();
 		int     checkMethod();
+		int checkLocMethodAllowed(const std::string &method, const std::string &path);
+		int isMethodAllowed(const std::string& method, const LocationConfig& location);
 		int     checkCgi();
 		// --- GETTERS ---
 		Client          *getClient() const;

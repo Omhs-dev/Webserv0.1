@@ -92,8 +92,10 @@ void HTTPRequest::parseRequestLine(const std::string &line)
 
 	ss >> _method >> _uriPath >> _version;
 
-	if (!checkMethod())
+
+	if (!checkLocMethodAllowed(_method, _uriPath))
 	{
+		Logger::NormalCout("Method not allowed");
 		errorOccur(405);
 		return;
 	}
@@ -344,11 +346,51 @@ int HTTPRequest::checkMaxBodySize()
 	return 0;
 }
 
-int HTTPRequest::checkMethod()
+// int HTTPRequest::checkMethod()
+// {
+// 	if (_method != "GET" && _method != "POST" && _method != "DELETE")
+// 		return 0;
+// 	return 1;
+// }
+
+int HTTPRequest::checkLocMethodAllowed(const std::string &method, const std::string &path)
 {
-	if (_method != "GET" && _method != "POST" && _method != "DELETE")
-		return 0;
-	return 1;
+	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
+	for (auto &server : configs)
+	{
+		for (LocationConfig &location : server.getLocations())
+		{
+			if (path == location.locationPath)
+			{
+				Logger::Specifique(location.requestAllowed[0], "first method");
+				Logger::Specifique(location.requestAllowed[1], "second method");
+				Logger::NormalCout("Request path == location path");
+				if (isMethodAllowed(method, location))
+				{
+					Logger::NormalCout("method allowed verified");
+					return 1;
+					// break;
+				}
+			}
+		}
+	}
+	Logger::NormalCout("Request method is not found in location methods");
+	return 0;
+}
+
+int HTTPRequest::isMethodAllowed(const std::string& method, const LocationConfig& location)
+{
+    const std::vector<std::string>& allowedMethods = location.requestAllowed;
+    for (auto &meth : allowedMethods)
+    {
+        if (method == meth)
+        {
+            Logger::NormalCout("method found in config location");
+            return 1;
+        }
+    }
+    Logger::NormalCout("method nooot found in config location");
+    return 0;
 }
 
 int HTTPRequest::checkCgi()
@@ -463,5 +505,5 @@ void HTTPRequest::EnumState(HTTPRequest::ParseState state)
 		stateName = "COMPLETE";
 		break;
 	}
-	// Logger::Specifique(stateName, "State");
+	Logger::Specifique(stateName, "State");
 }
