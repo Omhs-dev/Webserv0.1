@@ -56,18 +56,20 @@ std::string intToHexa(ssize_t num) {
 
 #include <string>
 #include <sstream>
-
 std::string errorPage(int code)
 {
-	std::ostringstream html;
-	Logger::NormalCout("in errorPage...");
-	html << "<!DOCTYPE html>\n"
+	std::ostringstream head;
+	std::ostringstream css;
+	std::ostringstream body;
+	std::string html;
+
+	head << "<!DOCTYPE html>\n"
 		<< " <html lang=\"en\">\n"
 		<< " <head>\n"
 		<< " <meta charset=\"UTF-8\">\n"
 		<< " <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
-		<< " <title>404 - Page Not Found</title>\n"
-		<< " <style>\n"
+		<< " <title>404 - Page Not Found</title>\n";
+	css << " <style>\n"
 		<< "    * {\n"
 		<< "      margin: 0;\n"
 		<< "      padding: 0;\n"
@@ -134,109 +136,33 @@ std::string errorPage(int code)
 		<< "      }\n"
 		<< "    }\n"
 		<< " </style>\n"
-		<< " </head>\n"
-		<< " <body>\n"
-		<< " <div class=\"error-container\">\n"
-		<< "   <div class=\"error-code\">" << code << "</div>\n"
-		<< "   <div class=\"error-message\">Page Not Found</div>\n"
-		<< "   <div class=\"error-description\">Sorry this page does not exist or has been moved.</div>\n"
-		<< "   <a href=\"/\" class=\"back-button\">Go Back Home</a>\n"
-		<< " </div>\n"
-		<< "</body>\n"
-		<< "</html>\n";
-
-	return html.str();
-}
-
-std::string errorPage2(int code)
-{
-	std::ostringstream html;
-
-	html << "<!DOCTYPE html>\n"
-		<< " <html lang=\"en\">\n"
-		<< " <head>\n"
-		<< " <meta charset=\"UTF-8\">\n"
-		<< " <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
-		<< " <title>404 - Page Not Found</title>\n"
-		<< " <style>\n"
-		<< "    * {\n"
-		<< "      margin: 0;\n"
-		<< "      padding: 0;\n"
-		<< "      box-sizing: border-box;\n"
-		<< "    }\n"
-		<< "    body {\n"
-		<< "      font-family: 'Roboto', sans-serif;\n"
-		<< "      background-color: #f4f4f9;\n"
-		<< "      color: #333;\n"
-		<< "      display: flex;\n"
-		<< "      justify-content: center;\n"
-		<< "      align-items: center;\n"
-		<< "      height: 100vh;\n"
-		<< "      overflow: hidden;\n"
-		<< "    }\n"
-		<< "    .error-container {\n"
-		<< "      text-align: center;\n"
-		<< "      padding: 40px;\n"
-		<< "      max-width: 600px;\n"
-		<< "      width: 100%;\n"
-		<< "      background-color: #fff;\n"
-		<< "      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);\n"
-		<< "      border-radius: 10px;\n"
-		<< "    }\n"
-		<< "    .error-code {\n"
-		<< "      font-size: 8rem;\n"
-		<< "      font-weight: 700;\n"
-		<< "      color: #4c49ea;\n"
-		<< "    }\n"
-		<< "    .error-message {\n"
-		<< "      font-size: 2rem;\n"
-		<< "      margin: 20px 0;\n"
-		<< "      color: #333;\n"
-		<< "    }\n"
-		<< "    .error-description {\n"
-		<< "      color: #666;\n"
-		<< "      font-size: 1rem;\n"
-		<< "      margin-bottom: 30px;\n"
-		<< "    }\n"
-		<< "    .back-button {\n"
-		<< "      display: inline-block;\n"
-		<< "      padding: 12px 24px;\n"
-		<< "      font-size: 1rem;\n"
-		<< "      font-weight: bold;\n"
-		<< "      color: #fff;\n"
-		<< "      background-color: #4c49ea;\n"
-		<< "      border-radius: 8px;\n"
-		<< "      text-decoration: none;\n"
-		<< "      transition: background-color 0.3s ease;\n"
-		<< "    }\n"
-		<< "    .back-button:hover {\n"
-		<< "      background-color: #3ecd5e;\n"
-		<< "    }\n"
-		<< "    .error-code {\n"
-		<< "      position: relative;\n"
-		<< "      animation: float 2s infinite ease-in-out;\n"
-		<< "    }\n"
-		<< "    @keyframes float {\n"
-		<< "      0%, 100% {\n"
-		<< "        transform: translateY(0);\n"
-		<< "      }\n"
-		<< "      50% {\n"
-		<< "        transform: translateY(-10px);\n"
-		<< "      }\n"
-		<< "    }\n"
-		<< " </style>\n"
-		<< " </head>\n"
-		<< " <body>\n"
-		<< " <div class=\"error-container\">\n"
-		<< "   <div class=\"error-code\">" << code << "</div>\n"
-		<< "   <div class=\"error-message\">Method Not Allowed</div>\n"
-		<< "   <div class=\"error-description\">Please use an Allowed Method.</div>\n"
-		<< "   <a href=\"/\" class=\"back-button\">Go Back Home</a>\n"
-		<< " </div>\n"
-		<< "</body>\n"
-		<< "</html>\n";
-
-	return html.str();
+		<< " </head>\n";
+	
+	if (code == 405)
+	{
+		body << " <body>\n"
+			<< " <div class=\"error-container\">\n"
+			<< "   <div class=\"error-code\">" << code << "</div>\n"
+			<< "   <div class=\"error-message\">Method Not Allowed</div>\n"
+			<< "   <div class=\"error-description\">Please use an allowed Methode</div>\n"
+			<< " </div>\n"
+			<< "</body>\n"
+			<< "</html>\n";
+	}
+	else
+	{
+		body << " <body>\n"
+			<< " <div class=\"error-container\">\n"
+			<< "   <div class=\"error-code\">" << code << "</div>\n"
+			<< "   <div class=\"error-message\">Page Not Found</div>\n"
+			<< "   <div class=\"error-description\">Sorry this page does not exist or has been moved.</div>\n"
+			<< "   <a href=\"/\" class=\"back-button\">Go Back Home</a>\n"
+			<< " </div>\n"
+			<< "</body>\n"
+			<< "</html>\n";
+	}
+	html = head.str() + css.str() + body.str();
+	return html;
 }
 
 std::string getMimeType(const std::string &path)

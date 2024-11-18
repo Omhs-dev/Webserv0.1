@@ -3,6 +3,10 @@
 #include "Logger/Logger.hpp"
 #include <iostream>
 
+// why checking the good server
+	// to set dynamically the server
+	// retrieve the error pages
+	// now wich server i am dealing with
 // find solution for the pollin fd and server
 // check the rest of things to do
 // continue hunting bugs

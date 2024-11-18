@@ -5,7 +5,7 @@ HTTPResponse::HTTPResponse(Client *client)
 {
 	_client = client;
 	_request = client->getRequest();
-	_server = nullptr;
+	// _server = nullptr;
 	_state = INIT;
 	_statusCode = "200";
 	_statusMessage = "OK";
@@ -37,7 +37,7 @@ void HTTPResponse::generateResponse()
 	else
 	{
 		Logger::SpecifiqueForInt(_client->getRequest()->getStateCode(), "request code");
-		_errorPage = errorPage2(_client->getRequest()->getStateCode());
+		_errorPage = errorPage(_client->getRequest()->getStateCode());
 		serveFile(_errorPage, "405", getErrorMesssage("405"));
 	}
 }
@@ -297,6 +297,20 @@ void HTTPResponse::setStandardResponse()
 
 // --------- Engine of the code ---------
 
+// ServerConfig HTTPResponse::checkServer()
+// {
+// 	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
+// 	for (auto &server : configs)
+// 	{
+// 		if (server._errorPage.begin()->first > 0 && server._errorPage.begin()->second != "")
+// 		{
+// 			Logger::NormalCout("server has an error page");
+// 			return server;
+// 			break;
+// 		}
+// 	}
+// }
+
 LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {
 	// Logger::NormalCout("-------------- checkLocationPath --------------");
@@ -438,8 +452,8 @@ void HTTPResponse::serveFile(const std::string &path, const std::string &code, c
 	else
 	{
 		Logger::NormalCout("serving file failed !");
-		// _errorPage = errorPage(404);
-		setStatus("404", "Not Found");
+		_errorPage = errorPage(std::stoi(code));
+		setStatus(code, mess);
 		setBody(_errorPage);
 	}
 }

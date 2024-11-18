@@ -90,7 +90,7 @@ class HTTPResponse
 		Client *_client;
 		// Server *_server;
 		HTTPRequest	*_request;
-		ServerConfig *_server;
+		// ServerConfig _server;
 	
 		ResponseState _state;
 		std::string _statusCode;
@@ -125,6 +125,7 @@ class HTTPResponse
 		void cleanPath(std::string &path);
 		std::string listDirectory(const std::string &path, const std::string& root);
 		LocationConfig checkLocationPath(const std::string& path);
+		ServerConfig checkServer();
 		std::string serverErroPage(int code);
 		
 		std::string getErrorPagePath(int code, ServerConfig server);
