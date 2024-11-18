@@ -1,5 +1,4 @@
-#include "../include/HTTPRequest.hpp"
-#include "../include/cgiHandler.hpp"
+#include "cgiHandler.hpp"
 
 static std::unique_ptr<cgiResponse> parseOutput(std::string output)
 {
@@ -25,25 +24,27 @@ static std::unique_ptr<cgiResponse> parseOutput(std::string output)
     response->status = status;
     return response;
 }
-std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &httpRequest)
+
+std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &Request)
 {
     std::unique_ptr<cgiResponse> response;
-    std::string path = httpRequest.getPath();
+    std::string path = Request.getPath();
     std::string scriptPath = "www" + path;
-
+    std::cout << "<<<<IN CGI HANDLER>>>>\n";
+    std::cout << scriptPath << std::endl;
     // Create environment variables
     std::vector<std::string> envVars;
-    envVars.push_back("REQUEST_METHOD=" + httpRequest.getMethod());
+    envVars.push_back("REQUEST_METHOD=" + Request.getMethod());
     envVars.push_back("SCRIPT_NAME=" + path);
-    if (!httpRequest.getQuery().empty())
-        envVars.push_back("QUERY_STRING=" + httpRequest.getQuery());
+    if (!Request.getQuery().empty())
+        envVars.push_back("QUERY_STRING=" + Request.getQuery());
 
     // Handle POST-specific environment variables
     std::string postBody;
-    if (httpRequest.getMethod() == "POST") {
-        postBody = httpRequest.getBody();
+    if (Request.getMethod() == "POST") {
+        postBody = Request.getBody();
         envVars.push_back("CONTENT_LENGTH=" + std::to_string(postBody.length()));
-        std::string content_type = httpRequest.getContentType();
+        std::string content_type = Request.getHeaders()["Content-Type"];
         std::cout << "<------>\n" << content_type << "\n<------->" << std::endl;
         std::string::size_type semicolon_pos = content_type.find(";");
         if (semicolon_pos != std::string::npos)
@@ -83,7 +84,7 @@ std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &httpRequest)
         dup2(pipefd_out[1], STDOUT_FILENO);  // Redirect stdout to the pipe
         close(pipefd_out[1]);
 
-        if (httpRequest.getMethod() == "POST") {
+        if (Request.getMethod() == "POST") {
             // Redirect stdin to the input pipe
             close(pipefd_in[1]);  // Close the writing end of the input pipe in the child
             dup2(pipefd_in[0], STDIN_FILENO);  // Redirect stdin to the input pipe
@@ -98,7 +99,7 @@ std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &httpRequest)
     else if (pid > 0)
     {
         // Parent process: send POST data to CGI script via pipe (if applicable)
-        if (httpRequest.getMethod() == "POST") {
+        if (Request.getMethod() == "POST") {
             close(pipefd_in[0]);  // Close reading end of the input pipe in the parent
             write(pipefd_in[1], postBody.c_str(), postBody.size());  // Send the POST data to CGI
             close(pipefd_in[1]);  // Close writing end after sending the data
@@ -126,7 +127,8 @@ std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &httpRequest)
         } else {
             std::cerr << "Error: CGI script did not exit properly" << std::endl;
         }
-        return response;
+        send(Request.getClient()->getClientSocket(), cgiOutput.c_str(), cgiOutput.size(), 0);
+        return nullptr;
     }
     return nullptr;
 }

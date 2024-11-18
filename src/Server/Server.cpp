@@ -72,20 +72,13 @@ void Server::run()
 				// Check if it's a new connection on the server socket
 				if (_serverSockets.size() > 0 && (pollfds[i].fd == _serverSockets[0] || pollfds[i].fd == _serverSockets[1]))
 				{
-					for (auto &conf :_configs)
-					{
-						std::cout << "In run before handling new connection: " << conf.getRoot() << std::endl;
-					}
 					std::cout << "Handling new connection" << std::endl;
 					// Logger::NormalCout("New connection on server socket");
 					handleNewConnection(_serverSockets[i]);
 				}
 				else
 				{
-					for (auto &conf :_configs)
-					{
-						std::cout << "In run before handling client: " << conf.getRoot() << std::endl;
-					}
+					std::cout << "Handling client request: fd: " <<pollfds[i].fd << std::endl;
 					// Otherwise, it's a client connection
 					handleClient(pollfds[i].fd);
 				}

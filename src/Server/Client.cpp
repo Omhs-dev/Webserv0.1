@@ -60,11 +60,11 @@ void Client::sendResponse(const std::string &response)
 	std::cout << sent;
 }
 
-// //Getters
-// std::vector<ServerConfig> Client::getConfigs() const
-// {
-// 	return _configs;
-// }
+//Getters
+int Client::getClientSocket() const
+{
+	return _clientSocket;
+}
 
 Client::~Client()
 {

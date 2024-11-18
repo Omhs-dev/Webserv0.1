@@ -14,6 +14,7 @@
 
 #include "../Request/HTTPRequest.hpp"
 #include "../Response/HTTPResponse.hpp"
+#include "../CGI/cgiHandler.hpp"
 #include "../Server/Client.hpp"
 #include "../Parse/LocationConfig.hpp"
 #include "../Parse/ServerConfig.hpp"

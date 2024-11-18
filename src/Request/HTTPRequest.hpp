@@ -66,6 +66,8 @@ class HTTPRequest
 		std::string     _headerValue;
 		bool            _isChunked;
 		std::string     _contentLength;
+		
+		
 		unsigned long long _iscontentLength;
 		int             _chunkSize;
 		time_t          _timeout;
@@ -99,7 +101,7 @@ class HTTPRequest
 		int     checkTransferEncoding();
 		int     checkContentLength();
 		int     checkMethod();
-		int     checkCgi();
+		int     isCGI();
 		// --- GETTERS ---
 		Client          *getClient() const;
 		LocationConfig  *getLocation() const;
