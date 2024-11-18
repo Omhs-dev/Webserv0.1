@@ -37,7 +37,7 @@ class Client
 		
 		Server *getServer() const { return _server; }
 		HTTPRequest *getRequest() const { return _request; }
-
+		int			getClientSocket() const;
 		std::vector<ServerConfig> getConfigs() const;
 		
 		class ClientException : public std::exception

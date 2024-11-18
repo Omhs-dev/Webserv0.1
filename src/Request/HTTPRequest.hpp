@@ -66,6 +66,8 @@ class HTTPRequest
 		std::string     _headerValue;
 		bool            _isChunked;
 		std::string     _contentLength;
+		
+		
 		unsigned long long _iscontentLength;
 		int             _chunkSize;
 		time_t          _timeout;
@@ -101,7 +103,8 @@ class HTTPRequest
 		int     checkMethod();
 		int checkLocMethodAllowed(const std::string &method, const std::string &path);
 		int isMethodAllowed(const std::string& method, const LocationConfig& location);
-		int     checkCgi();
+		int     isCGI();
+
 		// --- GETTERS ---
 		Client          *getClient() const;
 		LocationConfig  *getLocation() const;

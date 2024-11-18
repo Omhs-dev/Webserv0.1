@@ -28,7 +28,9 @@ void HTTPResponse::generateResponse()
 	std::cout << "In generateResponse()..\n";
 	std::string reqMethod = _request->getMethod();
 
-	if (reqMethod == "GET")
+	if (_request->isCGI())
+		handleCGIRequest(*_request);
+	else if (reqMethod == "GET")
 		handleGet();
 	else if (reqMethod == "DELETE")
 		handleDelete();
@@ -46,8 +48,8 @@ void HTTPResponse::generateResponse()
 
 void HTTPResponse::handleGet()
 {
+	std::cout << "Getting root\n";
 	std::string reqPath = _request->getPath();
-	std::cout << "Got root\n";
 	
 	// Logger::SpecifiqueForInt(_client->getServer()->getConfigs().size(), "size of server in handleGet");
 	LocationConfig location = checkLocationPath(reqPath);
@@ -116,7 +118,7 @@ void HTTPResponse::handleGet()
 		else
 			setBody(listDirectory(aliasPath, location.getRoot()));
 	}
-	else if (IS_NO_LOCATION)
+	else if (_state == IS_NO_LOCATION)
 	{
 		Logger::NormalCout("no location found");
 		_errorPage = serverErroPage(404);

@@ -4,7 +4,7 @@ TESTNAME = runTests
 
 # Compiler settings
 CXX = c++
-CXXFLAGS = -std=c++11 -Wall -Wextra -Werror -fsanitize=address -fsanitize=undefined -g
+CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -fsanitize=address -fsanitize=undefined -g 
 
 # Directories
 SRC_DIR = src
@@ -22,7 +22,8 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/Parse/ConfigParser.cpp \
        $(SRC_DIR)/Parse/LocationConfig.cpp \
        $(SRC_DIR)/Parse/ServerConfig.cpp \
-       $(SRC_DIR)/Logger/Logger.cpp
+       $(SRC_DIR)/Logger/Logger.cpp \
+       $(SRC_DIR)/CGI/cgiHandler.cpp \
 
 # Object files (excluding the main application file for tests)
 OBJS = $(filter-out $(SRC_DIR)/main.o, $(SRCS:.cpp=.o))
