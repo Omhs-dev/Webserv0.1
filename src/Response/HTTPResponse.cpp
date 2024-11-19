@@ -50,6 +50,11 @@ void HTTPResponse::handleGet()
 {
 	std::cout << "Getting root\n";
 	std::string reqPath = _request->getPath();
+
+	ServerConfig currentServer = checkServer();
+	Logger::Specifique(currentServer._listen, "server port in handleGet");
+	Logger::Specifique(currentServer._serverName, "server name");
+	Logger::Specifique(currentServer._locations[4].locationPath, "server name");
 	
 	// Logger::SpecifiqueForInt(_client->getServer()->getConfigs().size(), "size of server in handleGet");
 	LocationConfig location = checkLocationPath(reqPath);
@@ -299,19 +304,54 @@ void HTTPResponse::setStandardResponse()
 
 // --------- Engine of the code ---------
 
-// ServerConfig HTTPResponse::checkServer()
-// {
-// 	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
-// 	for (auto &server : configs)
-// 	{
-// 		if (server._errorPage.begin()->first > 0 && server._errorPage.begin()->second != "")
-// 		{
-// 			Logger::NormalCout("server has an error page");
-// 			return server;
-// 			break;
-// 		}
-// 	}
-// }
+ServerConfig HTTPResponse::checkServer()
+{
+    std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
+    auto headers = _client->getRequest()->getHeaders();
+
+    // Ensure the "Host" header exists
+    auto it = headers.find("Host");
+    if (it == headers.end())
+    {
+        Logger::ErrorCout("Host header not found in the request!");
+        return ServerConfig(); // Return default or indicate error
+    }
+
+    std::string hostHeader = it->second; // e.g., "localhost:8089"
+    Logger::Specifique(hostHeader, "Host header value");
+
+    // Split hostHeader into hostname and port
+    std::string hostname;
+    std::string port;
+    std::istringstream hostStream(hostHeader);
+    if (std::getline(hostStream, hostname, ':') && std::getline(hostStream, port))
+    {
+        Logger::Specifique(port, "Extracted port from Host header");
+    }
+    else
+    {
+        Logger::ErrorCout("Invalid Host header format!");
+        return ServerConfig(); // Return default or indicate error
+    }
+
+    for (const auto &server : configs)
+    {
+        Logger::Specifique(server._listen, "server listening on");
+		// if (port.find("one"))
+		// 	Logger::NormalCout("white space found");
+		// if (server._listen.find("\n"))
+		// 	Logger::NormalCout("white space found");
+        if (server._listen.find(port))
+        {
+            Logger::NormalCout("Matching server found!");
+			Logger::Specifique(server._listen, "server port here");
+            return server; // Return the first matching server
+        }
+    }
+
+    Logger::NormalCout("Server not found!");
+    return ServerConfig(); // Return default or empty config if no match is found
+}
 
 LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {

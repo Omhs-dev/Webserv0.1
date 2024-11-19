@@ -22,6 +22,8 @@ void Client::handleRequest()
 {
 	std::cout << "Handling request..\n";
 	char buffer[MAX_BUFFER_SIZE + 1];
+	Logger::NormalCout("in handleRequest");
+	Logger::SpecifiqueForInt(_clientSocket, "client socket");
 	int bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
 	if (bytesRead > 0)
 	{
