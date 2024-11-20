@@ -71,6 +71,6 @@ int Client::getClientSocket() const
 Client::~Client()
 {
 	delete _request;
-	// delete _response;
+	delete _response;
 	close(_clientSocket);
 }

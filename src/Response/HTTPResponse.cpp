@@ -51,10 +51,10 @@ void HTTPResponse::handleGet()
 	std::cout << "Getting root\n";
 	std::string reqPath = _request->getPath();
 
-	ServerConfig currentServer = checkServer();
+	ServerConfig currentServer = determineServer();
 	Logger::Specifique(currentServer._listen, "server port in handleGet");
 	Logger::Specifique(currentServer._serverName, "server name");
-	Logger::Specifique(currentServer._locations[4].locationPath, "server name");
+	// Logger::Specifique(currentServer._locations[4].locationPath, "server name");
 	
 	// Logger::SpecifiqueForInt(_client->getServer()->getConfigs().size(), "size of server in handleGet");
 	LocationConfig location = checkLocationPath(reqPath);
@@ -304,54 +304,46 @@ void HTTPResponse::setStandardResponse()
 
 // --------- Engine of the code ---------
 
-ServerConfig HTTPResponse::checkServer()
+ServerConfig HTTPResponse::determineServer()
 {
     std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
     auto headers = _client->getRequest()->getHeaders();
+	// std::vector<ServerConfig>::iterator iter = configs.begin();
 
-    // Ensure the "Host" header exists
     auto it = headers.find("Host");
     if (it == headers.end())
     {
-        Logger::ErrorCout("Host header not found in the request!");
-        return ServerConfig(); // Return default or indicate error
+        Logger::ErrorCout("Host header not found!");
+        return ServerConfig(); // Return the default server
     }
 
-    std::string hostHeader = it->second; // e.g., "localhost:8089"
-    Logger::Specifique(hostHeader, "Host header value");
-
-    // Split hostHeader into hostname and port
-    std::string hostname;
-    std::string port;
-    std::istringstream hostStream(hostHeader);
-    if (std::getline(hostStream, hostname, ':') && std::getline(hostStream, port))
+    std::string hostHeader = it->second; // e.g., localhost:8089
+    std::string hostname, port;
+    std::istringstream stream(hostHeader);
+    if (std::getline(stream, hostname, ':') && std::getline(stream, port))
     {
-        Logger::Specifique(port, "Extracted port from Host header");
-    }
-    else
-    {
-        Logger::ErrorCout("Invalid Host header format!");
-        return ServerConfig(); // Return default or indicate error
+        Logger::Specifique(hostname, "Extracted hostname");
+        Logger::Specifique(port, "Extracted port");
     }
 
-    for (const auto &server : configs)
+	Logger::SpecifiqueForInt(configs.size(), "server size in determineServer");
+	for (std::vector<ServerConfig>::reverse_iterator iter = configs.rbegin(); iter != configs.rend(); ++iter)
     {
-        Logger::Specifique(server._listen, "server listening on");
-		// if (port.find("one"))
-		// 	Logger::NormalCout("white space found");
-		// if (server._listen.find("\n"))
-		// 	Logger::NormalCout("white space found");
-        if (server._listen.find(port))
-        {
-            Logger::NormalCout("Matching server found!");
-			Logger::Specifique(server._listen, "server port here");
-            return server; // Return the first matching server
-        }
+		if (std::stoi(port) == std::stoi(iter->_listen))
+		{
+			Logger::NormalCout("server found !");
+
+			std::cout << "Extracted port :" << std::stoi(port) << std::endl;
+			std::cout << "server port :" << std::stoi(iter->_listen) << std::endl;
+
+			return *iter;
+		}
     }
 
-    Logger::NormalCout("Server not found!");
-    return ServerConfig(); // Return default or empty config if no match is found
+    Logger::NormalCout("Server not found! Returning default.");
+    return ServerConfig(); // Return default server for unmatched cases
 }
+
 
 LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 {

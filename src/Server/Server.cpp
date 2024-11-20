@@ -48,45 +48,47 @@ Server::Server(const std::vector<ServerConfig> &config) : _configs(config)
 
 void Server::run()
 {
-	std::signal(SIGINT, signalHandler);
+    std::signal(SIGINT, signalHandler);
 
-	while (serverRunning)
-	{
-		// Use poll() to handle multiple connections
-		int activity = poll(pollfds.data(), pollfds.size(), -1);
-		if (activity < 0)
-		{
-			// Logger::ErrorCout("Error in poll");
-			break;
-		}
+    while (serverRunning)
+    {
+        int activity = poll(pollfds.data(), pollfds.size(), -1);
+        if (activity < 0)
+        {
+            Logger::ErrorCout("Error in poll");
+            break;
+        }
 
-		for (size_t i = 0; i < pollfds.size(); ++i)
-		{
-			std::cout << "Server sockets: " << _serverSockets.size() << "; pollfds: " << pollfds.size() << "i = " << i << std::endl;
-			if (pollfds[i].revents & POLLIN)
-			{
-				    // if (i >= _serverSockets.size()) {
-            		// 	std::cerr << "Error: pollfd index out of bounds!" << std::endl;
-            		// 	continue;
-        			// }
-				// Check if it's a new connection on the server socket
-				if (_serverSockets.size() > 0 && (pollfds[i].fd == _serverSockets[0] || pollfds[i].fd == _serverSockets[1]))
-				{
-					std::cout << "Handling new connection" << std::endl;
-					// Logger::NormalCout("New connection on server socket");
-					handleNewConnection(_serverSockets[i]);
-				}
-				else
-				{
-					std::cout << "Handling client request: fd: " <<pollfds[i].fd << std::endl;
-					// Otherwise, it's a client connection
-					handleClient(pollfds[i].fd);
-				}
-			}
-		}
-	}
-	// Logger::NormalCout("Server stopped ! I am out of the loop");
+        for (size_t i = 0; i < pollfds.size(); ++i)
+        {
+            if (pollfds[i].revents & (POLLERR | POLLHUP | POLLNVAL))
+            {
+                Logger::SpecifiqueForInt(pollfds[i].fd, "Closing invalid or disconnected socket");
+                close(pollfds[i].fd);
+                pollfds.erase(pollfds.begin() + i);
+                --i; // Adjust index after removal
+                continue;
+            }
+
+            if (pollfds[i].revents & POLLIN)
+            {
+                if (std::find(_serverSockets.begin(), _serverSockets.end(), pollfds[i].fd) != _serverSockets.end())
+                {
+                    Logger::NormalCout("Handling new connection");
+                    handleNewConnection(pollfds[i].fd);
+                }
+                else
+                {
+                    Logger::SpecifiqueForInt(pollfds[i].fd, "Handling client request");
+                    handleClient(pollfds[i].fd);
+                }
+            }
+        }
+    }
+
+    Logger::NormalCout("Server stopped!");
 }
+
 
 // Handle a new connection on the server socket
 void Server::handleNewConnection(int server_fd)

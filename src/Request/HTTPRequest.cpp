@@ -25,7 +25,7 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 	Logger::Itroduction("parseRequest ↗️");
 	// Logger::VerticalSeparator();
 	_rawRequest = requestData;
-	std::cout << "RAW DATA\n" << _rawRequest << std::endl;
+	// std::cout << "RAW DATA\n" << _rawRequest << std::endl;
 	// Logger::Specifique(_rawRequest, "This is the raw request");
 	std::istringstream stream(_rawRequest);
 	std::string line;
@@ -50,10 +50,10 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 		if (line.find("Priority:") != std::string::npos)
 			break ;
 	}
-	for (auto &header : _headers)
-	{
-		std::cout << "Key: " << header.first << ", Value: " << header.second << std::endl;
-	}
+	// for (auto &header : _headers)
+	// {
+	// 	std::cout << "Key: " << header.first << ", Value: " << header.second << std::endl;
+	// }
 	if (!checkHostHeader())
 	{
 		// Logger::NormalCout("Host header missing in HTTP/1.1 request");
@@ -117,10 +117,10 @@ void HTTPRequest::parseRequestLine(const std::string &line)
 		_query = _uriPath.substr(pos + 1);
 		_uriPath = _uriPath.substr(0, pos);
 	}
-	// Logger::NormalCout("Parsed Request Line : ");
-	// Logger::Specifique(_method, "Method");
-	// Logger::Specifique(_uriPath, "Path");
-	// Logger::Specifique(_version, "Version");
+	Logger::NormalCout("Parsed Request Line : ");
+	Logger::Specifique(_method, "Method");
+	Logger::Specifique(_uriPath, "Path");
+	Logger::Specifique(_version, "Version");
 }
 
 void HTTPRequest::parseHeaderLine(const std::string &line)
@@ -128,7 +128,7 @@ void HTTPRequest::parseHeaderLine(const std::string &line)
 	// Logger::Itroduction("parseHeaderLine 📰");
 	// Logger::VerticalSeparator();
 	// _state = IS_HEADERS;
-	EnumState(_state);
+	// EnumState(_state);
 	size_t colonPos = line.find(':');
 	if (colonPos != std::string::npos)
 	{
@@ -146,7 +146,7 @@ void HTTPRequest::parseHeaderLine(const std::string &line)
 	// 	errorOccur(400);
 	// }
 	// _state = IS_HEADERS_END;
-	EnumState(_state);
+	// EnumState(_state);
 }
 
 // void HTTPRequest::parseBody(std::istringstream stream)
