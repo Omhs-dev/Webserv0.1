@@ -369,9 +369,9 @@ int HTTPRequest::checkLocMethodAllowed(const std::string &method, const std::str
 		{
 			if (path == location.locationPath)
 			{
-				Logger::Specifique(location.requestAllowed[0], "first method");
-				Logger::Specifique(location.requestAllowed[1], "second method");
-				Logger::NormalCout("Request path == location path");
+				// Logger::Specifique(location.requestAllowed[0], "first method");
+				// Logger::Specifique(location.requestAllowed[1], "second method");
+				// Logger::NormalCout("Request path == location path");
 				if (isMethodAllowed(method, location))
 				{
 					Logger::NormalCout("method allowed verified");
