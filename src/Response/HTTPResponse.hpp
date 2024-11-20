@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <fstream>
 #include <unistd.h>
 # include <fcntl.h>
@@ -126,7 +127,7 @@ class HTTPResponse
 		void cleanPath(std::string &path);
 		std::string listDirectory(const std::string &path, const std::string& root);
 		LocationConfig checkLocationPath(const std::string& path);
-		ServerConfig checkServer();
+		ServerConfig determineServer();
 		std::string serverErroPage(int code);
 		
 		std::string getErrorPagePath(int code, ServerConfig server);
