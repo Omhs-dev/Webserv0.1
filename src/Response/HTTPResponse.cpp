@@ -540,8 +540,22 @@ std::string HTTPResponse::listDirectory(const std::string &path, const std::stri
 		return "";
 	}
 	std::stringstream html;
-	html << "<html><head><title>Directory Listing</title></head><body>";
-	html << "<h1>Directory Listing for " << path << "</h1><ul>";
+	html << "<html>";
+	html << "<head>";
+	html << "<title>Directory Listing</title>";
+	html << "<style>";
+	html << "body { font-family: Arial, sans-serif; margin: 20px; }";
+	html << "h1 { color: #333; }";
+	html << "ul { list-style-type: none; padding: 0; }";
+	html << "li { margin: 5px 0;}";
+	html << "a:hover { text-decoration: underline; }";
+	html << "div { margin-bottom: 10px; }";
+	html << "</style>";
+	html << "</head>";
+	html << "<body>";
+	html << "<h1>Directory Listing for " << path << "</h1>";
+	html << "<div><a href='../'>" << "../" << "</a></div>";
+	html << "<ul>";
 
 	struct dirent *entry;
 	while ((entry = readdir(dir)) != NULL)
@@ -565,7 +579,9 @@ std::string HTTPResponse::listDirectory(const std::string &path, const std::stri
 		}
 	}
 	closedir(dir);
-	html << "</ul></body></html>";
+	html << "</ul>";
+	html << "</body>";
+	html << "</html>";
 	return html.str();
 }
 
