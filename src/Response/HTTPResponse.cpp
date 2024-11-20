@@ -53,8 +53,6 @@ void HTTPResponse::handleGet()
 
 	ServerConfig currentServer = determineServer();
 	Logger::Specifique(currentServer._listen, "server port in handleGet");
-	Logger::Specifique(currentServer._serverName, "server name");
-	Logger::Specifique(currentServer._locations[4].locationPath, "server name");
 	
 	Logger::SpecifiqueForInt(_client->getServer()->getConfigs().size(), "size of server in handleGet");
 	LocationConfig location = checkLocationPath(reqPath);
@@ -67,7 +65,7 @@ void HTTPResponse::handleGet()
 	Logger::Itroduction("handleGet");
 	Logger::Specifique(reqPath, "Request Path 🪜 ");
 	Logger::Specifique(location.getLocationPath(), "Location Path 🪜 ");
-	Logger::Specifique(root, "Request Root 🛤️ ");
+	Logger::Specifique(root, "Server Root 🛤️ ");
 	Logger::Specifique(indexFilePath, "Request Root + path + index 🪜 ");
 	std::cout << "In handleGet()..\n";
 	if (reqPath == "/")
@@ -331,8 +329,9 @@ ServerConfig HTTPResponse::determineServer()
     {
 		if (std::stoi(port) == std::stoi(iter->_listen))
 		{
-			// Logger::NormalCout("server found !");
-
+			_serverRoot = iter->_root;
+			Logger::NormalCout("server found !");
+			
 			std::cout << "Extracted port :" << std::stoi(port) << std::endl;
 			std::cout << "server port :" << std::stoi(iter->_listen) << std::endl;
 
