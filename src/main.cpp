@@ -3,29 +3,20 @@
 #include "Logger/Logger.hpp"
 #include <iostream>
 
-// why checking the good server
-	// to set dynamically the server
-	// retrieve the error pages
-	// now wich server i am dealing with
-// find solution for the pollin fd and server
 // check the rest of things to do
 // continue hunting bugs
 // check chunk response again 
 // get a way to return to the home page once on directory listenning
-// check if i can connect to the same port with different tabs
-// compare allow_methods of the config and the incoming requests
 // check all appropriate status code for every request
 // Upload some file to the server and get it back.
 // Setup a list of methods accepted for a certain route (e.g., try to delete something with and without permission).
-// use host header to know wich server i am dealing with
 
 int main(int argc, char *argv[])
 {
 	std::string configFile = "config/test.conf";
+
 	if (argc == 2)
-	{
 		configFile = argv[1];
-	}
 	else if (argc > 2)
 	{
 		std::cerr << "Usage: " << argv[0] << " [configuration_file]" << std::endl;
