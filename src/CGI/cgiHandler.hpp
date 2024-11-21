@@ -9,16 +9,19 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include <fstream>
 
 class HTTPRequest;
 
 struct cgiResponse
 {
-    std::string headers;
-    std::string body;
+    std::string response_data;
     int         status_code;
     std::string status;
+
+    //Constructor
+    cgiResponse() :response_data(""), status_code(200), status("OK") {}
 };
 
-std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &httpRequest);
+void handleCGIRequest(const HTTPRequest &httpRequest);
 #endif // CGI_HANDLER_HPP

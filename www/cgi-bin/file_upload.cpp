@@ -3,8 +3,6 @@
 #include <string>
 #include <filesystem>
 
-namespace fs = std::filesystem;
-
 int main() {
     std::ofstream       logs("log.txt");
     std::ostringstream  resp_body_stream;
@@ -54,13 +52,13 @@ int main() {
     {
         logs <<  "Creating new file: " << filename << std::endl;
         // Save the file to the server
-        std::ofstream ofs("www/uploads/" + fs::path(filename).filename().string(), std::ios::binary);
+        std::ofstream ofs("www/uploads/" + std::filesystem::path(filename).filename().string(), std::ios::binary);
         if (!ofs)
         {
             status_code = 500;
             status_string = "Internal Server Error";
             logs <<  "Error: Could not save the file to";
-            logs << "../uploads/" + fs::path(filename).filename().string() << std::endl;
+            logs << "../uploads/" + std::filesystem::path(filename).filename().string() << std::endl;
         }
         else
         {
@@ -80,6 +78,7 @@ int main() {
         if (success_page.is_open())
         {
             resp_body_stream << success_page.rdbuf();
+            success_page.close();
         }
         else
         {

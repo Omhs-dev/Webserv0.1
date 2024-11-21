@@ -1,51 +1,120 @@
 #include "cgiHandler.hpp"
 
-static std::unique_ptr<cgiResponse> parseOutput(std::string output)
+static cgiResponse build_response(int code, std::string output)
 {
-    std::unique_ptr<cgiResponse> response = std::make_unique<cgiResponse>();
-    if (output.empty()) {
-        std::cerr << "Error: Empty CGI output" << std::endl;
-        return nullptr;
-    }
-    std::size_t l_headers = output.find("\r\n\r\n") + 4;
-    if (l_headers == std::string::npos)
-    {
-        std::cerr << "Error: Failed to find header-body separator in CGI output" << std::endl;
-        return nullptr;
-    }
-    std::size_t l_body = output.length() - l_headers;
-    response->headers = output.substr(0, l_headers);
-    response->body = output.substr(l_headers, l_body);
+    cgiResponse         response;
+    std::ostringstream  body_stream;
+    std::ostringstream  headers_stream;
+    std::string         error_message;
 
-    std::istringstream status_line(response->headers);
-    std::string  protocol, code, status;
-    status_line >> protocol >> code >> status;
-    response->status_code = atoi(code.c_str());
-    response->status = status;
+    if (code == 200)
+    {
+        response.response_data = output;
+        response.status_code = 200;
+        response.status = "OK";
+        return response;
+    }
+    else if (code == 400)
+    {
+        std::ifstream error_page("www/pages/400.html");
+        if (error_page.is_open())
+        {
+            body_stream << error_page.rdbuf();
+            error_page.close();
+        }
+        else
+            body_stream << "<html><body><h1>400</h1><p>Bad request</p></body></html>";
+        error_message = "Bad request";
+    }
+    else if (code == 405)
+    {
+        std::ifstream error_page("www/pages/405.html");
+        if (error_page.is_open())
+        {
+            body_stream << error_page.rdbuf();
+            error_page.close();
+        }
+        else
+            body_stream << "<html><body><h1>405</h1><p>Method not allowed</p></body></html>";
+        error_message = "Method not allowed";
+    }
+    else if (code == 500)
+    {
+        std::ifstream error_page("www/pages/500.html");
+        if (error_page.is_open())
+        {
+            body_stream << error_page.rdbuf();
+            error_page.close();
+        }
+        else
+            body_stream << "<html><body><h1>500</h1><p>Internal server error</p></body></html>";
+        error_message = "Internal server error";
+    }
+
+    headers_stream  << "HTTP/1.1 " << code << " " << error_message << "\r\n"
+                    << "Content-Length: " << body_stream.str().size() << "\r\n"
+                    << "Content-Type: text/html\r\n"
+                    << "Connection: close\r\n\r\n";
+
+    response.response_data = headers_stream.str() + body_stream.str();
+    response.status_code = code;
+    response.status = error_message;
+
     return response;
 }
 
-std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &Request)
+static void sendCgiResponse(const cgiResponse &response, int socket)
 {
-    std::unique_ptr<cgiResponse> response;
+    std::string  resp_str = response.response_data;
+    send(socket, resp_str.c_str(), resp_str.size(), 0);
+}
+
+void handleCGIRequest(const HTTPRequest &Request)
+{
+    cgiResponse response;
+    int socket = Request.getClient()->getClientSocket();
+
+    //************1************/
+    //get the path to CGI script
     std::string path = Request.getPath();
+    if (path.empty())
+    {
+        std::cerr << "Error: empty request path (handlecgiRequest())\n";
+        sendCgiResponse(build_response(500, ""), socket);
+        return ;
+    }
     std::string scriptPath = "www" + path;
-    std::cout << "<<<<IN CGI HANDLER>>>>\n";
-    std::cout << scriptPath << std::endl;
-    // Create environment variables
+    std::cout << "CgiLog: request path: " << scriptPath << std::endl;
+    //************1*************/
+
+    //******************2*********************/
+    //Create env variables for script process
     std::vector<std::string> envVars;
+    if (Request.getMethod() != "GET" && Request.getMethod() != "POST")
+    {
+        std::cerr << "Error: method not allowed (handlecgiRequest())\n";
+        sendCgiResponse(build_response(405, ""), socket);
+        return ;
+    }
     envVars.push_back("REQUEST_METHOD=" + Request.getMethod());
-    envVars.push_back("SCRIPT_NAME=" + path);
+ 
     if (!Request.getQuery().empty())
         envVars.push_back("QUERY_STRING=" + Request.getQuery());
-
-    // Handle POST-specific environment variables
-    std::string postBody;
-    if (Request.getMethod() == "POST") {
-        postBody = Request.getBody();
+    
+    std::string postBody = Request.getBody();
+    if (Request.getMethod() == "POST")
+    {
+        if (postBody.empty())
+        {
+            std::cerr << "Error: empty POST body (handlecgiRequest())\n";
+            sendCgiResponse(build_response(400, ""), socket);
+            return ;
+        }
+        std::cout <<  "CgiLog: body: " << postBody;
         envVars.push_back("CONTENT_LENGTH=" + std::to_string(postBody.length()));
         std::string content_type = Request.getHeaders()["Content-Type"];
-        std::cout << "<------>\n" << content_type << "\n<------->" << std::endl;
+        std::cout << "CgiLog: content-type: " << content_type << std::endl;
+
         std::string::size_type semicolon_pos = content_type.find(";");
         if (semicolon_pos != std::string::npos)
         {
@@ -61,20 +130,24 @@ std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &Request)
         else
             envVars.push_back("CONTENT_TYPE=" + content_type);
     }
+    //*********************2******************/
 
+    //*********************3******************/
     // Prepare environment variables for execve (as char* array)
     std::vector<char*> envp;
     for (auto &var : envVars) {
         envp.push_back(const_cast<char*>(var.c_str()));
     }
     envp.push_back(nullptr);
+    //*********************3******************/
 
+    //*********************4******************/
     int pipefd_out[2];  // Pipe for reading CGI output
     int pipefd_in[2];   // Pipe for sending POST data to CGI stdin (if necessary)
 
-    if (pipe(pipefd_out) == -1 || pipe(pipefd_in) == -1) {
+    if (pipe(pipefd_out) == -1 || pipe(pipefd_in) == -1)
+    {
         std::cerr << "Error: Failed to create pipe" << std::endl;
-        return nullptr;
     }
     pid_t pid = fork();
     if (pid == 0)
@@ -116,19 +189,18 @@ std::unique_ptr<cgiResponse> handleCGIRequest(const HTTPRequest &Request)
             cgiOutput.append(buffer, bytesRead);
 
         close(pipefd_out[0]);
-        response = parseOutput(cgiOutput);
 
         int status;
         waitpid(pid, &status, 0);
 
-        if (WIFEXITED(status)) {
+        if (WIFEXITED(status))
+        {
             int exitCode = WEXITSTATUS(status);
             std::cout << "CGI script exited with code: " << exitCode << std::endl;
         } else {
             std::cerr << "Error: CGI script did not exit properly" << std::endl;
         }
-        send(Request.getClient()->getClientSocket(), cgiOutput.c_str(), cgiOutput.size(), 0);
-        return nullptr;
+        //parseOutput(cgiOutput, response);
+        sendCgiResponse( build_response(200, cgiOutput), socket);
     }
-    return nullptr;
 }
