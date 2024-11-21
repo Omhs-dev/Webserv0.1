@@ -179,16 +179,6 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
                     serverConfig._requestAllowed.push_back(method);
                 }
             }
-            // else if (key == "return")
-            // {
-            //     size_t pos = value.find(" ");
-			// 	if (pos != std::string::npos)
-			// 	{
-			// 		int code = std::stoi(value.substr(0, pos));
-			// 		std::string path = value.substr(pos + 1);
-			// 		serverConfig._redirect[code] = path;
-			// 	}
-            // }
             else
             {
                 throw std::runtime_error("Unknown directive in server block: " + key);
@@ -364,39 +354,6 @@ std::string ConfigParser::toUpperCase(const std::string& str)
     std::transform(upperStr.begin(), upperStr.end(), upperStr.begin(), ::toupper);
     return upperStr;
 }
-
-// RequestType ConfigParser::strToRequestType(const std::string& str)
-// {
-//     std::string trimmedStr = trim(str);
-//     std::string upperStr = toUpperCase(trimmedStr);
-    
-//     if (upperStr == "GET")
-//         return GET;
-//     if (upperStr == "POST")
-//         return POST;
-//     if (upperStr == "DELETE")
-//         return DELETE;
-//     throw std::runtime_error("Unsupported request: " + str);
-// }
-
-// void ConfigParser::printRequestTypes(const std::vector<RequestType>& requestTypes)
-// {
-//     for (std::vector<RequestType>::const_iterator it = requestTypes.begin(); it != requestTypes.end(); ++it)
-//     {
-//         switch (*it) {
-//             case GET:
-//                 std::cout << "GET ";
-//                 break;
-//             case POST:
-//                 std::cout << "POST ";
-//                 break;
-//             case DELETE:
-//                 std::cout << "DELETE ";
-//                 break;
-//         }
-//     }
-//     std::cout << std::endl;
-// }
 
 void ConfigParser::printLocationConfig(const LocationConfig& location)
 {

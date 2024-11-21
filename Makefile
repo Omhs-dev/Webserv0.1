@@ -1,10 +1,10 @@
 # Executable names
 NAME = webserv
-TESTNAME = runTests
 
 # Compiler settings
 CXX = c++
 CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -fsanitize=address -fsanitize=undefined -g 
+INCLUDES = -I $(INCLUDE_DIR)
 
 # Directories
 SRC_DIR = src
@@ -39,38 +39,30 @@ TESTSRCS = $(TEST_DIR)/test.cpp \
 # Test object files
 TESTOBJS = $(TESTSRCS:.cpp=.o)
 
-# Include paths
-INCLUDES = -I $(INCLUDE_DIR)
+# Colors for messages
+RESET = \033[0m
+GREEN = \033[32m
+BLUE = \033[34m
+YELLOW = \033[33m
 
 # Build the main executable
 all: $(NAME)
 
 $(NAME): $(OBJS) $(SRC_DIR)/main.o
-	$(CXX) $(CXXFLAGS) $(OBJS) $(SRC_DIR)/main.o -o $(NAME)
+	@$(CXX) $(CXXFLAGS) $(OBJS) $(SRC_DIR)/main.o -o $(NAME)
+	@echo "$(GREEN)Build successful: $(NAME)$(RESET)"
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	@echo "$(BLUE)[Compiling] $<...$(RESET)"
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 # Clean object files and executables
 clean:
-	rm -rf $(OBJS) $(TESTOBJS) $(SRC_DIR)/*.o $(TEST_DIR)/*.o
+	@echo "$(YELLOW)Cleaning object files...$(RESET)"
+	@rm -rf $(OBJS) $(TESTOBJS) $(SRC_DIR)/*.o $(TEST_DIR)/*.o
 
 fclean: clean
-	rm -rf $(NAME) $(TESTNAME)
+	@echo "$(YELLOW)Removing executables...$(RESET)"
+	@rm -rf $(NAME) $(TESTNAME)
 
 re: fclean all
-
-# Test target
-test: $(TESTNAME)
-
-$(TESTNAME): $(TESTOBJS) $(OBJS)
-	$(CXX) $(CXXFLAGS) $(TESTOBJS) $(OBJS) -o $(TESTNAME)
-
-# Clean test files only
-testclean:
-	rm -rf $(TESTOBJS)
-
-testfclean: testclean
-	rm -rf $(TESTNAME)
-
-testre: testfclean test

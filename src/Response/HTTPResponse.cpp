@@ -211,14 +211,14 @@ void HTTPResponse::setChunkResponse(const std::string &path)
     if (bytesRead == -1)
     {
         std::cerr << "Error reading from file: " << path << std::endl;
-        setStatus("500", "Internal Server Error");
+        setStatus("500", getErrorMesssage("500"));
         setBody("<html><body><h1>500 Internal Server Error</h1></body></html>");
     }
     else
     {
         responseBody << "0\r\n\r\n";
         setBody(responseBody.str());
-        setStatus("200", "OK");
+        setStatus("200", getErrorMesssage("200"));
     }
 
     close(_fileFd);
@@ -284,8 +284,7 @@ void HTTPResponse::setStandardResponse()
 		else
 		{
 			_errorPage = serverErroPage(404);
-			setStatus("404", getErrorMesssage("404"));
-			serveFile(_errorPage, "405", getErrorMesssage("405"));
+			serveFile(_errorPage, "404", getErrorMesssage("404"));
 		}
 	}
 }
