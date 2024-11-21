@@ -12,14 +12,14 @@ void buildResponse(int code, std::string message)
 
     if (code == 200)
     {
-        std::ifstream success_page("www/pages/upload_success.html");
+        std::ifstream success_page("www/pages/post_success.html");
         if (success_page.is_open())
         {
             resp_body_stream << success_page.rdbuf();
             success_page.close();
         }
         else
-            resp_body_stream << "<html><body><h1>505</h1><p>Internal server error</p></body></html>";
+            resp_body_stream << "<html><body><h1>200</h1><p>Success</p></body></html>";
     }
     else if (code == 405)
     {

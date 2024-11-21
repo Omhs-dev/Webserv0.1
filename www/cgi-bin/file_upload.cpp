@@ -3,17 +3,85 @@
 #include <string>
 #include <filesystem>
 
+void buildResponse(int code, std::string message)
+{
+    std::ostringstream  resp_body_stream;
+    std::ostringstream  headers_stream;
+
+    if (code == 200)
+    {
+        std::ifstream success_page("www/pages/upload_success.html");
+        if (success_page.is_open())
+        {
+            resp_body_stream << success_page.rdbuf();
+            success_page.close();
+        }
+        else
+            resp_body_stream << "<html><body><h1>200</h1><p>Success</p></body></html>";
+    }
+    else if (code == 405)
+    {
+        std::ifstream error_page("www/pages/405.html");
+        if (error_page.is_open())
+        {
+            resp_body_stream << error_page.rdbuf();
+            error_page.close();
+        }
+        else
+            resp_body_stream << "<html><body><h1>405</h1><p>Method not allowed</p></body></html>";
+    }
+    else if (code == 415)
+    {
+        std::ifstream error_page("www/pages/415.html");
+        if (error_page.is_open())
+        {
+            resp_body_stream << error_page.rdbuf();
+            error_page.close();
+        }
+        else
+            resp_body_stream << "<html><body><h1>405</h1><p>File extension not allowed</p></body></html>";
+    }
+    else if (code == 500)
+    {
+        std::ifstream error_page("www/pages/500.html");
+        if (error_page.is_open())
+        {
+            resp_body_stream << error_page.rdbuf();
+            error_page.close();
+        }
+        else
+            resp_body_stream << "<html><body><h1>505</h1><p>Internal server error</p></body></html>";
+    }
+    
+
+    headers_stream  << "HTTP/1.1 " << std::to_string(code) << " " << message << "\r\n"
+                    << "Content-Length: " << resp_body_stream.str().size() << "\r\n"
+                    << "Content-Type: text/html\r\n"
+                    << "Connection: close\r\n\r\n";
+
+    std::cout << headers_stream.str() << resp_body_stream.str();
+}
+
 int main() {
     std::ofstream       logs("log.txt");
     std::ostringstream  resp_body_stream;
     std::ostringstream  headers_stream;
-    int                 status_code = 200;
-    std::string         status_string = "OK";
+    int                 code = 200;
+    std::string         message = "OK";
+
     logs << "Executing script\n";
     // Read content length
-    std::string content_length_str = getenv("CONTENT_LENGTH") ? getenv("CONTENT_LENGTH") : "0";
+    char* contentLengthStr = std::getenv("CONTENT_LENGTH");
+    if (contentLengthStr == nullptr) {
+        logs << "Error: CONTENT_LENGTH environment variable not set" << std::endl;
+        code = 405;
+        message = "Method not allowed";
+        logs.close();
+        buildResponse(code, message);
+        exit(1);
+    }
     std::string boundary_str = getenv("BOUNDARY");
-    int content_length = std::stoi(content_length_str);
+    int content_length = std::stoi(contentLengthStr);
 
     // Read POST data from stdin
     std::string post_data;
@@ -35,9 +103,12 @@ int main() {
             // Check if the filename ends with .txt
             if (filename.substr(filename.find_last_of(".") + 1) != "txt")
             {
-                status_code = 415;
-                status_string = "Unsupported Media Type";
+                code = 415;
+                message = "Unsupported Media Type";
                 logs << "Error: Unsupported file format: " << filename << std::endl;
+                buildResponse(code, message);
+                logs.close();
+                exit(1);
             }
             else
             {
@@ -48,17 +119,20 @@ int main() {
             }
         }
     }
-    if (status_code == 200)
+    if (code == 200)
     {
         logs <<  "Creating new file: " << filename << std::endl;
         // Save the file to the server
         std::ofstream ofs("www/uploads/" + std::filesystem::path(filename).filename().string(), std::ios::binary);
         if (!ofs)
         {
-            status_code = 500;
-            status_string = "Internal Server Error";
+            code = 500;
+            message = "Internal Server Error";
             logs <<  "Error: Could not save the file to";
             logs << "../uploads/" + std::filesystem::path(filename).filename().string() << std::endl;
+            logs.close();
+            buildResponse(code, message);
+            exit (1);
         }
         else
         {
@@ -71,35 +145,7 @@ int main() {
         }
     }
 
-    
-    if (status_code == 200)
-    {
-        std::ifstream success_page("www/pages/upload_success.html");
-        if (success_page.is_open())
-        {
-            resp_body_stream << success_page.rdbuf();
-            success_page.close();
-        }
-        else
-        {
-            logs << "Failed to open upload_success.html\n";
-            resp_body_stream << "<html><body><h1>505</h1><p>Internal server error</p></body></html>";
-        }
-    }
-    else if (status_code == 415)
-        resp_body_stream << "<html><body><h1>Wrong file format: " << filename << "<br>Please upload a file in .txt format</br></h1></body></html>";
-    else if (status_code == 500)
-        resp_body_stream << "<html><body><h1>Error: Could not save the file</h1></body></html>";
-
-    //Response headers
-    headers_stream  << "HTTP/1.1 " << std::to_string(status_code) << " " << status_string << "\r\n"
-                    << "Content-Length: " << resp_body_stream.str().size() << "\r\n"
-                    << "Content-Type: text/html\r\n"
-                    << "Connection: close\r\n\r\n";
-    logs << "<<--- Response --->>";
-    logs << headers_stream.str();
-    logs << resp_body_stream.str();
-    std::cout << headers_stream.str() << resp_body_stream.str();
+    buildResponse(200, "OK");
     logs.close();
     return 0;
 }
