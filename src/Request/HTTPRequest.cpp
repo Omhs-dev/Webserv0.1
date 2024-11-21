@@ -73,6 +73,7 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 		// Logger::NormalCout("POST method detected");
 		std::string bodyData((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
 		_body = bodyData;
+		Logger::Specifique(_body, "this is the body: ");
 		// if (_headers.find("Content-Type") != _headers.end() && _headers["Content-Type"].find("multipart/form-data") != std::string::npos)
 		// {
 		// 	std::cout << "Found correct content type\n";

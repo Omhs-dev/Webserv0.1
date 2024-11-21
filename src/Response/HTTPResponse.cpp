@@ -7,8 +7,8 @@ HTTPResponse::HTTPResponse(Client *client)
 	_request = client->getRequest();
 	// _server = nullptr;
 	_state = INIT;
-	_statusCode = "200";
-	_statusMessage = "OK";
+	_statusCode = "";
+	_statusMessage = "";
 	_headers = {};
 	_body = "";
 	_errorPage = "";
@@ -39,7 +39,7 @@ void HTTPResponse::generateResponse()
 	else
 	{
 		// Logger::SpecifiqueForInt(_client->getRequest()->getStateCode(), "request code");
-		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
+		_errorPage = errorPage(_client->getRequest()->getStateCode());
 		serveFile(_errorPage, "405", getErrorMesssage("405"));
 	}
 }
@@ -121,9 +121,19 @@ void HTTPResponse::handleGet()
 		else
 			setBody(listDirectory(aliasPath, location.getRoot()));
 	}
+	else if (_state == IS_NO_LOCATION)
+	{
+		// Logger::NormalCout("no location found");
+		_errorPage = serverErroPage(404);
+		// Logger::Specifique(_errorPage, "error page path");
+		// setStatus("404", getErrorMesssage("404"));
+		serveFile(_errorPage, "404", getErrorMesssage("404"));
+	}
 	else
 	{
-		_errorPage = serverErroPage(404);
+		// Logger::NormalCout("default error page");
+		_errorPage = errorPage(404);
+		// setStatus("404", getErrorMesssage("404"));
 		serveFile(_errorPage, "404", getErrorMesssage("404"));
 	}
 }
@@ -281,13 +291,13 @@ void HTTPResponse::setStandardResponse()
 				return;
 			}
 		}
-		else
-		{
-			_errorPage = serverErroPage(404);
-			setStatus("404", getErrorMesssage("404"));
-			serveFile(_errorPage, "405", getErrorMesssage("405"));
-		}
 	}
+	// else
+	// {
+	// 	_errorPage = errorPage(reqPath, location.getRoot());
+	// 	setStatus("404", "Not Found");
+	// 	setBody(_errorPage);
+	// }
 }
 
 // --------- Engine of the code ---------
@@ -385,6 +395,7 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 	}
 	// std::cout << "server location index: " << server.getIndex() << std::endl;
 	Logger::NormalCout("|\nNext server 🚀");
+	_state = IS_NO_LOCATION;
 	return LocationConfig();
 }
 
@@ -593,13 +604,13 @@ std::string HTTPResponse::serverErroPage(int code)
 	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
 	for (ServerConfig &server : configs)
 	{
-		std::string errPage = getErrorPagePath(code, server);
-		if (!errPage.empty())
+		std::string errorPage = getErrorPagePath(code, server);
+		if (!errorPage.empty())
 		{
 			// Logger::Specifique(errorPage, "error page path in serverErrorPages");
-			return errPage;
+			return errorPage;
 		}
 		// Logger::NormalCout("path empty");
 	}
-	return errorPage(code);
+	return "";
 }
