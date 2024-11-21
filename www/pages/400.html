@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>404 - Page Not Found</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Roboto', sans-serif;
+			background-color: #f4f4f9;
+			color: #333;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			overflow: hidden;
+		}
+
+		.error-container {
+			text-align: center;
+			padding: 40px;
+			max-width: 600px;
+			width: 100%;
+			background-color: #fff;
+			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+			border-radius: 10px;
+		}
+
+		.error-code {
+			font-size: 8rem;
+			font-weight: 700;
+			color: #4c49ea;
+		}
+
+		.error-message {
+			font-size: 2rem;
+			margin: 20px 0;
+			color: #333;
+		}
+
+		.error-description {
+			color: #666;
+			font-size: 1rem;
+			margin-bottom: 30px;
+		}
+
+		.back-button {
+			display: inline-block;
+			padding: 12px 24px;
+			font-size: 1rem;
+			font-weight: bold;
+			color: #fff;
+			background-color: #4c49ea;
+			border-radius: 8px;
+			text-decoration: none;
+			transition: background-color 0.3s ease;
+		}
+
+		.back-button:hover {
+			background-color: #3ecd5e;
+		}
+
+		.error-code {
+			position: relative;
+			animation: float 2s infinite ease-in-out;
+		}
+
+		@keyframes float {
+
+			0%,
+			100% {
+				transform: translateY(0);
+			}
+
+			50% {
+				transform: translateY(-10px);
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="error-container">
+		<div class="error-code">400</div>
+		<div class="error-message">Ooops.. Bad request</div>
+		<div class="error-description">Most probably it's your fault though</div>
+		<a href="/" class="back-button">Go Back Home</a>
+	</div>
+</body>
+
+</html>
