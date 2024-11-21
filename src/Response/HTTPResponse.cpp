@@ -39,7 +39,7 @@ void HTTPResponse::generateResponse()
 	else
 	{
 		// Logger::SpecifiqueForInt(_client->getRequest()->getStateCode(), "request code");
-		_errorPage = errorPage(_client->getRequest()->getStateCode());
+		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
 		serveFile(_errorPage, "405", getErrorMesssage("405"));
 	}
 }
@@ -121,19 +121,9 @@ void HTTPResponse::handleGet()
 		else
 			setBody(listDirectory(aliasPath, location.getRoot()));
 	}
-	else if (_state == IS_NO_LOCATION)
-	{
-		// Logger::NormalCout("no location found");
-		_errorPage = serverErroPage(404);
-		// Logger::Specifique(_errorPage, "error page path");
-		// setStatus("404", getErrorMesssage("404"));
-		serveFile(_errorPage, "404", getErrorMesssage("404"));
-	}
 	else
 	{
-		// Logger::NormalCout("default error page");
-		_errorPage = errorPage(404);
-		// setStatus("404", getErrorMesssage("404"));
+		_errorPage = serverErroPage(404);
 		serveFile(_errorPage, "404", getErrorMesssage("404"));
 	}
 }
@@ -291,13 +281,13 @@ void HTTPResponse::setStandardResponse()
 				return;
 			}
 		}
+		else
+		{
+			_errorPage = serverErroPage(404);
+			setStatus("404", getErrorMesssage("404"));
+			serveFile(_errorPage, "405", getErrorMesssage("405"));
+		}
 	}
-	// else
-	// {
-	// 	_errorPage = errorPage(reqPath, location.getRoot());
-	// 	setStatus("404", "Not Found");
-	// 	setBody(_errorPage);
-	// }
 }
 
 // --------- Engine of the code ---------
@@ -395,7 +385,6 @@ LocationConfig HTTPResponse::checkLocationPath(const std::string &path)
 	}
 	// std::cout << "server location index: " << server.getIndex() << std::endl;
 	Logger::NormalCout("|\nNext server 🚀");
-	_state = IS_NO_LOCATION;
 	return LocationConfig();
 }
 
@@ -604,13 +593,13 @@ std::string HTTPResponse::serverErroPage(int code)
 	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
 	for (ServerConfig &server : configs)
 	{
-		std::string errorPage = getErrorPagePath(code, server);
-		if (!errorPage.empty())
+		std::string errPage = getErrorPagePath(code, server);
+		if (!errPage.empty())
 		{
 			// Logger::Specifique(errorPage, "error page path in serverErrorPages");
-			return errorPage;
+			return errPage;
 		}
 		// Logger::NormalCout("path empty");
 	}
-	return "";
+	return errorPage(code);
 }
