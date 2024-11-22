@@ -81,6 +81,7 @@ class HTTPRequest
 		
 		// --- Parse Body ---
 		void        parseBody(std::istringstream stream);
+		std::string parseBody(const std::string &body, const std::string &boundary);
 		void        parseNormalBody(const std::string &line);
 		void        parseChunkedBody(const std::string &line);
 		

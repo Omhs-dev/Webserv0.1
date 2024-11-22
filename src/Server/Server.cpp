@@ -52,7 +52,7 @@ void Server::run()
 
     while (serverRunning)
     {
-        int activity = poll(pollfds.data(), pollfds.size(), -1);
+        int activity = poll(pollfds.data(), pollfds.size(), 500);
         if (activity < 0)
         {
             Logger::ErrorCout("Error in poll");
@@ -61,14 +61,14 @@ void Server::run()
 
         for (size_t i = 0; i < pollfds.size(); ++i)
         {
-            if (pollfds[i].revents & (POLLERR | POLLHUP | POLLNVAL))
-            {
-                Logger::SpecifiqueForInt(pollfds[i].fd, "Closing invalid or disconnected socket");
-                close(pollfds[i].fd);
-                pollfds.erase(pollfds.begin() + i);
-                --i; // Adjust index after removal
-                continue;
-            }
+            // if (pollfds[i].revents & (POLLERR | POLLHUP | POLLNVAL))
+            // {
+            //     Logger::SpecifiqueForInt(pollfds[i].fd, "Closing invalid or disconnected socket");
+            //     close(pollfds[i].fd);
+            //     pollfds.erase(pollfds.begin() + i);
+            //     --i; // Adjust index after removal
+            //     continue;
+            // }
 
             if (pollfds[i].revents & POLLIN)
             {
@@ -120,7 +120,8 @@ void Server::handleClient(int client_fd)
 	std::cout << "Handling client.." << std::endl;
 	Client client(client_fd, (this));		  // Create a client object to handle the connection
 	client.clientConnectionProcess(); // Process the client's request
-	closeClient(client_fd);			  // Close the client connection
+	// close(client_fd);			  // Close the client connection
+	Logger::NormalCout("Client fd closed");
 }
 
 // After handling the client, remove it from the pollfd set

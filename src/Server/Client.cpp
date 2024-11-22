@@ -24,11 +24,14 @@ void Client::handleRequest()
 	char buffer[MAX_BUFFER_SIZE + 1];
 	Logger::NormalCout("in handleRequest");
 	Logger::SpecifiqueForInt(_clientSocket, "client socket");
-	int bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
+	Logger::NormalCout("Receiving request from the client");
+	ssize_t bytesRead = recv(_clientSocket, buffer, MAX_BUFFER_SIZE, 0);
+	Logger::SpecifiqueForInt(bytesRead, "Received from the client");
 	if (bytesRead > 0)
 	{
 		buffer[bytesRead] = '\0'; // Null-terminate the buffer
 		_request->parseRequest(std::string(buffer, bytesRead));
+		Logger::Specifique(_request->getBody(), "HandleRequest -> request body");
 
 		// For debugging: print the parsed request method, path, and version
 		std::cout << "Method: " << _request->getMethod() << std::endl;
@@ -37,6 +40,7 @@ void Client::handleRequest()
 	}
 	else if (bytesRead == 0)
 	{
+		Logger::NormalCout("bytes is zero, message received...");
 		throw ClientException();
 	}
 	else 

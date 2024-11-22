@@ -149,7 +149,7 @@ int main()
                 phone = request_body.substr(pos_phone, pos_end - pos_phone);
             }
 
-            std::ofstream file(name);
+            std::ofstream file("www/userdb/" + name);
             if (!file)
             {
                 logs << "Error: Could not create the user file: " << name << std::endl;
@@ -164,7 +164,7 @@ int main()
                 file << "surname: " << surname << std::endl;
                 file << "email: " << email << std::endl;
                 file << "phone: " << phone << std::endl;
-                file << std::string::npos;
+                // file << std::string::npos;
                 file.flush();
                 file.close();
             }

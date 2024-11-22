@@ -9,7 +9,7 @@
 #include "../Response/HTTPResponse.hpp"
 #include "Server.hpp"
 
-#define MAX_BUFFER_SIZE 1024
+#define MAX_BUFFER_SIZE 8192
 
 class HTTPRequest;
 class HTTPResponse;

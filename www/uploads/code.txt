@@ -1,0 +1,12 @@
+ohamadou@2-A-1 cgi-bin % ls
+create_user.cgi create_user.cpp file_upload.cgi file_upload.cpp
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp -o file_upload.cgi 
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp -o file_upload.cgi
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp -o file_upload.cgi
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp -o file_upload.cgi
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp -o file_upload.cgi
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp -o file_upload.cgi
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp -o file_upload.cgi
+ohamadou@2-A-1 cgi-bin % c++ -std=c++17 -Wall -Wextra -Werror file_upload.cpp -o file_upload.cgi
+ohamadou@2-A-1 cgi-bin % 

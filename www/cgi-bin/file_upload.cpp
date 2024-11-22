@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <filesystem>
+#include <sstream>
 
 void buildResponse(int code, std::string message)
 {
@@ -136,7 +137,7 @@ int main() {
         }
         else
         {
-            ofs.write(file_content.data(), file_content.size());
+            ofs.write(file_content.data(), file_content.size() - 44);
             ofs.close();
             logs << "<<<--- START OF FILE CONTENT --->>>\n";
             logs << file_content;
