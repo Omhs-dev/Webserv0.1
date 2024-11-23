@@ -137,7 +137,7 @@ int main() {
         }
         else
         {
-            ofs.write(file_content.data(), file_content.size() - 44);
+            ofs.write(file_content.data(), file_content.size() - 46);
             ofs.close();
             logs << "<<<--- START OF FILE CONTENT --->>>\n";
             logs << file_content;

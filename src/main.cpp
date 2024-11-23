@@ -3,10 +3,13 @@
 #include "Logger/Logger.hpp"
 #include <iostream>
 
+// download existing files locally
+// locat cgi in server locations
+// fix hanging connection
+// fix leaks
 // check the rest of things to do
 // continue hunting bugs
 // check chunk response again 
-// get a way to return to the home page once on directory listenning
 // check all appropriate status code for every request
 // Upload some file to the server and get it back.
 // Setup a list of methods accepted for a certain route (e.g., try to delete something with and without permission).

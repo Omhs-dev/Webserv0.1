@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Download Page</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			background-color: #f0f8ff;
+			font-family: Arial, sans-serif;
+			color: #333;
+		}
+
+		.container {
+			width: 90%;
+			max-width: 600px;
+			background-color: #fff;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			box-shadow: 0 4px 8px rgba(26, 28, 35, 0.1);
+			padding: 20px;
+		}
+
+		h1 {
+			text-align: center;
+			font-size: 2rem;
+			color: #0c150c;
+			margin-bottom: 20px;
+		}
+
+		.file-list {
+			list-style: none;
+		}
+
+		.file-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 0;
+			border-bottom: 1px solid #ddd;
+		}
+
+		.file-item:last-child {
+			border-bottom: none;
+		}
+
+		.file-item a {
+			text-decoration: none;
+			color: #357abf;
+			font-size: 1rem;
+		}
+
+		.file-item a:hover {
+			text-decoration: underline;
+		}
+
+		.file-icon {
+			width: 20px;
+			height: 20px;
+			margin-right: 10px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Directory Files</h1>
+		<ul id="fileList" class="file-list"></ul>
+	</div>
+
+	<script>
+		// Fetch file list from the server
+		async function loadFiles() {
+			const fileList = document.getElementById('fileList');
+			try {
+				// Replace '/api/files' with your endpoint to fetch directory files
+				const response = await fetch('/www/downloads/');
+				if (!response.ok) {
+					throw new Error('Failed to fetch file list');
+				}
+
+				const files = await response.json(); // Expecting a JSON array of file names
+				fileList.innerHTML = ''; // Clear existing content
+
+				// Populate the file list
+				files.forEach(file => {
+					const li = document.createElement('li');
+					li.className = 'file-item';
+
+					li.innerHTML = `
+						<a href="/files/${encodeURIComponent(file)}" download>
+						<img src="./assets/download.png" alt="File Icon" class="file-icon">
+							${file}
+						</a>
+					`;
+
+					fileList.appendChild(li);
+				});
+			} catch (error) {
+				console.error('Error loading files:', error);
+				fileList.innerHTML = '<li>Failed to load files.</li>';
+			}
+		}
+
+		// Load files when the page is ready
+		loadFiles();
+	</script>
+</body>
+
+</html>

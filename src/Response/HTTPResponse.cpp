@@ -573,7 +573,10 @@ std::string HTTPResponse::listDirectory(const std::string &path, const std::stri
 			}
 			else
 			{
-				html << "<li><a href=\"" << path + name << "\">" << name << "</a></li>";
+				if (path.find("uploads") != std::string::npos)
+					html << "<li><a href=\"" << path + name << "\" download>" << name << "</a></li>";
+				else
+					html << "<li><a href=\"" << path + name << "\">" << name << "</a></li>";
 			}
 		}
 	}
