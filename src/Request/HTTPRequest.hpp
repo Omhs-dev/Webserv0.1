@@ -3,13 +3,13 @@
 
 #include <string>
 #include <map>
+#include <sstream>
+#include <iostream>
 
 #include "../Server/Client.hpp"
 #include "../Parse/LocationConfig.hpp"
 #include "../Parse/ServerConfig.hpp"
 #include "../Logger/Logger.hpp"
-
-#define REQUEST_DEFAULT_STATE_CODE 200
 
 // class Logger;
 class Client;
@@ -77,16 +77,11 @@ class HTTPRequest
 		void        parseRequestLine(const std::string &line);
 		
 		// --- Parse Headers ---
-		void        parseHeaderLine(const std::string &line);
+		void        parseHeaders(const std::string &line);
 		
 		// --- Parse Body ---
-		void        parseBody(std::istringstream stream);
-		std::string parseBody(const std::string &body, const std::string &boundary);
 		void        parseNormalBody(const std::string &line);
 		void        parseChunkedBody(const std::string &line);
-		
-		// --- UTILS ---
-		unsigned long long             _maxBody;
 		
 		// --- ENUM ---
         ParseState _state;
@@ -102,6 +97,7 @@ class HTTPRequest
 		int     checkTransferEncoding();
 		int     checkContentLength();
 		int     checkMethod();
+		int		checkFormUrlEncoded();
 		int checkLocMethodAllowed(const std::string &method, const std::string &path);
 		int isMethodAllowed(const std::string& method, const LocationConfig& location);
 		int     isCGI();
@@ -117,8 +113,6 @@ class HTTPRequest
 		// --- Headers ---
 		
 		std::map<std::string, std::string> getHeaders() const;
-		std::string     getHeaderKey() const;
-		std::string     getHeaderValue() const;
 		std::string     getBody() const;
 		std::string     getQuery() const;
 		std::string     getRawRequest() const;
@@ -134,10 +128,7 @@ class HTTPRequest
 		std::string getLineSanitizer(std::stringstream &ss);
 		void EnumState(HTTPRequest::ParseState state);
 		void errorOccur(int code);
-		void parseMultipartBody(const std::string& bodyData);
-		void saveFile(const std::string& filename, const std::string& content);
-		std::string getBoundary();
-		void setMaxbodySize(unsigned long long size);
+		unsigned long long getMaxbodySize();
 };
 
 #endif

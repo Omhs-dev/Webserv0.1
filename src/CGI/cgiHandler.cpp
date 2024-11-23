@@ -38,6 +38,18 @@ static cgiResponse build_response(int code, std::string output)
             body_stream << "<html><body><h1>405</h1><p>Method not allowed</p></body></html>";
         error_message = "Method not allowed";
     }
+	else if (code == 413)
+    {
+        std::ifstream error_page("www/pages/413.html");
+        if (error_page.is_open())
+        {
+            body_stream << error_page.rdbuf();
+            error_page.close();
+        }
+        else
+            body_stream << "<html><body><h1>405</h1><p>Request Entity Too Large</p></body></html>";
+        error_message = "Request Entity Too Large";
+    }
     else if (code == 500)
     {
         std::ifstream error_page("www/pages/500.html");
@@ -74,6 +86,14 @@ void handleCGIRequest(const HTTPRequest &Request)
     cgiResponse response;
     int socket = Request.getClient()->getClientSocket();
 
+	int reqStateCode = Request.getStateCode();
+	std::cout << "request state code : " << reqStateCode << std::endl;
+	if (reqStateCode == 413)
+	{
+		std::cerr << "Error: empty request path (handlecgiRequest())\n";
+        sendCgiResponse(build_response(413, ""), socket);
+        return ;
+	}
     //************1************/
     //get the path to CGI script
     std::string path = Request.getPath();

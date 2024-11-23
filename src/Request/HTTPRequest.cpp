@@ -1,7 +1,4 @@
 #include "HTTPRequest.hpp"
-#include "../Server/Client.hpp"
-#include <sstream>
-#include <iostream>
 
 HTTPRequest::HTTPRequest(Client *client)
 {
@@ -15,130 +12,80 @@ HTTPRequest::HTTPRequest(Client *client)
 	_method = "";
 	_uriPath = "";
 	_version = "";
-	_maxBody = 0;
 	_state = IS_REQUEST_LINE;
 }
 
 void HTTPRequest::parseRequest(const std::string &requestData)
 {
-	// Logger::VerticalSeparator();
 	Logger::Itroduction("parseRequest ↗️");
-	// Logger::VerticalSeparator();
 	_rawRequest += requestData;
-	std::cout << "RAW DATA\n" << _rawRequest << std::endl;
-	// Logger::Specifique(_rawRequest, "This is the raw request");
+	Logger::Specifique(_rawRequest, "RAW DATA");
 	std::istringstream stream(_rawRequest);
 	std::string line;
 
 	if (_state == COMPLETE)
 	{
-		// Logger::NormalCout("Request already parsed");
+		Logger::NormalCout("Request already parsed");
 		return;
 	}
 
+	// Parse Request Line and Headers
 	bool headersParsed = false;
-while (std::getline(stream, line))
-{
-    if (line == "\r")
-    {
-        headersParsed = true;
-        break;
-    }
-    if (_state == IS_REQUEST_LINE)
-    {
-        parseRequestLine(line);
-        _state = IS_HEADERS;
-    }
-    else if (_state == IS_HEADERS)
-    {
-        parseHeaderLine(line);
-    }
-}
-if (!headersParsed) {
-    errorOccur(400); // Malformed request
-    return;
-}
+	while (std::getline(stream, line))
+	{
+		if (line == "\r")
+		{
+			headersParsed = true;
+			break;
+		}
+		if (_state == IS_REQUEST_LINE)
+		{
+			parseRequestLine(line);
+			_state = IS_HEADERS;
+		}
+		else if (_state == IS_HEADERS)
+		{
+			parseHeaders(line);
+		}
+	}
 
-	// for (auto &header : _headers)
-	// {
-	// 	std::cout << "Key: " << header.first << ", Value: " << header.second << std::endl;
-	// }
+	if (!headersParsed)
+	{
+		errorOccur(400);
+		return;
+	}
 	if (!checkHostHeader())
 	{
-		// Logger::NormalCout("Host header missing in HTTP/1.1 request");
-		errorOccur(400); // Bad Request: Host header missing in HTTP/1.1 request
+		Logger::ErrorCout("Host header missing in HTTP/1.1 request");
+		errorOccur(400);
 		return;
 	}
-	if (checkMaxBodySize())
-	{
-		errorOccur(413);
-		Logger::ErrorCout("Request Entity Too Large");
-		return;
-	}
-	// // Parse the body for methods like POST
+
+	// Parse the body for methods for POST
 	_state = IS_BODY_START;
 	if (_method == "POST")
-{
-	// std::string bodyData;
-	// std::string line1;
-	// while (std::getline(stream, line1))
-	// {
-	// 	// if (!line.find("------WebKitFormBoundary"))
-	// 	// {
-	// 	// 	Logger::NormalCout("valide line");
-	// 	// 	continue;
-	// 	// }
-	// 	bodyData += line1 + "\r\n";
-	// 	Logger::Specifique(line, "line in the body");
-	// }
-    // auto it = _headers.find("Content-Length");
-    // if (it != _headers.end())
-    // {
-        // size_t contentLength = std::stoi(it->second);
+	{
+		std::string bodyData((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+		if (checkFormUrlEncoded()) // this is suppose to work the opposite way, on hold...
+		{
+			Logger::NormalCout("post type multipart/form-data");
+			size_t byte_count = bodyData.size() - 183;
+			Logger::SpecifiqueForInt(byte_count, "body bytes");
+			if (byte_count > getMaxbodySize())
+			{
+				errorOccur(413);
+				Logger::ErrorCout("Request Entity Too Large");
+				return;
+			}
+		}
+		// parseMultipartBody(bodyData);
+		// Logger::Specifique(bodyData, "this is bodydata \n");
 
-        // std::string bodyData(contentLength, '\0');
-        std::string bodyData((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-		// std::string boudary = getBoundary();
-		// Logger::Specifique(boudary, "this is boudary");
-		// Logger::Specifique(parseMultipartBody(bodyData), "this is parsed body");
-		parseMultipartBody(bodyData);
-		Logger::Specifique(bodyData, "this is bodydata \n");
-
-        _body = bodyData;
-        Logger::Specifique(_body, "this is the body");
-    // }
-    // else
-    // {
-    //     errorOccur(411); // Length required
-    //     Logger::ErrorCout("Missing Content-Length header");
-    // }
-}
+		_body = bodyData;
+		Logger::Specifique(_body, "this is the body");
+	}
 
 	_state = COMPLETE;
-}
-
-std::string HTTPRequest::parseBody(const std::string &body, const std::string &boundary)
-{
-    std::string startBoundary = "--" + boundary;
-    std::string endBoundary = startBoundary + "--";
-    std::string content;
-
-    // Find start of body content
-    size_t start = body.find(startBoundary);
-    if (start == std::string::npos) return "";
-
-    start += startBoundary.length();
-    size_t headerEnd = body.find("\r\n\r\n", start); // End of headers
-    if (headerEnd == std::string::npos) return "";
-
-    headerEnd += 4; // Move past the "\r\n\r\n"
-    size_t end = body.find(endBoundary, headerEnd); // Find end boundary
-    if (end == std::string::npos) return "";
-
-    // Extract content
-    content = body.substr(headerEnd, end - headerEnd);
-
-    return content;
 }
 
 void HTTPRequest::parseRequestLine(const std::string &line)
@@ -177,12 +124,19 @@ void HTTPRequest::parseRequestLine(const std::string &line)
 	Logger::Specifique(_version, "Version");
 }
 
-void HTTPRequest::parseHeaderLine(const std::string &line)
+void HTTPRequest::parseHeaders(const std::string &line)
 {
-	// Logger::Itroduction("parseHeaderLine 📰");
+	// Logger::Itroduction("parseHeaders 📰");
 	// Logger::VerticalSeparator();
 	// _state = IS_HEADERS;
 	// EnumState(_state);
+	if (line.empty())
+	{
+		Logger::ErrorCout("Header line is invalid");
+		errorOccur(400);
+		return;
+	}
+
 	size_t colonPos = line.find(':');
 	if (colonPos != std::string::npos)
 	{
@@ -194,25 +148,14 @@ void HTTPRequest::parseHeaderLine(const std::string &line)
 		value.erase(value.begin(), it);
 		_headers[key] = value;
 	}
-	// else
-	// {
-		//Logger::NormalCout("Header line is invalid");
-	// 	errorOccur(400);
-	// }
-	// _state = IS_HEADERS_END;
-	// EnumState(_state);
 }
 
-// void HTTPRequest::parseBody(std::istringstream stream)
-// {
-	
-// }
 
 void HTTPRequest::parseNormalBody(const std::string &bodyData)
 {
 	_state = IS_BODY_NORMAL;
 	std::cout << "Is NORMAL BODY, no bodyshaming please\n";
-	_body = bodyData.substr(0, _iscontentLength);
+	_body = bodyData;
 }
 
 void HTTPRequest::parseChunkedBody(const std::string &bodyData)
@@ -259,89 +202,6 @@ void HTTPRequest::parseChunkedBody(const std::string &bodyData)
 	EnumState(_state);
 }
 
-////////////////////////////////////////////////////
-// ------------------- UPLOADS -------------------//
-////////////////////////////////////////////////////
-
-std::string HTTPRequest::getBoundary()
-{
-    auto it = _headers.find("Content-Type");
-    if (it != _headers.end())
-    {
-        size_t pos = it->second.find("boundary=");
-        if (pos != std::string::npos)
-        {
-            std::string boundary = it->second.substr(pos + 9); // Extract boundary
-            if (boundary.rfind("----", 0) == 0) // Check if it starts with ------
-                return boundary.substr(6); // Remove the leading ------
-            return boundary;
-        }
-    }
-    return "";
-}
-
-
-
-void HTTPRequest::parseMultipartBody(const std::string &bodyData)
-{
-	std::string boundary = getBoundary();
-	if (boundary.empty())
-	{
-		errorOccur(400); // Bad Request: Invalid boundary
-		return;
-	}
-	std::string delimiter = "--" + boundary;
-	std::string endDelimiter = "--" + boundary + "--";
-	size_t pos = bodyData.find(delimiter);
-	if (pos == std::string::npos)
-	{
-		errorOccur(400); // Bad Request: Invalid boundary
-		return;
-	}
-	pos += delimiter.length();
-	while (pos != std::string::npos)
-	{
-		size_t endPos = bodyData.find(delimiter, pos);
-		if (endPos == std::string::npos)
-			break;
-		std::string part = bodyData.substr(pos, endPos - pos);
-		size_t headerPos = part.find("\r\n\r\n");
-		if (headerPos == std::string::npos)
-			break;
-		std::string header = part.substr(0, headerPos);
-		std::string content = part.substr(headerPos + 4);
-		std::istringstream stream(header);
-		std::string line;
-		std::string key;
-		std::string value;
-		while (std::getline(stream, line) && !line.empty())
-		{
-			size_t colonPos = line.find(':');
-			if (colonPos != std::string::npos)
-			{
-				key = line.substr(0, colonPos);
-				value = line.substr(colonPos + 1);
-				std::string::iterator it = value.begin();
-				while (it != value.end() && std::isspace(*it))
-					it++;
-				value.erase(value.begin(), it);
-			}
-		}
-	}
-}
-
-void HTTPRequest::saveFile(const std::string &filename, const std::string &content)
-{
-	std::ofstream file("./uploads/" + filename, std::ios::binary);
-	if (file.is_open())
-	{
-		// Logger::NormalCout("File opened successfully");
-		file << content;
-		file.close();
-	}
-	// else
-	// 	Logger::NormalCout("File failed to open");
-}
 
 ////////////////////////////////////////////////////
 // ------------------- CHECKERS ------------------//
@@ -355,6 +215,14 @@ bool HTTPRequest::checkHttpVersion()
 bool HTTPRequest::checkHostHeader()
 {
 	return (_headers.find("Host") != _headers.end());
+}
+
+int HTTPRequest::checkFormUrlEncoded()
+{
+	auto it = _headers.find("Content-Type");
+	if (it != _headers.end() && it->second == "application/x-www-form-urlencoded")
+		return 1;
+	return 0;
 }
 
 int HTTPRequest::checkTransferEncoding()
@@ -386,28 +254,6 @@ int HTTPRequest::checkContentLength()
 	}
 	return 0;
 }
-
-int HTTPRequest::checkMaxBodySize()
-{
-	setMaxbodySize(_maxBody);
-	Logger::SpecifiqueForInt(_iscontentLength, "body length");
-	Logger::SpecifiqueForInt(_maxBody, "max body set successfully..");
-	if (_iscontentLength > _maxBody)
-	{
-		Logger::SpecifiqueForInt(_iscontentLength, "content legth size checkMaxBodySize");
-		Logger::SpecifiqueForInt(_maxBody, "maxBody size checkMaxBodySize");
-		Logger::NormalCout("Content too large !");
-		return 1;
-	}
-	return 0;
-}
-
-// int HTTPRequest::checkMethod()
-// {
-// 	if (_method != "GET" && _method != "POST" && _method != "DELETE")
-// 		return 0;
-// 	return 1;
-// }
 
 int HTTPRequest::checkLocMethodAllowed(const std::string &method, const std::string &path)
 {
@@ -465,8 +311,11 @@ Client *HTTPRequest::getClient() const { return _client; }
 LocationConfig *HTTPRequest::getLocation() const { return _location; }
 
 std::string HTTPRequest::getMethod() const { return _method; }
+
 std::string HTTPRequest::getPath() const { return _uriPath; }
+
 std::string	HTTPRequest::getQuery() const { return _query; }
+
 std::string HTTPRequest::getVersion() const { return _version; }
 
 std::map<std::string, std::string> HTTPRequest::getHeaders() const { return _headers; }
@@ -485,19 +334,18 @@ int HTTPRequest::getStateCode() const { return _stateCode; }
 // ------------------- UTILS -------------------- //
 ////////////////////////////////////////////////////
 
-void HTTPRequest::setMaxbodySize(unsigned long long size)
+unsigned long long HTTPRequest::getMaxbodySize()
 {
 	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
 	for (ServerConfig &server : configs)
 	{
-		if (server.getClientMaxBodySize() > 0)
+		if (server._clientMaxBodySize > 0)
 		{
-			Logger::SpecifiqueForInt(server.getClientMaxBodySize(), "client max body found");
-			size = server.getClientMaxBodySize();
-			Logger::SpecifiqueForInt(size, "size set at ");
-			break;
+			Logger::SpecifiqueForInt(server._clientMaxBodySize, "client max body found");
+			return server._clientMaxBodySize;
 		}
 	}
+	return 0;
 }
 
 void HTTPRequest::errorOccur(int code)

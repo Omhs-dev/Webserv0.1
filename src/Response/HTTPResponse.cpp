@@ -276,8 +276,13 @@ void HTTPResponse::setStandardResponse()
 			serveFile(indexFilePath, "200", getErrorMesssage("200"));
 			return;
 		}
-		// if not check if the directory has an autoindex on or off
-		else if (location.getAutoindex() == true)
+		if (location.autoindex == false)
+		{
+			Logger::ErrorCout("autoindex off in location");
+			_errorPage = serverErroPage(404);
+			serveFile(_errorPage, "404", getErrorMesssage("404"));
+		}
+		else
 		{
 			// Logger::Cout("Autoindex found 📁");
 			// Logger::Specifique(reqPath, "Request Path 🪜");
@@ -290,11 +295,6 @@ void HTTPResponse::setStandardResponse()
 				setBody(directoryListing);
 				return;
 			}
-		}
-		else
-		{
-			_errorPage = serverErroPage(404);
-			serveFile(_errorPage, "404", getErrorMesssage("404"));
 		}
 	}
 }
@@ -475,7 +475,7 @@ void HTTPResponse::serveFile(const std::string &path, const std::string &code, c
 	}
 	else
 	{
-		Logger::NormalCout("serving file failed !");
+		Logger::ErrorCout("serving file failed !");
 		_errorPage = errorPage(std::stoi(code));
 		setStatus(code, mess);
 		setBody(_errorPage);

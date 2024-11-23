@@ -6,11 +6,20 @@
 #include <atomic>
 #include <csignal>
 #include <iostream>
+#include <unistd.h>
+#include <fcntl.h>
+#include <iostream>
+#include <csignal>
+#include <sys/socket.h>
 
+#include "Client.hpp"
 #include "../Parse/ConfigParser.hpp"
 #include "../Socket/Socket.hpp"
 #include "../Logger/Logger.hpp"
+#include "../Request/HTTPRequest.hpp"
+#include "../Response/HTTPResponse.hpp"
 
+#define SERVER_DEFAULT_WAIT 600
 // implement signal handling to stop the server
 
 // implement timeout for the server

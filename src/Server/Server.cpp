@@ -1,20 +1,12 @@
 #include "Server.hpp"
-#include "Client.hpp"
-#include "../Request/HTTPRequest.hpp"
-#include "../Response/HTTPResponse.hpp"
-#include <sys/socket.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <iostream>
-#include <csignal>
 
 static volatile bool serverRunning = true;
 
 void signalHandler(int signum) {
 	if (signum == SIGINT)
 	{
-	    std::cout << "\nInterrupt signal (" << signum << ") received : ";
-	    serverRunning = false;
+		std::cout << "\nInterrupt signal (" << signum << ") received : ";
+		serverRunning = false;
 	}
 }
 
@@ -52,7 +44,7 @@ void Server::run()
 
     while (serverRunning)
     {
-        int activity = poll(pollfds.data(), pollfds.size(), 500);
+        int activity = poll(pollfds.data(), pollfds.size(), SERVER_DEFAULT_WAIT);
         if (activity < 0)
         {
             Logger::ErrorCout("Error in poll");
@@ -89,7 +81,6 @@ void Server::run()
     Logger::NormalCout("Server stopped!");
 }
 
-
 // Handle a new connection on the server socket
 void Server::handleNewConnection(int server_fd)
 {
@@ -109,7 +100,7 @@ void Server::handleNewConnection(int server_fd)
 	// Add the new client socket to the pollfd set
 	pollfd clientPollFd;
 	clientPollFd.fd = clientSocket;
-	clientPollFd.events = POLLIN; // We're interested in reading data from the client
+	clientPollFd.events = POLLIN;
 	pollfds.push_back(clientPollFd);
 
 	std::cout << "New client connected. fd: "<< clientSocket << std::endl;
@@ -132,9 +123,6 @@ void Server::closeClient(int client_fd)
 								{ return pfd.fd == client_fd; }),pollfds.end());
 	// Logger::NormalCout("cleanup and close sockets");
 }
-
-// add a signal handler to close the server socket
-// when the server is terminated or ctrl-c is pressed
 
 // --- GETTERS ---
 
@@ -178,14 +166,6 @@ void Server::shutdown()
 	_serverSockets.clear();
 	// Logger::NormalCout("Server shutdown complete");
 }
-
-// void Server::stop()
-// {
-// 	for (int serverSocket : _serverSockets)
-// 	{
-// 		close(serverSocket);
-// 	}
-// }
 
 Server::~Server()
 {
