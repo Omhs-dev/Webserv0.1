@@ -14,7 +14,7 @@ Server::Server(const std::vector<ServerConfig> &config) : _configs(config)
 {
 	// _state = SERVER_START;
 	_serverRun = true;
-	Logger::SpecifiqueForInt(_configs.size(), "the server size in Server ");
+	Logger::SpecifiqueForInt(_configs.size(), "Number of servers");
 	for (auto &serverConfig : _configs)
 	{
 		_socketObject.create();
@@ -22,10 +22,9 @@ Server::Server(const std::vector<ServerConfig> &config) : _configs(config)
 		_socketObject.listen(30);
 		_socketObject.setNonBlocking();
 
-		std::cout << "Server name: " << serverConfig._serverName << std::endl;
-		std::cout << "Server listening on port: " << serverConfig._listen << std::endl;
-		std::cout << "Server root directory: " << serverConfig._root << std::endl;
-		std::cout << "Server index file: " << serverConfig._index << std::endl;
+		Logger::ServerInfos(serverConfig._serverName, "Server name");
+		Logger::ServerInfos(serverConfig._listen, "Server listening on port");
+		Logger::ServerInfos(serverConfig._index, "Server index file");
 
 		// Add the server socket to the pollfd set
 		pollfd serverPollFd;
@@ -77,8 +76,6 @@ void Server::run()
             }
         }
     }
-
-    Logger::NormalCout("Server stopped!");
 }
 
 // Handle a new connection on the server socket
@@ -103,16 +100,13 @@ void Server::handleNewConnection(int server_fd)
 	clientPollFd.events = POLLIN;
 	pollfds.push_back(clientPollFd);
 
-	std::cout << "New client connected. fd: "<< clientSocket << std::endl;
+	Logger::SpecifiqueForInt(clientSocket, "New client connected. fd");
 }
 
 void Server::handleClient(int client_fd)
 {
-	std::cout << "Handling client.." << std::endl;
-	Client client(client_fd, (this));		  // Create a client object to handle the connection
-	client.clientConnectionProcess(); // Process the client's request
-	// close(client_fd);			  // Close the client connection
-	Logger::NormalCout("Client fd closed");
+	Client client(client_fd, (this));
+	client.clientConnectionProcess();
 }
 
 // After handling the client, remove it from the pollfd set

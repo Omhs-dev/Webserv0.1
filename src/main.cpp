@@ -34,9 +34,8 @@ int main(int argc, char *argv[])
 		parser.parseConfigFile(configFile);
 		std::vector<ServerConfig> configs = parser.getConfigs();
 
-		Logger::NormalCout("Server configuration:");
 		for (auto &config : configs) {
-			parser.printServerConfig(config);
+			parser.printServerConfig(config, false);
 		}
 
 		Server server(configs);

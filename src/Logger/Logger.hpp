@@ -10,7 +10,7 @@
 // Color codes
 const std::string RESET = "\033[0m";
 const std::string GREEN = "\033[32m";        // SUCCESS
-const std::string BLUE = "\033[34m";         // INFO
+const std::string BLUE = "\033[36m";         // INFO
 const std::string RED = "\033[31m";          // ERROR
 const std::string ORANGE = "\033[38;5;208m"; // DEBUG
 
@@ -27,6 +27,7 @@ public:
     static void Cout(std::string sring);
     static void ErrorCout(std::string string);
     static void Checker(std::string string);
+	static void ServerInfos(std::string elemt, std::string elemMessage);
     static void Specifique(std::string elemt, std::string elemMessage);
     static void SpecifiqueForBool(bool elemt, std::string elemMessage);
     static void SpecifiqueForInt(int elemt, std::string elemMessage);

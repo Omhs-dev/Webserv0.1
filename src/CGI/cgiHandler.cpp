@@ -122,10 +122,8 @@ void handleCGIRequest(const HTTPRequest &Request)
         envVars.push_back("QUERY_STRING=" + Request.getQuery());
     
     std::string postBody = Request.getBody();
-	std::cout << "body : " << postBody << std::endl;
     if (Request.getMethod() == "POST")
     {
-		Logger::NormalCout("method is Post");
         if (postBody.empty())
         {
             std::cerr << "Error: empty POST body (handlecgiRequest())\n";

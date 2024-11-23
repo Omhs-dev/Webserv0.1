@@ -158,7 +158,6 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
             else if (key == "max_body_size")
             {
                 serverConfig._clientMaxBodySize = std::stoull(value);
-				std::cout << "client max body" << serverConfig._clientMaxBodySize << std::endl;
             }
             else if (key == "error_page")
             {
@@ -388,21 +387,26 @@ void ConfigParser::printLocationConfig(const LocationConfig& location)
     }
 }
 
-void ConfigParser::printServerConfig(const ServerConfig& server)
+void ConfigParser::printServerConfig(const ServerConfig& server, bool pswitch)
 {
-    std::cout << "Server {" << std::endl;
-    std::cout << "  Listen: " << server._listen << std::endl;
-    std::cout << "  Server Name: " << server._serverName << std::endl;
-    std::cout << "  Root: " << server._root << std::endl;
-    std::cout << "  Index: " << server._index << std::endl;
-    std::cout << "  Max Body Size: " << server._clientMaxBodySize << std::endl;
-    for (std::map<int, std::string>::const_iterator it = server._errorPage.begin(); it != server._errorPage.end(); ++it) {
-    std::cout << "  Error Page: " << it->first << " -> " << it->second << std::endl;
-    }
-    for (std::vector<LocationConfig>::const_iterator it = server._locations.begin(); it != server._locations.end(); ++it) {
-        std::cout << "  Location {" << std::endl;
-        printLocationConfig(*it);
-        std::cout << "  }" << std::endl;
-    }
-    std::cout << "}" << std::endl;
+	if (pswitch == true)
+	{
+		std::cout << "Server {" << std::endl;
+		std::cout << "  Listen: " << server._listen << std::endl;
+		std::cout << "  Server Name: " << server._serverName << std::endl;
+		std::cout << "  Root: " << server._root << std::endl;
+		std::cout << "  Index: " << server._index << std::endl;
+		std::cout << "  Max Body Size: " << server._clientMaxBodySize << std::endl;
+		for (std::map<int, std::string>::const_iterator it = server._errorPage.begin(); it != server._errorPage.end(); ++it) {
+		std::cout << "  Error Page: " << it->first << " -> " << it->second << std::endl;
+		}
+		for (std::vector<LocationConfig>::const_iterator it = server._locations.begin(); it != server._locations.end(); ++it) {
+			std::cout << "  Location {" << std::endl;
+			printLocationConfig(*it);
+			std::cout << "  }" << std::endl;
+		}
+		std::cout << "}" << std::endl;
+	}
+	else
+		return;
 }

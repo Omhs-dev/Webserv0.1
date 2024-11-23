@@ -1,0 +1,8 @@
+Executing script
+Found file name
+Creating new file: files.txt
+<<<--- START OF FILE CONTENT --->>>
+Ifjioadsjojadsfjladsfaklsfjaklsjldscdnvklanadsfasdfas
+------WebKitFormBoundary8HXlF0fLztjuAwkh--
+<<<--- END OF FILE CONTENT --->>>
+File uploaded successfully: files.txt

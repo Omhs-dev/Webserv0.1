@@ -53,20 +53,25 @@ void Logger::Checker(std::string string)
     Log(string, GREEN, "CHECK");
 }
 
+void Logger::ServerInfos(std::string elemt, std::string elemMessage)
+{
+    Log(elemMessage + ": " + elemt, GREEN, "INFO");
+}
+
 void Logger::Specifique(std::string elemt, std::string elemMessage)
 {
-    Log(elemMessage + ": " + elemt, BLUE, "SPECIFIC");
+    Log(elemMessage + ": " + elemt, BLUE, "INFO");
 }
 
 void Logger::SpecifiqueForBool(bool elemt, std::string elemMessage)
 {
     std::string value = elemt ? "true" : "false";
-    Log(elemMessage + ": " + value, BLUE, "SPECIFIC");
+    Log(elemMessage + ": " + value, BLUE, "INFO");
 }
 
 void Logger::SpecifiqueForInt(int elemt, std::string elemMessage)
 {
-    Log(elemMessage + ": " + std::to_string(elemt), BLUE, "SPECIFIC");
+    Log(elemMessage + ": " + std::to_string(elemt), BLUE, "INFO");
 }
 
 Logger::~Logger() {}

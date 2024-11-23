@@ -25,7 +25,6 @@ HTTPResponse::~HTTPResponse()
 
 void HTTPResponse::generateResponse()
 {
-	std::cout << "In generateResponse()..\n";
 	std::string reqMethod = _request->getMethod();
 
 	if (_request->isCGI())
@@ -48,7 +47,6 @@ void HTTPResponse::generateResponse()
 
 void HTTPResponse::handleGet()
 {
-	std::cout << "Getting root\n";
 	std::string reqPath = _request->getPath();
 
 	ServerConfig currentServer = determineServer();
@@ -59,7 +57,6 @@ void HTTPResponse::handleGet()
 	std::string root = _serverRoot;
 	std::string indexFilePath = root + reqPath;
 
-	std::cout << "In handleGet()..\n";
 	// Logger::Separator();
 	// Logger::VerticalSeparator();
 	// Logger::Itroduction("handleGet");
@@ -67,7 +64,6 @@ void HTTPResponse::handleGet()
 	// Logger::Specifique(location.getLocationPath(), "Location Path 🪜 ");
 	// Logger::Specifique(root, "Server Root 🛤️ ");
 	// Logger::Specifique(indexFilePath, "Request Root + path + index 🪜 ");
-	std::cout << "In handleGet()..\n";
 	if (reqPath == "/")
 	{
 		// checkLocationPath(path);
@@ -330,10 +326,6 @@ ServerConfig HTTPResponse::determineServer()
 		{
 			_serverRoot = iter->_root;
 			// Logger::NormalCout("server found !");
-			
-			std::cout << "Extracted port :" << std::stoi(port) << std::endl;
-			std::cout << "server port :" << std::stoi(iter->_listen) << std::endl;
-
 			return *iter;
 		}
     }
@@ -431,7 +423,7 @@ std::string HTTPResponse::getData() const
 	std::ostringstream oss;
 	if (_state == IS_REDIRECT)
 	{
-		std::cout << "HERE 1\n";
+		Logger::NormalCout("Redirect Response");
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << _headers[0] << "\r\n";
 		oss << "Content-Length: 0\r\n";
@@ -440,7 +432,7 @@ std::string HTTPResponse::getData() const
 	}
 	else if (_state == IS_CHUNK)
 	{
-		std::cout << "HERE 2\n";
+		Logger::NormalCout("Chunk Response");
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
 		oss << "Transfer-Encoding: chunked"  << "\r\n";
@@ -449,7 +441,7 @@ std::string HTTPResponse::getData() const
 	}
 	else
 	{
-		std::cout << "HERE 3\n";
+		Logger::NormalCout("Sending Response");
 		oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
 		oss << "Content-Type: " << getMimeType(_request->getPath()) << "\r\n";
 		oss << "Content-Length: " << _body.size() << "\r\n";

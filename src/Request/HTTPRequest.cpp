@@ -17,9 +17,7 @@ HTTPRequest::HTTPRequest(Client *client)
 
 void HTTPRequest::parseRequest(const std::string &requestData)
 {
-	Logger::Itroduction("parseRequest ↗️");
 	_rawRequest += requestData;
-	Logger::Specifique(_rawRequest, "RAW DATA");
 	std::istringstream stream(_rawRequest);
 	std::string line;
 
@@ -49,6 +47,7 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 		}
 	}
 
+	// check headers errors
 	if (!headersParsed)
 	{
 		errorOccur(400);
@@ -78,11 +77,12 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 				return;
 			}
 		}
-		// parseMultipartBody(bodyData);
-		// Logger::Specifique(bodyData, "this is bodydata \n");
-
+		if (checkTransferEncoding())
+		{
+			Logger::NormalCout("POST -> Transfer-Encoding : chunked");
+			parseChunkedBody(bodyData);
+		}
 		_body = bodyData;
-		Logger::Specifique(_body, "this is the body");
 	}
 
 	_state = COMPLETE;
@@ -90,26 +90,22 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 
 void HTTPRequest::parseRequestLine(const std::string &line)
 {
-	Logger::Itroduction("parseRequestLine 📜");
-	Logger::VerticalSeparator();
-	std::stringstream ss(line);
-	// _method = parseMethod(ss.str());
-	// _uriPath = parsePath(ss.str());
-	// _version = parseVersion(ss.str());attempting
 	_state = IS_REQUEST_LINE;
+
+	std::stringstream ss(line);
 
 	ss >> _method >> _uriPath >> _version;
 
-
 	if (!checkLocMethodAllowed(_method, _uriPath))
 	{
-		Logger::NormalCout("Method not allowed");
+		Logger::ErrorCout("Method not allowed");
 		errorOccur(405);
 		return;
 	}
 	if (!checkHttpVersion())
 	{
-		errorOccur(505); // HTTP Version Not Supported
+		Logger::ErrorCout("HTTP Version Not Supported");
+		errorOccur(505);
 		return;
 	}
 	if (_uriPath.find('?') != std::string::npos)
@@ -118,18 +114,10 @@ void HTTPRequest::parseRequestLine(const std::string &line)
 		_query = _uriPath.substr(pos + 1);
 		_uriPath = _uriPath.substr(0, pos);
 	}
-	Logger::NormalCout("Parsed Request Line : ");
-	Logger::Specifique(_method, "Method");
-	Logger::Specifique(_uriPath, "Path");
-	Logger::Specifique(_version, "Version");
 }
 
 void HTTPRequest::parseHeaders(const std::string &line)
 {
-	// Logger::Itroduction("parseHeaders 📰");
-	// Logger::VerticalSeparator();
-	// _state = IS_HEADERS;
-	// EnumState(_state);
 	if (line.empty())
 	{
 		Logger::ErrorCout("Header line is invalid");
@@ -160,9 +148,6 @@ void HTTPRequest::parseNormalBody(const std::string &bodyData)
 
 void HTTPRequest::parseChunkedBody(const std::string &bodyData)
 {
-	// Logger::VerticalSeparator();
-	// Logger::Itroduction("parseChunkedBody");
-	// Logger::VerticalSeparator();
 	std::stringstream ss(bodyData);
 	std::string line;
 	_state = IS_BODY_CHUNKED;
@@ -176,7 +161,7 @@ void HTTPRequest::parseChunkedBody(const std::string &bodyData)
 		}
 		catch (const std::invalid_argument &)
 		{
-			errorOccur(400); // Bad Request: Invalid chunk size
+			errorOccur(400);
 			break;
 		}
 		if (_isChunked && _headers.find("Content-Length") != _headers.end())
@@ -247,7 +232,7 @@ int HTTPRequest::checkContentLength()
 		}
 		catch (const std::invalid_argument &)
 		{
-			errorOccur(400); // Bad Request: Invalid Content-Length
+			errorOccur(400);
 			return 0;
 		}
 		return 1;
@@ -264,9 +249,6 @@ int HTTPRequest::checkLocMethodAllowed(const std::string &method, const std::str
 		{
 			if (path == location.locationPath)
 			{
-				// Logger::Specifique(location.requestAllowed[0], "first method");
-				// Logger::Specifique(location.requestAllowed[1], "second method");
-				// Logger::NormalCout("Request path == location path");
 				if (isMethodAllowed(method, location))
 				{
 					Logger::NormalCout("method allowed verified");
@@ -298,7 +280,7 @@ int HTTPRequest::isMethodAllowed(const std::string& method, const LocationConfig
 int HTTPRequest::isCGI()
 {
 	if (_uriPath.find("/cgi-bin/") == std::string::npos)
-		return (std::cout << "Not a CGI requst" << std::endl, 0);
+		return (0);
 	return 1;
 }
 
@@ -352,11 +334,9 @@ void HTTPRequest::errorOccur(int code)
 {
 	_stateCode = code;
 	_state = COMPLETE;
-	// Logger::SpecifiqueForInt(_stateCode, "an error occured");
 	EnumState(_state);
 }
 
-// make sure to remove the '\r' character from the line
 std::string HTTPRequest::getLineSanitizer(std::stringstream &ss)
 {
 	std::string line;
