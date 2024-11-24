@@ -18,7 +18,7 @@ HTTPRequest::HTTPRequest(Client *client)
 void HTTPRequest::parseRequest(const std::string &requestData)
 {
 	_rawRequest += requestData;
-	// Logger::Specifique(_rawRequest, "Raw");
+	Logger::Specifique(_rawRequest, "Raw");
 	std::istringstream stream(_rawRequest);
 	std::string line;
 
@@ -75,15 +75,20 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 		if (checkFormData())
 		{
 			Logger::NormalCout("Post type multipart/form-data");
-
-			size_t byte_count = bodyData.size() - 183;
-			Logger::SpecifiqueForInt(byte_count, "body bytes");
-			if (byte_count > getMaxbodySize())
+			if (!bodyData.empty())
 			{
-				errorOccur(413);
-				_body = "";
-				Logger::ErrorCout("Request Entity Too Large");
-				return;
+				size_t byte_count = bodyData.size() - 183;
+				Logger::SpecifiqueForInt(byte_count, "body bytes");
+				if (byte_count > getMaxbodySize())
+				{
+					errorOccur(413);
+					_body = "";
+					Logger::ErrorCout("Request Entity Too Large");
+					return;
+				}
+			}
+			{
+				Logger::ErrorCout("Body Data is empty !");
 			}
 		}
 		if (checkTransferEncoding())

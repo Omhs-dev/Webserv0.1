@@ -100,6 +100,7 @@ void Server::handleClient(int client_fd)
 {
 	Client client(client_fd, (this));
 	client.clientConnectionProcess();
+	closeClient(client_fd);
 }
 
 // After handling the client, remove it from the pollfd set
