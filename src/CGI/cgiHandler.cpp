@@ -130,7 +130,7 @@ void handleCGIRequest(const HTTPRequest &Request)
             sendCgiResponse(build_response(400, ""), socket);
             return ;
         }
-        std::cout <<  "CgiLog: body: " << postBody;
+        // std::cout <<  "CgiLog: body: " << postBody;
         envVars.push_back("CONTENT_LENGTH=" + std::to_string(postBody.length()));
         std::string content_type = Request.getHeaders()["Content-Type"];
         std::cout << "CgiLog: content-type: " << content_type << std::endl;

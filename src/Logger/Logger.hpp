@@ -7,12 +7,11 @@
 #include <sstream>
 #include <ctime>
 
-// Color codes
 const std::string RESET = "\033[0m";
-const std::string GREEN = "\033[32m";        // SUCCESS
-const std::string BLUE = "\033[36m";         // INFO
-const std::string RED = "\033[31m";          // ERROR
-const std::string ORANGE = "\033[38;5;208m"; // DEBUG
+const std::string GREEN = "\033[32m";       
+const std::string BLUE = "\033[36m";        
+const std::string RED = "\033[31m";         
+const std::string ORANGE = "\033[38;5;208m";
 
 class Logger
 {

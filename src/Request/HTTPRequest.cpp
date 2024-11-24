@@ -18,6 +18,7 @@ HTTPRequest::HTTPRequest(Client *client)
 void HTTPRequest::parseRequest(const std::string &requestData)
 {
 	_rawRequest += requestData;
+	// Logger::Specifique(_rawRequest, "Raw");
 	std::istringstream stream(_rawRequest);
 	std::string line;
 
@@ -46,7 +47,15 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 			parseHeaders(line);
 		}
 	}
+	ServerConfig server = determineServer();
+	Logger::Specifique(server._listen, "listening on");
 
+	if (!isMethodAllowed(_method, _uriPath))
+	{
+		Logger::ErrorCout("Method not allowed");
+		errorOccur(405);
+		return;
+	}
 	// check headers errors
 	if (!headersParsed)
 	{
@@ -65,14 +74,16 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 	if (_method == "POST")
 	{
 		std::string bodyData((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-		if (checkFormUrlEncoded()) // this is suppose to work the opposite way, on hold...
+		if (checkFormData())
 		{
-			Logger::NormalCout("post type multipart/form-data");
+			Logger::NormalCout("Post type multipart/form-data");
+
 			size_t byte_count = bodyData.size() - 183;
 			Logger::SpecifiqueForInt(byte_count, "body bytes");
 			if (byte_count > getMaxbodySize())
 			{
 				errorOccur(413);
+				_body = "";
 				Logger::ErrorCout("Request Entity Too Large");
 				return;
 			}
@@ -96,12 +107,6 @@ void HTTPRequest::parseRequestLine(const std::string &line)
 
 	ss >> _method >> _uriPath >> _version;
 
-	if (!checkLocMethodAllowed(_method, _uriPath))
-	{
-		Logger::ErrorCout("Method not allowed");
-		errorOccur(405);
-		return;
-	}
 	if (!checkHttpVersion())
 	{
 		Logger::ErrorCout("HTTP Version Not Supported");
@@ -221,6 +226,20 @@ int HTTPRequest::checkTransferEncoding()
 	return 0;
 }
 
+int HTTPRequest::checkFormData()
+{
+	auto it = _headers.find("Content-Type");
+	if (it != _headers.end())
+	{
+		size_t space_pos = it->second.find(' ');
+		std::string second = it->second.substr(0, space_pos);
+		// Logger::Specifique(second, "Second Header");
+		if (second == "multipart/form-data;")
+			return 1;
+	}
+	return 0;
+}
+
 int HTTPRequest::checkContentLength()
 {
 	auto it = _headers.find("content-length");
@@ -240,41 +259,42 @@ int HTTPRequest::checkContentLength()
 	return 0;
 }
 
-int HTTPRequest::checkLocMethodAllowed(const std::string &method, const std::string &path)
+LocationConfig HTTPRequest::determineLocation(const std::string &path)
 {
-	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
-	for (auto &server : configs)
+	ServerConfig server = determineServer();
+
+	for (LocationConfig &location : server.getLocations())
 	{
-		for (LocationConfig &location : server.getLocations())
+		if (path == location.locationPath)
 		{
-			if (path == location.locationPath)
-			{
-				if (isMethodAllowed(method, location))
-				{
-					Logger::NormalCout("method allowed verified");
-					return 1;
-					// break;
-				}
-			}
+			Logger::NormalCout("location found !");
+			return location;
 		}
 	}
-	Logger::NormalCout("Request method is not found in location methods");
-	return 0;
+
+	return LocationConfig();
 }
 
-int HTTPRequest::isMethodAllowed(const std::string& method, const LocationConfig& location)
+bool HTTPRequest::isMethodAllowed(const std::string& method, const std::string &path)
 {
+	const auto location = determineLocation(path);
     const std::vector<std::string>& allowedMethods = location.requestAllowed;
-    for (auto &meth : allowedMethods)
-    {
-        if (method == meth)
-        {
-            Logger::NormalCout("method found in config location");
-            return 1;
-        }
-    }
-    Logger::NormalCout("method nooot found in config location");
-    return 0;
+	if (location.requestAllowed.size() > 0)
+	{
+		for (auto &meth : allowedMethods)
+		{
+			Logger::Specifique(meth, "meth allowed");
+			if (meth == _method)
+			{
+				Logger::NormalCout("method found in config location");
+				return true;
+			}
+		}
+		return false;
+	}
+
+    Logger::NormalCout("Path is not a server location. Continue...");
+    return method == "GET" || method == "POST" || method == "DELETE";
 }
 
 int HTTPRequest::isCGI()
@@ -321,13 +341,49 @@ unsigned long long HTTPRequest::getMaxbodySize()
 	std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
 	for (ServerConfig &server : configs)
 	{
-		if (server._clientMaxBodySize > 0)
+		if (server._clientMaxBodySize > 0 && server._clientMaxBodySize != 0)
 		{
 			Logger::SpecifiqueForInt(server._clientMaxBodySize, "client max body found");
 			return server._clientMaxBodySize;
 		}
 	}
 	return 0;
+}
+
+
+ServerConfig HTTPRequest::determineServer()
+{
+    std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
+	// std::vector<ServerConfig>::iterator iter = configs.begin();
+
+    auto it = _headers.find("Host");
+    if (it == _headers.end())
+    {
+        // Logger::ErrorCout("Host header not found!");
+        return ServerConfig(); // Return the default server
+    }
+
+    std::string hostHeader = it->second; // e.g., localhost:8089
+    std::string hostname, port;
+    std::istringstream stream(hostHeader);
+    if (std::getline(stream, hostname, ':') && std::getline(stream, port))
+    {
+        Logger::Specifique(hostname, "Extracted hostname");
+        Logger::Specifique(port, "Extracted port");
+    }
+
+	// Logger::SpecifiqueForInt(configs.size(), "server size in determineServer");
+	for (std::vector<ServerConfig>::reverse_iterator iter = configs.rbegin(); iter != configs.rend(); ++iter)
+    {
+		if (std::stoi(port) == std::stoi(iter->_listen))
+		{
+			Logger::NormalCout("server found !");
+			return *iter;
+		}
+    }
+
+    // Logger::NormalCout("Server not found! Returning default.");
+    return ServerConfig(); // Return default server for unmatched cases
 }
 
 void HTTPRequest::errorOccur(int code)

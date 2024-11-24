@@ -91,16 +91,17 @@ class HTTPRequest
 		void parseRequest(const std::string &requestData);
 		
 		// --- CHECKERS ---
-		bool    checkHttpVersion();
-		bool    checkHostHeader();
 		int     checkMaxBodySize();
 		int     checkTransferEncoding();
 		int     checkContentLength();
+		int 	checkFormData();
 		int     checkMethod();
 		int		checkFormUrlEncoded();
-		int checkLocMethodAllowed(const std::string &method, const std::string &path);
-		int isMethodAllowed(const std::string& method, const LocationConfig& location);
 		int     isCGI();
+		bool		isMethodAllowed(const std::string& method, const std::string &path);
+		bool    checkHttpVersion();
+		bool    checkHostHeader();
+		LocationConfig determineLocation(const std::string &path);
 
 		// --- GETTERS ---
 		Client          *getClient() const;
@@ -129,6 +130,7 @@ class HTTPRequest
 		void EnumState(HTTPRequest::ParseState state);
 		void errorOccur(int code);
 		unsigned long long getMaxbodySize();
+		ServerConfig determineServer();
 };
 
 #endif

@@ -1,5 +1,0 @@
-The POST HTTP method sends data to the server. The type of the body of the request is indicated by the Content-Type header.
-
-The difference between PUT and POST is that PUT is idempotent: calling it once is no different from calling it several times successively (there are no side effects). Successive identical POST requests may have additional effects, such as creating the same order several times.
-
-HTML forms typically send data using POST and this usually results in a change on the server. For HTML forms the format/encoding of the body content is determined by the enctype attribute of the <form> element or the formenctype attribute of the <input> or <button> elements. The encoding may be one of the following:

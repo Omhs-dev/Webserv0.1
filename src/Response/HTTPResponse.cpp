@@ -26,6 +26,16 @@ HTTPResponse::~HTTPResponse()
 void HTTPResponse::generateResponse()
 {
 	std::string reqMethod = _request->getMethod();
+	int reqStateCode = _request->getStateCode();
+	Logger::SpecifiqueForInt(reqStateCode, "request state code");
+
+	if (reqStateCode == 405)
+	{
+		Logger::SpecifiqueForInt(_client->getRequest()->getStateCode(), "request code");
+		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
+		serveFile(_errorPage, "405", getErrorMesssage("405"));
+		return;
+	}
 
 	if (_request->isCGI())
 		handleCGIRequest(*_request);
@@ -38,9 +48,10 @@ void HTTPResponse::generateResponse()
 	else
 	{
 		Logger::SpecifiqueForInt(_client->getRequest()->getStateCode(), "request code");
-		_errorPage = errorPage(_client->getRequest()->getStateCode());
+		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
 		serveFile(_errorPage, "405", getErrorMesssage("405"));
 	}
+	
 }
 
 // --------- Handling Requests ---------
@@ -48,7 +59,6 @@ void HTTPResponse::generateResponse()
 void HTTPResponse::handleGet()
 {
 	std::string reqPath = _request->getPath();
-
 	ServerConfig currentServer = determineServer();
 	// Logger::Specifique(currentServer._listen, "server port in handleGet");
 	
@@ -588,6 +598,8 @@ std::string HTTPResponse::getErrorPagePath(int code, ServerConfig server)
 		if (page.first == code && page.second.find("404.html"))
 			return page.second;
 		if (page.first == code && page.second.find("403.html"))
+			return page.second;
+		if (page.first == code && page.second.find("405.html"))
 			return page.second;
 	}
 	return "";
