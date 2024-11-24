@@ -149,6 +149,17 @@ std::string errorPage(int code)
 			<< "</body>\n"
 			<< "</html>\n";
 	}
+	else if (code == 400)
+	{
+		body << " <body>\n"
+			<< " <div class=\"error-container\">\n"
+			<< "   <div class=\"error-code\">" << code << "</div>\n"
+			<< "   <div class=\"error-message\">Bad Request</div>\n"
+			<< "   <div class=\"error-description\">Please use an allowed Methode</div>\n"
+			<< " </div>\n"
+			<< "</body>\n"
+			<< "</html>\n";
+	}
 	else
 	{
 		body << " <body>\n"

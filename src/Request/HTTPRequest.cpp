@@ -259,22 +259,6 @@ int HTTPRequest::checkContentLength()
 	return 0;
 }
 
-LocationConfig HTTPRequest::determineLocation(const std::string &path)
-{
-	ServerConfig server = determineServer();
-
-	for (LocationConfig &location : server.getLocations())
-	{
-		if (path == location.locationPath)
-		{
-			Logger::NormalCout("location found !");
-			return location;
-		}
-	}
-
-	return LocationConfig();
-}
-
 bool HTTPRequest::isMethodAllowed(const std::string& method, const std::string &path)
 {
 	const auto location = determineLocation(path);
@@ -285,10 +269,7 @@ bool HTTPRequest::isMethodAllowed(const std::string& method, const std::string &
 		{
 			Logger::Specifique(meth, "meth allowed");
 			if (meth == _method)
-			{
-				Logger::NormalCout("method found in config location");
 				return true;
-			}
 		}
 		return false;
 	}
@@ -351,6 +332,22 @@ unsigned long long HTTPRequest::getMaxbodySize()
 }
 
 
+LocationConfig HTTPRequest::determineLocation(const std::string &path)
+{
+	ServerConfig server = determineServer();
+
+	for (LocationConfig &location : server.getLocations())
+	{
+		if (path == location.locationPath)
+		{
+			// Logger::NormalCout("location found !");
+			return location;
+		}
+	}
+
+	return LocationConfig();
+}
+
 ServerConfig HTTPRequest::determineServer()
 {
     std::vector<ServerConfig> configs = _client->getServer()->getConfigs();
@@ -372,18 +369,16 @@ ServerConfig HTTPRequest::determineServer()
         Logger::Specifique(port, "Extracted port");
     }
 
-	// Logger::SpecifiqueForInt(configs.size(), "server size in determineServer");
 	for (std::vector<ServerConfig>::reverse_iterator iter = configs.rbegin(); iter != configs.rend(); ++iter)
     {
 		if (std::stoi(port) == std::stoi(iter->_listen))
 		{
-			Logger::NormalCout("server found !");
+			// Logger::NormalCout("server found !");
 			return *iter;
 		}
     }
 
-    // Logger::NormalCout("Server not found! Returning default.");
-    return ServerConfig(); // Return default server for unmatched cases
+    return ServerConfig();
 }
 
 void HTTPRequest::errorOccur(int code)

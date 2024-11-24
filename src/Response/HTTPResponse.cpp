@@ -27,13 +27,19 @@ void HTTPResponse::generateResponse()
 {
 	std::string reqMethod = _request->getMethod();
 	int reqStateCode = _request->getStateCode();
-	Logger::SpecifiqueForInt(reqStateCode, "request state code");
 
 	if (reqStateCode == 405)
 	{
-		Logger::SpecifiqueForInt(_client->getRequest()->getStateCode(), "request code");
+		Logger::ErrorCout("Error Code 405");
 		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
 		serveFile(_errorPage, "405", getErrorMesssage("405"));
+		return;
+	}
+	if (reqStateCode == 400)
+	{
+		Logger::ErrorCout("Error Code 400");
+		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
+		serveFile(_errorPage, "400", getErrorMesssage("400"));
 		return;
 	}
 
@@ -47,11 +53,10 @@ void HTTPResponse::generateResponse()
 		handlePost();
 	else
 	{
-		Logger::SpecifiqueForInt(_client->getRequest()->getStateCode(), "request code");
+		Logger::ErrorCout("Error Code 405");
 		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
 		serveFile(_errorPage, "405", getErrorMesssage("405"));
 	}
-	
 }
 
 // --------- Handling Requests ---------
@@ -601,6 +606,8 @@ std::string HTTPResponse::getErrorPagePath(int code, ServerConfig server)
 			return page.second;
 		if (page.first == code && page.second.find("405.html"))
 			return page.second;
+		if (page.first == code && page.second.find("400.html"))
+			return page.second;
 	}
 	return "";
 }
@@ -616,7 +623,6 @@ std::string HTTPResponse::serverErroPage(int code)
 			Logger::Specifique(errorPage, "error page path in serverErrorPages");
 			return errorPage;
 		}
-		Logger::NormalCout("path empty");
 	}
 	return "";
 }
