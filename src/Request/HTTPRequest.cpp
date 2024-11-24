@@ -18,7 +18,7 @@ HTTPRequest::HTTPRequest(Client *client)
 void HTTPRequest::parseRequest(const std::string &requestData)
 {
 	_rawRequest += requestData;
-	Logger::Specifique(_rawRequest, "Raw");
+	// Logger::Specifique(_rawRequest, "Raw");
 	std::istringstream stream(_rawRequest);
 	std::string line;
 
@@ -49,7 +49,6 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 	}
 
 	LocationConfig location = determineLocation(_uriPath);
-	Logger::SpecifiqueForBool(location.autoindex, "autoindex");
 	if (location.locationPath == "/cgi-bin/" && location.autoindex == false)
 	{
 		Logger::ErrorCout("Acces denied !");

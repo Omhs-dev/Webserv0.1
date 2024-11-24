@@ -126,6 +126,13 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
                 else
                 {
                     serverConfig._listen = value;
+					for (const auto &server : configs)
+					{
+						if (serverConfig._listen == server._listen)
+						{
+							throw std::runtime_error("Duplicated Port in configuration file !");
+						}
+					}
                 }
             }
             else if (key == "server_name")

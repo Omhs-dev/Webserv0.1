@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 		std::vector<ServerConfig> configs = parser.getConfigs();
 
 		for (auto &config : configs) {
-			parser.printServerConfig(config, true);
+			parser.printServerConfig(config, false);
 		}
 		
 		Server server(configs);
