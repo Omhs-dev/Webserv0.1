@@ -363,8 +363,8 @@ ServerConfig HTTPRequest::determineServer()
     std::istringstream stream(hostHeader);
     if (std::getline(stream, hostname, ':') && std::getline(stream, port))
     {
-        Logger::Specifique(hostname, "Extracted hostname");
-        Logger::Specifique(port, "Extracted port");
+        // Logger::Specifique(hostname, "Extracted hostname");
+        // Logger::Specifique(port, "Extracted port");
     }
 
 	for (std::vector<ServerConfig>::reverse_iterator iter = configs.rbegin(); iter != configs.rend(); ++iter)
