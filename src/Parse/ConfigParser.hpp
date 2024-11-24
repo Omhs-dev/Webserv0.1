@@ -17,6 +17,8 @@
 #include <cstring>
 #include <iterator>
 #include <numeric>
+#include <unordered_set>
+
 
 #include "enumeration.hpp"
 #include "LocationConfig.hpp"

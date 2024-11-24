@@ -51,7 +51,7 @@ void HTTPResponse::generateResponse()
 	else if (reqMethod == "DELETE")
 		handleDelete();
 	else if (reqMethod == "POST")
-		handlePost();
+		handleCGIRequest(*_request);
 	else
 	{
 		Logger::ErrorCout("Error Code 405");

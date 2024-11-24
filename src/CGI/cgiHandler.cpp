@@ -133,7 +133,7 @@ void handleCGIRequest(const HTTPRequest &Request)
         // std::cout <<  "CgiLog: body: " << postBody;
         envVars.push_back("CONTENT_LENGTH=" + std::to_string(postBody.length()));
         std::string content_type = Request.getHeaders()["Content-Type"];
-        std::cout << "CgiLog: content-type: " << content_type << std::endl;
+        // std::cout << "CgiLog: content-type: " << content_type << std::endl;
 
         std::string::size_type semicolon_pos = content_type.find(";");
         if (semicolon_pos != std::string::npos)
