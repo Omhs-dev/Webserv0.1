@@ -3,8 +3,6 @@
 #include "Logger/Logger.hpp"
 #include <iostream>
 
-// set max body size
-// get good server
 // set cgi in the config
 // locat cgi in server locations
 // fix hanging connection

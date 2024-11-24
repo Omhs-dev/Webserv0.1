@@ -47,8 +47,6 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 			parseHeaders(line);
 		}
 	}
-	ServerConfig server = determineServer();
-	Logger::Specifique(server._listen, "listening on");
 
 	if (!isMethodAllowed(_method, _uriPath))
 	{

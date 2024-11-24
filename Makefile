@@ -3,7 +3,7 @@ NAME = webserv
 
 # Compiler settings
 CXX = c++
-CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -fsanitize=address -fsanitize=undefined -g 
+CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -g #-fsanitize=address -fsanitize=undefined -g 
 INCLUDES = -I $(INCLUDE_DIR)
 
 # Directories

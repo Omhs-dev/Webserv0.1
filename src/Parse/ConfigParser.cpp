@@ -158,7 +158,6 @@ void ConfigParser::parseServerBlock(std::ifstream &file, ServerConfig &serverCon
             else if (key == "max_body_size")
             {
                 serverConfig._clientMaxBodySize = std::stoull(value);
-				std::cout << "max bosdy: " << serverConfig._clientMaxBodySize << std::endl;
             }
             else if (key == "error_page")
             {
