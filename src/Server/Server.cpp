@@ -30,6 +30,7 @@ Server::Server(const std::vector<ServerConfig> &config) : _configs(config)
 		pollfd serverPollFd;
 		serverPollFd.fd = _socketObject.getSocketFd();
 		serverPollFd.events = POLLIN; // We're interested in reading new connections
+		serverPollFd.revents = 0;
 		pollfds.push_back(serverPollFd);
 
 		_serverSockets.push_back(_socketObject.getSocketFd());
@@ -49,34 +50,26 @@ void Server::run()
             Logger::ErrorCout("Error in poll");
             break;
         }
-
-        for (size_t i = 0; i < pollfds.size(); ++i)
+		std::vector<pollfd> pollFds = pollfds;
+        for (size_t i = 0; i < pollFds.size(); ++i)
         {
-            // if (pollfds[i].revents & (POLLERR | POLLHUP | POLLNVAL))
-            // {
-            //     Logger::SpecifiqueForInt(pollfds[i].fd, "Closing invalid or disconnected socket");
-            //     close(pollfds[i].fd);
-            //     pollfds.erase(pollfds.begin() + i);
-            //     --i; // Adjust index after removal
-            //     continue;
-            // }
-
-            if (pollfds[i].revents & POLLIN)
+            if (pollFds[i].revents & POLLIN)
             {
-                if (std::find(_serverSockets.begin(), _serverSockets.end(), pollfds[i].fd) != _serverSockets.end())
+                if (std::find(_serverSockets.begin(), _serverSockets.end(), pollFds[i].fd) != _serverSockets.end())
                 {
                     Logger::NormalCout("Handling new connection");
-                    handleNewConnection(pollfds[i].fd);
+                    handleNewConnection(pollFds[i].fd);
                 }
                 else
                 {
-                    Logger::SpecifiqueForInt(pollfds[i].fd, "Handling client request");
-                    handleClient(pollfds[i].fd);
+                    Logger::SpecifiqueForInt(pollFds[i].fd, "Handling client request");
+                    handleClient(pollFds[i].fd);
                 }
             }
         }
     }
 }
+
 
 // Handle a new connection on the server socket
 void Server::handleNewConnection(int server_fd)
