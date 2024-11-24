@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 		for (auto &config : configs) {
 			parser.printServerConfig(config, false);
 		}
-
+		
 		Server server(configs);
 		server.run();
 	}

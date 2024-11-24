@@ -31,11 +31,15 @@ void Client::handleRequest()
 	}
 	else if (bytesRead == 0)
 	{
-		Logger::NormalCout("bytes is zero, message received...");
+		Logger::NormalCout("bytes is 0, message received...");
 		throw ClientException();
 	}
-	else 
+	else
+	{
 		Logger::ErrorCout("Error: bytes read");
+		if (bytesRead == 1)
+			Logger::SpecifiqueForInt(_clientSocket, "Failed to read from Fd");
+	}
 }
 
 void Client::handleResponse()
@@ -47,6 +51,15 @@ void Client::handleResponse()
 void Client::sendResponse(const std::string &response)
 {
 	ssize_t sent = send(_clientSocket, response.c_str(), response.size(), 0);
+	if(sent == -1)
+	{
+		Logger::ErrorCout("Failed to send");
+		return;
+	}
+	if (sent == 0)
+	{
+		throw ClientException();
+	}
 	Logger::SpecifiqueForInt(sent, "Bytes sent");
 }
 
