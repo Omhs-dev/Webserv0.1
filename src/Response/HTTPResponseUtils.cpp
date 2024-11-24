@@ -27,7 +27,7 @@ bool isLargeFile(const std::string &path)
 	struct stat fileStat;
 	if (stat(path.c_str(), &fileStat) != 0)
 	{
-        std::cerr << "Failed to stat largefile: " << path << ". Error: " << std::strerror(errno) << std::endl;
+        std::cerr << "Large file Failed : " << path << ". Error: " << std::strerror(errno) << std::endl;
 		return false;
 	}
 	return fileStat.st_size >  MAX_FILE_SIZE;
