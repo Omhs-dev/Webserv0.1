@@ -51,15 +51,15 @@ void Client::handleResponse()
 void Client::sendResponse(const std::string &response)
 {
 	ssize_t sent = send(_clientSocket, response.c_str(), response.size(), 0);
-	if(sent == -1)
-	{
-		Logger::ErrorCout("Failed to send");
-		return;
-	}
-	if (sent == 0)
-	{
-		throw ClientException();
-	}
+	// if(sent == -1)
+	// {
+	// 	Logger::ErrorCout("Failed to send");
+	// 	return;
+	// }
+	// if (sent == 0)
+	// {
+	// 	throw ClientException();
+	// }
 	Logger::SpecifiqueForInt(sent, "Bytes sent");
 }
 

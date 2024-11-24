@@ -1,9 +1,0 @@
-Executing script
-Found file name
-Creating new file: test.txt
-<<<--- START OF FILE CONTENT --->>>
-hello this is a test file
-
-------WebKitFormBoundaryHu0MTs9cCAYQUiZj--
-<<<--- END OF FILE CONTENT --->>>
-File uploaded successfully: test.txt
