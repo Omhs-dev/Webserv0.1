@@ -48,6 +48,21 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 		}
 	}
 
+	LocationConfig location = determineLocation(_uriPath);
+	Logger::SpecifiqueForBool(location.autoindex, "autoindex");
+	if (location.locationPath == "/cgi-bin/" && location.autoindex == false)
+	{
+		Logger::ErrorCout("Acces denied !");
+		errorOccur(403);
+		return;
+	}
+	else if (location.locationPath == "/cgi-bin/")
+	{
+		Logger::ErrorCout("autoindex found");
+		errorOccur(667);
+		return;
+	}
+
 	if (!isMethodAllowed(_method, _uriPath))
 	{
 		Logger::ErrorCout("Method not allowed");
@@ -75,20 +90,14 @@ void HTTPRequest::parseRequest(const std::string &requestData)
 		if (checkFormData())
 		{
 			Logger::NormalCout("Post type multipart/form-data");
-			if (!bodyData.empty())
+			size_t byte_count = bodyData.size() - 183;
+			Logger::SpecifiqueForInt(byte_count, "body bytes");
+			if (byte_count > getMaxbodySize())
 			{
-				size_t byte_count = bodyData.size() - 183;
-				Logger::SpecifiqueForInt(byte_count, "body bytes");
-				if (byte_count > getMaxbodySize())
-				{
-					errorOccur(413);
-					_body = "";
-					Logger::ErrorCout("Request Entity Too Large");
-					return;
-				}
-			}
-			{
-				Logger::ErrorCout("Body Data is empty !");
+				errorOccur(413);
+				_body = "";
+				Logger::ErrorCout("Request Entity Too Large");
+				return;
 			}
 		}
 		if (checkTransferEncoding())
@@ -334,20 +343,20 @@ unsigned long long HTTPRequest::getMaxbodySize()
 	return 0;
 }
 
-
 LocationConfig HTTPRequest::determineLocation(const std::string &path)
 {
 	ServerConfig server = determineServer();
 
 	for (LocationConfig &location : server.getLocations())
 	{
+		Logger::Specifique(location.locationPath, "loc path");
 		if (path == location.locationPath)
 		{
-			// Logger::NormalCout("location found !");
+			Logger::NormalCout("location found !");
 			return location;
 		}
 	}
-
+	Logger::NormalCout("Location not found");
 	return LocationConfig();
 }
 

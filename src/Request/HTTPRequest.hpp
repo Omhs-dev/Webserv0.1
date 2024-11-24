@@ -106,6 +106,7 @@ class HTTPRequest
 		// --- GETTERS ---
 		Client          *getClient() const;
 		LocationConfig  *getLocation() const;
+		// ParseState getParseState() const { return _state; }
 		
 		// --- Request Line ---
 		std::string     getMethod() const;

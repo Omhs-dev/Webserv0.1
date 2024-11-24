@@ -29,14 +29,26 @@ void HTTPResponse::generateResponse()
 	std::string reqMethod = _request->getMethod();
 	int reqStateCode = _request->getStateCode();
 
-	if (reqStateCode == 405)
+	if (reqStateCode == 403)
+	{
+		Logger::NormalCout("Acces denied here.....");
+		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
+		serveFile(_errorPage, "403", getErrorMesssage("403"));
+		return;
+	}
+	else if (reqStateCode == 667)
+	{
+		setBody(listDirectory(_request->getPath(), "./www"));
+		return;
+	}
+	else if (reqStateCode == 405)
 	{
 		Logger::ErrorCout("Error Code 405");
 		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
 		serveFile(_errorPage, "405", getErrorMesssage("405"));
 		return;
 	}
-	if (reqStateCode == 400)
+	else if (reqStateCode == 400)
 	{
 		Logger::ErrorCout("Error Code 400");
 		_errorPage = serverErroPage(_client->getRequest()->getStateCode());
