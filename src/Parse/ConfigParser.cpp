@@ -22,12 +22,12 @@ void ConfigParser::parseConfigFile(const std::string &filename)
     std::string line;
     while (std::getline(file, line))
     {
+        line = trim(line);
         if (line.empty() || line[0] == '#' || line == "{")
             continue;
 
         if (line == "http {")
         {
-            removeWhiteSpace(line);
             parseHttpBlock(file);
         }
         else
