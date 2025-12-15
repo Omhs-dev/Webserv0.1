@@ -1,6 +1,6 @@
 # Webserv - HTTP Server in C++
 
-A lightweight, HTTP/1.1 compliant web server written in C++98, inspired by NGINX. This project implements core web server functionality including multi-server support, CGI execution, file uploads, and comprehensive HTTP method handling.
+A lightweight, HTTP/1.1 compliant web server written in C++, inspired by NGINX. This project implements core web server functionality, including multi-server support, CGI execution, file uploads, and comprehensive HTTP method handling.
 
 ---
 
