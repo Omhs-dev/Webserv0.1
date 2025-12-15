@@ -6,8 +6,8 @@ A lightweight, HTTP/1.1 compliant web server written in C++, inspired by NGINX. 
 
 ## Table of Contents
 
-- [Features](#-features)
-- [Requirements](#-requirements)
+- [Features](#Features)
+- [Requirements](#-Requirements)
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Configuration](#-configuration)
