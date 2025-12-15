@@ -1,10 +1,10 @@
-# 🌐 Webserv - HTTP Server in C++
+# Webserv - HTTP Server in C++
 
 A lightweight, HTTP/1.1 compliant web server written in C++98, inspired by NGINX. This project implements core web server functionality including multi-server support, CGI execution, file uploads, and comprehensive HTTP method handling.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#-features)
 - [Requirements](#-requirements)
@@ -17,7 +17,7 @@ A lightweight, HTTP/1.1 compliant web server written in C++98, inspired by NGINX
 
 ---
 
-## ✨ Features
+## Features
 
 ### Core Functionality
 - **Non-blocking I/O** - Efficient multiplexing with `poll()` or equivalent
@@ -38,7 +38,7 @@ A lightweight, HTTP/1.1 compliant web server written in C++98, inspired by NGINX
 
 ---
 
-## 🔧 Requirements
+## Requirements
 
 - **C++ Compiler** - C++14 or higher
 - **Make** - GNU Make
@@ -46,7 +46,7 @@ A lightweight, HTTP/1.1 compliant web server written in C++98, inspired by NGINX
 
 ---
 
-## 📦 Installation
+## Installation
 
 1. **Clone the repository**
    ```bash
@@ -68,7 +68,7 @@ A lightweight, HTTP/1.1 compliant web server written in C++98, inspired by NGINX
 
 ---
 
-## 🚀 Usage
+## Usage
 
 ### Starting the Server
 
@@ -93,7 +93,7 @@ You'll see the homepage with various testing options.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 The server uses NGINX-style configuration files. Here's a basic example:
 
@@ -158,7 +158,7 @@ http {
 
 ---
 
-## 🧪 Testing the Server
+## Testing the Server
 
 ### Homepage Overview
 
@@ -166,7 +166,7 @@ http {
 
 The homepage provides easy access to test different server features:
 
-### 1. **GET Method** 📥
+### 1. **GET Method**
 Test retrieving resources from the server.
 - Navigate to the GET test page
 - Request various file types (HTML, images, text files)
@@ -178,7 +178,7 @@ curl http://localhost:8090/index.html
 curl http://localhost:8090/images/
 ```
 
-### 2. **POST Method** 📤
+### 2. **POST Method**
 Test sending data to the server.
 - Submit forms
 - Upload files
@@ -190,7 +190,7 @@ curl -X POST -d "name=test&value=123" http://localhost:8090/uploads/
 curl -X POST -F "file=@myfile.txt" http://localhost:8090/uploads/
 ```
 
-### 3. **DELETE Method** 🗑️
+### 3. **DELETE Method**
 Test resource deletion.
 - Delete uploaded files
 - Verify proper permission handling
@@ -200,43 +200,43 @@ Test resource deletion.
 curl -X DELETE http://localhost:8090/uploads/test.txt
 ```
 
-### 4. **Redirection** 🔁
+### 4. **Redirection**
 Test HTTP redirections.
 - Click the redirection button to be redirected to GitHub
 - Verify 301 redirect status
 
 **URL:** `http://localhost:8090/github/`
 
-### 5. **Directory Listing** 📂
+### 5. **Directory Listing**
 Test autoindex feature.
 - Browse directories with autoindex enabled
 - Navigate through nested folders
 
 **URL:** `http://localhost:8090/listening/`
 
-### 6. **Alias** 🔗
+### 6. **Alias**
 Test path aliasing.
 - Access resources through aliased paths
 - Verify correct file resolution
 
 **URL:** `http://localhost:8090/alias/`
 
-### 7. **File Upload** ⬆️
+### 7. **File Upload**
 Test file upload functionality.
-- Upload files through web interface
+- Upload files through the web interface
 - Test maximum body size limits
 - Verify uploaded files in the uploads directory
 
 **URL:** `http://localhost:8090/pages/upload.html`
 
-### 8. **File Download** ⬇️
+### 8. **File Download**
 Test file serving and downloads.
 - Browse uploaded files
 - Download files through the browser
 
 **URL:** `http://localhost:8090/uploads/`
 
-### 9. **Error Pages** ⚠️
+### 9. **Error Pages**
 Test custom error page handling.
 - Access non-existent pages (404)
 - Test forbidden resources (403)
@@ -249,7 +249,7 @@ curl http://localhost:8090/nonexistent      # 404
 curl -X PUT http://localhost:8090/          # 405 Method Not Allowed
 ```
 
-### 10. **CGI Execution** ⚙️
+### 10. **CGI Execution**
 Test CGI script execution.
 - Execute CGI scripts with GET parameters
 - Submit forms to CGI scripts (POST)
@@ -259,11 +259,11 @@ Test CGI script execution.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Webserv0.1/
-├── config/                 # Configuration files
+├── config/                # Configuration files
 │   ├── test.conf          # Main test configuration
 │   └── webserv.conf       # Alternative configuration
 ├── include/               # Header files
@@ -271,29 +271,29 @@ Webserv0.1/
 │   └── Webserv.hpp
 ├── src/                   # Source files
 │   ├── main.cpp
-│   ├── CGI/              # CGI handler
-│   ├── Logger/           # Logging system
-│   ├── Parse/            # Configuration parser
-│   ├── Request/          # HTTP request parser
-│   ├── Response/         # HTTP response handler
-│   ├── Server/           # Server and client management
-│   └── Socket/           # Socket operations
+│   ├── CGI/               # CGI handler
+│   ├── Logger/            # Debugging Logs
+│   ├── Parse/             # Configuration parser
+│   ├── Request/           # HTTP request parser
+│   ├── Response/          # HTTP response handler
+│   ├── Server/            # Server and client management
+│   └── Socket/            # Socket operations
 ├── www/                   # Web root directory
-│   ├── index.html        # Homepage
-│   ├── pages/            # HTML pages
-│   ├── cgi-bin/          # CGI scripts
-│   ├── uploads/          # Upload directory
-│   ├── downloads/        # Download directory
-│   └── images/           # Image assets
-├── Makefile              # Build configuration
-└── README.md             # This file
+│   ├── index.html         # Homepage
+│   ├── pages/             # HTML pages
+│   ├── cgi-bin/           # CGI scripts
+│   ├── uploads/           # Upload directory
+│   ├── downloads/         # Download directory
+│   └── images/            # Image assets
+├── Makefile               # Build configuration
+└── README.md              # Readme
 ```
 
 ---
 
-## 🛠️ Advanced Testing
+## Advanced Testing
 
-### Using cURL
+### Using CURL
 
 **GET Request:**
 ```bash
@@ -323,7 +323,7 @@ curl -L http://localhost:8090/github/
 ### Using Siege (Load Testing)
 
 ```bash
-# Install siege
+# Install Siege
 sudo apt-get install siege  # Linux
 brew install siege          # macOS
 
@@ -340,7 +340,7 @@ siege -c 10 -t 30S http://localhost:8090/
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Port Already in Use
 If you get a "port already in use" error:
@@ -366,13 +366,13 @@ taskkill /PID <PID> /F
 
 ---
 
-## 👥 Contributors
+## Contributors
 
 <div align="center">
 
 | Developer | GitHub |
 |-----------|--------|
-| **Omhs** | [@Omhs-dev](https://github.com/Omhs-dev) |
+| **Omar** | [@Omhs-dev](https://github.com/Omhs-dev) |
 | **Valentin** | [@Valentinoszadcsij](https://github.com/Valentinoszadcsij) |
 | **Narcisse** | [@NarcisseObadiah](https://github.com/NarcisseObadiah) |
 
@@ -397,7 +397,5 @@ This project is part of the 42 school curriculum.
 <div align="center">
 
 **⭐ If you find this project useful, please consider giving it a star! ⭐**
-
-Made with ❤️ by the Webserv Team
 
 </div>
